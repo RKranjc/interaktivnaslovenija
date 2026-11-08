@@ -1,0 +1,24 @@
+name: Maya1 info
+on: { workflow_dispatch: {}, push: { branches: [main], paths: ['.github/workflows/maya-info.yml'] } }
+permissions: { contents: write }
+jobs:
+  info:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -q huggingface_hub
+          mkdir -p tools/maya
+          python - <<'PY'
+          from huggingface_hub import hf_hub_download, list_repo_files
+          import shutil
+          for repo in ['texdata/Maya1-Slovenian-TTS']:
+              fs=list_repo_files(repo); print(fs)
+              open('tools/maya/files.txt','w').write('\n'.join(fs))
+              for f in fs:
+                  if f.endswith(('.py','.md','.json','.txt')) and 'safetensors' not in f:
+                      p=hf_hub_download(repo,f); shutil.copy(p,'tools/maya/'+f.replace('/','_'))
+          PY
+          nproc; free -g
+          git config user.name "github-actions[bot]"; git config user.email "41898281+github-actions[bot]@users.noreply.github.com"
+          git add tools/maya && git commit -qm "Maya1: info" && git push -q
