@@ -2948,7 +2948,8 @@ function thunder(t){ const s=AC.createBufferSource(); const b=AC.createBuffer(1,
 // voice
 let slVoice=null; function findVoice(){ try{ const v=speechSynthesis.getVoices(); slVoice=v.find(x=>/^sl/i.test(x.lang))||null; }catch(e){} }
 try{ findVoice(); speechSynthesis.onvoiceschanged=findVoice; }catch(e){}
-function say(txt){ if(!slVoice||!sfxOn) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.voice=slVoice; u.lang=slVoice.lang; u.rate=.95; u.pitch=1.1; speechSynthesis.speak(u); }catch(e){} }
+let noVoiceWarned=false;
+function say(txt){ if(!slVoice&&sfxOn&&!noVoiceWarned){ findVoice(); if(!slVoice){ noVoiceWarned=true; setTimeout(()=>toast('Ta brskalnik nima slovenskega glasu 🙁 Za branje odpri zemljevid v Edgeu ali Chromu.'),1200); } } if(!slVoice||!sfxOn) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.voice=slVoice; u.lang=slVoice.lang; u.rate=.95; u.pitch=1.1; speechSynthesis.speak(u); }catch(e){} }
 
 // =====================================================================
 //  UI
