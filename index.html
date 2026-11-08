@@ -436,7 +436,8 @@ function attr(loc,b,size,stride=0,off=0,div=0){gl.bindBuffer(gl.ARRAY_BUFFER,b);
 const LIGHT=`
 uniform vec3 uSun; uniform vec3 uSunCol; uniform vec3 uAmbSky; uniform vec3 uAmbGnd; uniform vec3 uFogCol; uniform float uFogK; uniform vec3 uCam; uniform float uNight; uniform float uSnow; uniform float uTime; uniform vec3 uSeason;
 vec3 light(vec3 base, vec3 n){ float d=max(dot(n,uSun),0.); vec3 amb=mix(uAmbGnd,uAmbSky,n.y*.5+.5); return base*(amb+uSunCol*d); }
-vec3 fog(vec3 c, vec3 p){ float d=length(p-uCam); float f=1.-exp(-d*uFogK); return mix(c,uFogCol,clamp(f,0.,.85)); }
+vec3 fog(vec3 c, vec3 p){ float d=length(p-uCam); float f=1.-exp(-d*uFogK); c=mix(c,uFogCol,clamp(f,0.,.85));
+  float e=min(${BX.toFixed(3)}-abs(p.x), ${BZ.toFixed(3)}-abs(p.z)); float ef=1.-smoothstep(.3,9.5,e); vec3 vd=normalize(p-uCam); vec3 bg=mix(uFogCol*.85,uFogCol,smoothstep(-.4,0.,vd.y)); return mix(c,bg,ef); }
 float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
 `;
 
@@ -3177,7 +3178,7 @@ function frameInner(now){
   setCommon(terrain.P,E,T); gl.uniform2f(terrain.P.u.uB,BX,BZ); gl.uniform1f(terrain.P.u.uEX,EX); flashT=Math.max(0,flashT-lastDt/2.5); gl.uniform2f(terrain.P.u.uFlash,flashId,flashT); gl.uniform1f(terrain.P.u.uRoadPaint,STYLE.road?0:1); gl.uniform1f(terrain.P.u.uLineW,clamp(cam.D*.0032,.22,1.1)); { const A=(game&&game.area)||(postal&&postal.area); if(A){ A.a=Math.min(1,(A.a||0)+lastDt*1.5); gl.uniform4f(terrain.P.u.uArea,A.x,A.z,A.r,A.a);} else gl.uniform4f(terrain.P.u.uArea,0,0,1,0); } gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,overlayTex); gl.uniform1i(terrain.P.u.uOv,0); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,roadTex); gl.uniform1i(terrain.P.u.uRd,1); gl.activeTexture(gl.TEXTURE0);
   gl.disable(gl.CULL_FACE);
   gl.bindVertexArray(terrain.vao); gl.drawElements(gl.TRIANGLES,terrain.count,gl.UNSIGNED_INT,0);
-  setCommon(skirt.P,E,T); gl.bindVertexArray(skirt.vao); gl.drawArrays(gl.TRIANGLES,0,skirt.count);
+
   // trees & houses
   drawRails(E); drawRoads(E);
   for(const tr of [...trees,houses,blocks]){ setCommon(tr.P,E,T); if(tr.P.u.uTreeStyle) gl.uniform1f(tr.P.u.uTreeStyle,STYLE.tree); gl.bindVertexArray(tr.vao); gl.drawArraysInstanced(gl.TRIANGLES,0,tr.count,tr.inst); }
