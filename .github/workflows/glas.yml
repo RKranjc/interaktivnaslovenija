@@ -1,23 +1,35 @@
 name: Slovenski glas
 on:
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Ponovno posnemi vse stavke (1 = da)'
+        default: '0'
   push:
     branches: [main]
-    paths: ['phrases.json', 'tools/glas.py']
+    paths: ['phrases.json', 'tools/glas.py', '.github/workflows/glas.yml']
 permissions:
   contents: write
-concurrency: { group: glas, cancel-in-progress: false }
+concurrency: { group: glas, cancel-in-progress: true }
 jobs:
   posnemi:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
-      - name: Posnemi manjkajoče stavke
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Namesti Piper
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          pip install -q piper-tts huggingface_hub onnxruntime
+      - name: Zapeci glas
         env:
-          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
-          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+          FORCE: ${{ github.event.inputs.force }}
+        run: python tools/glas.py
+      - name: Shrani posnetke
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898281+github-actions[bot]@users.noreply.github.com"
-          python3 tools/glas.py
+          git add audio
+          git diff --cached --quiet || (git commit -q -m "Glas: zapečeni posnetki stavkov" && git pull -q --rebase origin main && git push -q origin HEAD:main)
