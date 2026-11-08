@@ -412,8 +412,10 @@ function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a
 //  GL SETUP
 // =====================================================================
 const cv=document.getElementById('gl');
-const gl=cv.getContext('webgl2',{antialias:true,alpha:false});
+let LITE=false; try{ LITE=localStorage.getItem('ms3d_lite')==='1'; }catch(e){}
+const gl=cv.getContext('webgl2',{antialias:!LITE,alpha:false,powerPreference:LITE?'low-power':'default'});
 function fail(msg){const e=document.getElementById('err');e.style.display='grid';e.textContent=msg;}
+cv.addEventListener('webglcontextlost',e=>{ e.preventDefault(); if(!LITE){ try{ localStorage.setItem('ms3d_lite','1'); }catch(_){} setTimeout(()=>location.reload(),300); } else fail('Tej napravi je zmanjkalo pomnilnika za 3D zemljevid. Odpri povezavo v Safariju ali Chromu in zapri druge zavihke.'); });
 if(!gl){fail('Ta brskalnik ne podpira 3D grafike (WebGL2). Poskusi z novejšim Chromom ali Edgeom.');throw new Error('no webgl2');}
 
 function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.error(src.split('\n').map((l,i)=>(i+1)+': '+l).join('\n'));throw new Error(gl.getShaderInfoLog(s));}return s;}
@@ -3127,7 +3129,7 @@ let helpHidden=false; function hideHelpSoon(){ if(helpHidden) return; helpHidden
 // =====================================================================
 //  RENDER
 // =====================================================================
-function resize(){ const dpr=Math.min(window.devicePixelRatio||1,innerWidth<760?1.5:2); W=innerWidth; H=innerHeight; cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); gl.viewport(0,0,cv.width,cv.height); }
+function resize(){ const dpr=LITE?1:Math.min(window.devicePixelRatio||1,innerWidth<760?1.5:2); W=innerWidth; H=innerHeight; cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); gl.viewport(0,0,cv.width,cv.height); }
 window.addEventListener('resize',resize);
 
 const CLOUDS=[]; { const r=mulberry(9); for(let i=0;i<34;i++) CLOUDS.push({x:(r()*2-1)*BX*1.2, z:(r()*2-1)*BZ*1.2, y:22+r()*8, s:14+r()*12, sp:.6+r()*.6, k:i}); }
@@ -3288,7 +3290,9 @@ function drawRange(a,b){ if(b<=a) return; // set attrib offsets to start at a
     requestAnimationFrame(t=>{ last=t; frame(t); });
     window.__ready=true;
     setTimeout(()=>{ toast('Klikni na živali, reke, gore in kraje!'); },1500);
-  }catch(e){ console.error(e); fail('Ups, nekaj je šlo narobe pri risanju karte: '+e.message); }
+  }catch(e){ console.error(e); const lost=gl.isContextLost&&gl.isContextLost();
+    if(!LITE){ try{ localStorage.setItem('ms3d_lite','1'); location.reload(); return; }catch(_){} }
+    fail(lost||e.message==null||e.message==='null' ? 'Tej napravi je zmanjkalo pomnilnika za 3D zemljevid. Odpri povezavo v Safariju ali Chromu (v Messengerju: ⋯ → Odpri v brskalniku) in zapri druge zavihke.' : 'Ups, nekaj je šlo narobe pri risanju karte: '+e.message); }
 })();
 </script>
 </body>
