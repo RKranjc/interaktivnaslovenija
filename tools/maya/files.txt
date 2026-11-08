@@ -1,0 +1,8 @@
+.gitattributes
+README.md
+adapter_config.json
+adapter_model.safetensors
+chat_template.jinja
+maya_tts.py
+tokenizer.json
+tokenizer_config.json
