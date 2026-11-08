@@ -31,18 +31,41 @@ snac = SNAC.from_pretrained("hubertsiuzdak/snac_24khz").eval()
 be = EspeakBackend("sl", with_stress=True, preserve_punctuation=True)
 
 NAGL = json.load(open('tools/naglasi.json', encoding='utf-8')) if os.path.exists('tools/naglasi.json') else []
+ACC = 'áéíóúàèìòùâêîôûŕ'
+VOW_T = 'aeiouáéíóúàèìòùâêîôûə'
+VOW_I = 'aeiouɛɔəɐæɪʊɑ'
+def restress(tok, naglas):
+    """premakne naglas v espeakovem zapisu besede na zlog, ki je v 'naglas' označen s strešico/ostrivcem"""
+    word = naglas.lower(); n = None; k = 0
+    for c in word:
+        if c in VOW_T:
+            if c in ACC: n = k; break
+            k += 1
+    if n is None: return tok
+    t = tok.replace('ˈ', '').replace('ˌ', '')
+    k = 0
+    for i, c in enumerate(t):
+        if c in VOW_I:
+            if k == n:
+                j = i
+                if j > 0 and t[j-1] not in VOW_I + 'ː': j -= 1
+                return t[:j] + 'ˈ' + t[j:]
+            k += 1
+            while i + 1 < len(t) and t[i+1] in 'ː': i += 1
+    return tok
 def phon(text):
     ph = phonemize_sl(text, be)
-    rules = [r for r in NAGL if r.get('stavek') in (None, text) or (r.get('stavek') and r['stavek'] in text)]
+    rules = [r for r in NAGL if not r.get('stavek') or r['stavek'] == text]
     if not rules: return ph
     words = text.split(); toks = ph.split(' ')
     if len(words) == len(toks):
         for r in rules:
             for i, w in enumerate(words):
-                if w.strip('.,!?:;') == r['beseda']:
-                    tail = ''.join(c for c in toks[i] if c in '.,!?:;'); toks[i] = r['ipa'] + tail
-        ph = ' '.join(toks)
-    print('fonemi:', text, '->', ph, flush=True)
+                if w.strip('.,!?:;').lower() == r['beseda'].lower():
+                    toks[i] = r['ipa'] if r.get('ipa') else restress(toks[i], r['naglas'])
+        new = ' '.join(toks)
+        with open('audio/maya/fonemi.txt', 'a', encoding='utf-8') as f: f.write(f'{text}\t{ph}\t{new}\n')
+        ph = new
     return ph
 def synth(text):
     ph = phon(text)
