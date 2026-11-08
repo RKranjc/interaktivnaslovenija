@@ -41,6 +41,14 @@
   .card .more ul{margin:6px 0 0;padding-left:20px}
   .pctl{position:fixed;left:50%;bottom:20px;transform:translate(-50%,200%);display:flex;gap:10px;align-items:center;z-index:7;transition:transform .3s}
   .pctl.show{transform:translate(-50%,0)}
+  #cBtns button.next{background:#6fd18a!important;color:#14361f}
+  .inapp{position:fixed;inset:0;z-index:50;background:linear-gradient(#a8dcf7,#e8f6ff);display:none;place-items:center;padding:20px;text-align:center;font-family:'Nunito',sans-serif}
+  .inapp.show{display:grid}
+  .inbox{background:#fffdf7;border-radius:30px;padding:24px 22px;max-width:420px;box-shadow:0 8px 0 #0002}
+  .inbox h2{font-family:'Grandstander',sans-serif;margin:4px 0 8px;font-size:28px}
+  .inbox p{font-size:18px;line-height:1.4;margin:8px 0}
+  .inbox button{display:block;width:100%;margin:12px 0 0;border:0;border-radius:18px;padding:12px;font:inherit;font-weight:800;font-size:18px;background:#ffe27a;box-shadow:0 4px 0 #0002}
+  .inbox a{display:inline-block;margin-top:14px;color:#5b6b7b;font-size:14px}
   .phelp{position:fixed;left:50%;bottom:150px;transform:translate(-50%,0) scale(.9);opacity:0;pointer-events:none;z-index:7;background:#fffdf7;border-radius:22px;padding:10px 18px;font-family:'Grandstander',sans-serif;font-weight:700;font-size:20px;box-shadow:0 5px 0 #0002;transition:.35s;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:92vw;text-align:center}
   .phelp.show{opacity:1;transform:translate(-50%,0) scale(1)}
   .phelp span{background:#eef6ff;border-radius:12px;padding:2px 10px}
@@ -129,11 +137,13 @@
     .card p{font-size:16px!important}
     .card .btns button{font-size:15px!important;padding:5px 12px!important}
     .card .x{width:36px!important;height:36px!important;font-size:18px!important}
-    .ride,.pctl{bottom:86px!important}
-    .ride.view{right:8px!important;bottom:150px!important;font-size:16px!important;padding:6px 14px!important}
+    .pctl{bottom:86px!important}
+    .ride{bottom:calc(86px + var(--cardH,0px))!important;transition:transform .3s,bottom .3s}
+    .ride.view{right:8px!important;bottom:calc(150px + var(--cardH,0px))!important;font-size:16px!important;padding:6px 14px!important}
     .ride.view:not(.show){transform:translate(0,600%)!important}
     .ride.horn{left:8px!important;bottom:calc(150px + var(--cardH,0px))!important;font-size:16px!important;padding:6px 14px!important}
     .ride.horn:not(.show){transform:translate(0,600%)!important}
+    .ride:not(.show){opacity:0;pointer-events:none}
     .pctl button{width:56px!important;height:50px!important}
     .phelp{bottom:200px!important;font-size:15px!important;gap:6px!important}
     .parrow{top:110px!important;width:64px!important;height:64px!important;margin-left:-32px!important}.parrow div{width:64px!important;height:64px!important;font-size:36px!important}
@@ -188,7 +198,7 @@
 <div class="book" id="book"><div class="in"><button class="x" id="bookX">✖</button><h2>Moje nalepke <span id="bookCount" style="color:#ff9f43"></span></h2><div class="grid" id="bookGrid"></div></div></div>
 <div class="help" id="help">Povleci = premikaj · kolešček = približaj · klikni živali, reke, gore in kraje!</div>
 <div class="loading" id="loading">Gradim Slovenijo …</div>
-<div class="err" id="err"></div>
+<div class="err" id="err"></div><div class="inapp" id="inapp"><div class="inbox"><div style="font-size:64px">🗺️</div><h2>Moja Slovenija 3D</h2><p>Ta brskalnik v aplikaciji (Messenger, Facebook, Instagram …) nima dovolj moči za 3D zemljevid.</p><p><b>Odpri v pravem brskalniku:</b><br>tapni <b>⋯</b> zgoraj desno in izberi <b>Odpri v brskalniku</b> (Safari ali Chrome).</p><button id="inCopy">📋 Kopiraj povezavo</button><button id="inChrome" style="display:none">🌐 Odpri v Chromu</button><a href="#" id="inAnyway">Vseeno poskusi tukaj</a></div></div>
 <div class="confetti" id="confetti"></div>
 <div class="toast" id="toast"></div>
 
@@ -2989,10 +2999,12 @@ function showCard(it,fact){ fact=fact||curFact(it); it._shown=fact; $('cEmo').in
   if(it.id==='t_povodni'){ const bp=document.createElement('button'); bp.textContent='📜 Pesmica'; bp.onclick=openPoem; b.appendChild(bp); }
   { const bm=document.createElement('button'); bm.textContent='Povej mi več'; bm.onclick=()=>showMore(it); b.appendChild(bm); }
   $('cMore').style.display='none';
-  if(it.c==='vozilo'){ const br=document.createElement('button'); br.textContent='Pelji se'; br.title='Pelji se'; br.onclick=()=>startRide(it); b.appendChild(br); }
+  b.querySelectorAll('button').forEach(x=>x.addEventListener('click',()=>{ if(game&&game.waiting){ clearTimeout(game.timer); game.paused=true; } }));
+  if(game&&game.waiting){ const bn=document.createElement('button'); bn.textContent='Naprej ➜'; bn.className='next'; bn.onclick=gameAdvance; b.appendChild(bn); }
+  if(it.c==='vozilo'&&follow!==it){ const br=document.createElement('button'); br.textContent='Pelji se'; br.title='Pelji se'; br.onclick=()=>startRide(it); b.appendChild(br); }
   hornSync(it); $('card').classList.add('show'); requestAnimationFrame(()=>document.documentElement.style.setProperty('--cardH',($('card').offsetHeight+18)+'px')); }
 function closeCard(){ $('card').classList.remove('show'); try{ hornSync(null); }catch(e){} document.documentElement.style.setProperty('--cardH','0px'); }
-$('cardX').onclick=closeCard;
+$('cardX').onclick=()=>{ if(game&&game.waiting) gameAdvance(); else closeCard(); };
 function collect(it){ if(it.kraj||found.has(it.id)) return false; found.add(it.id); saveFound(); updateBag(); setTimeout(()=>play('sticker'),700); if(ITEMS.every(i=>i.kraj||found.has(i.id))){ confetti(); setTimeout(()=>play('cheer'),900);} return true; }
 
 const WATER_ID={1:'soca',2:'krka',3:'savinja',4:'vipava',5:'sava',6:'idrijca',7:'kolpa',8:'drava',9:'mura',10:'ljubljanica',11:'bled',12:'bohinj',13:'cerknica',14:'jasna',15:'velenjsko',16:'smartinsko',17:'triglavska',18:'krnsko',19:'ptujsko',20:'divje',21:'crno',22:'zbiljsko',23:'plansarsko'};
@@ -3141,11 +3153,12 @@ function nextQ(){ const pool=ITEMS.filter(i=>!i.labelOnly && !i.kraj && (!game.a
   $('quest').classList.add('show'); say((t.plural?'Kje so ':'Kje je ')+t.n+'?');
   const R=t.mv&&t.mv.k!=='path'?Math.max(8,(t.mv.r||0)+5):7; const a=Math.random()*6.283, off=Math.random()*R*.45; const p=t.mv&&t.mv.k==='path'?t.pos:[t.home[0],0,t.home[1]];
   game.area={x:p[0]+Math.cos(a)*off,z:p[2]+Math.sin(a)*off,r:R,a:0}; flyTo(game.area.x,game.area.z,R*7,null); cam.pitch=.85; }
-function gameClick(it){ const t=game.target; if(!t) return;
+function gameAdvance(){ if(!game||!game.waiting) return; game.waiting=false; clearTimeout(game.timer); try{speechSynthesis.cancel();}catch(e){} closeCard(); setHome(); nextQ(); }
+function gameClick(it){ if(game.waiting) return; const t=game.target; if(!t) return;
   if(it===t){ game.score++; play('cheer'); it.pulse=1; collect(it); burst(); game.target=null; flyTo(it.pos[0],it.pos[2],it.mv?30:55,it.pos[1]);
-    game.area=null; const fact=nextFact(it); showCard(it,fact); $('qStars').textContent='Najdeno: '+game.score;
+    game.area=null; game.waiting=true; game.paused=false; const fact=nextFact(it); showCard(it,fact); $('qStars').textContent='Najdeno: '+game.score;
     const msg='Bravo! To je '+it.n+'. '+fact; const wait=slVoice? Math.max(5000, msg.length*75+1500) : 5500;
-    setTimeout(()=>say(msg),700); game.timer=setTimeout(()=>{ if(game){ closeCard(); setHome(); nextQ(); } },wait); }
+    setTimeout(()=>say(msg),700); game.timer=setTimeout(gameAdvance,Math.max(wait,9000)); }
   else { game.tries++; play('boing'); it.wig=1; if(game.tries>=2){ t.pulse=3; game.area={x:t.pos[0],z:t.pos[2],r:3,a:game.area?game.area.a:1}; } }
 }
 function confetti(){ const c=$('confetti'), e=['🎉','⭐','🎈','🐻','🏔️','🐝','💚','🍇']; for(let i=0;i<70;i++){ const s=document.createElement('span'); s.textContent=e[i%e.length]; s.style.left=Math.random()*100+'vw'; s.style.animationDuration=(2.2+Math.random()*2.5)+'s'; s.style.animationDelay=Math.random()+'s'; c.appendChild(s); setTimeout(()=>s.remove(),5500);} }
@@ -3304,7 +3317,15 @@ function drawRange(a,b){ if(b<=a) return; // set attrib offsets to start at a
 // =====================================================================
 //  START
 // =====================================================================
+const INAPP=/FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|Line\/|MicroMessenger|Snapchat|TikTok|musical_ly|Bytedance/i.test(navigator.userAgent);
 (async function main(){
+  let force=false; try{ force=sessionStorage.getItem('ms3d_force')==='1'; }catch(e){}
+  if(INAPP && !force){ const box=$('inapp'); box.classList.add('show'); $('loading').style.display='none';
+    const url=location.href.split('#')[0];
+    $('inCopy').onclick=async()=>{ try{ await navigator.clipboard.writeText(url); $('inCopy').textContent='✅ Povezava kopirana – prilepi jo v Safari ali Chrome'; }catch(e){ prompt('Kopiraj povezavo:',url); } };
+    if(/Android/i.test(navigator.userAgent)){ const b=$('inChrome'); b.style.display='block'; b.onclick=()=>{ location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end'; }; }
+    $('inAnyway').onclick=e=>{ e.preventDefault(); try{ sessionStorage.setItem('ms3d_force','1'); }catch(_){} location.reload(); };
+    return; }
   try{
     resize();
     const [hp,op,rp]=await Promise.all([loadPixels(HEIGHT_PNG),loadPixels(OVERLAY_PNG),loadPixels(ROADS_PNG)]);
