@@ -345,6 +345,7 @@ const ITEMS=[
  {id:'vintgar',c:'zanim',e:'🌉',n:'Vintgar',at:[14.085,46.392],snd:'river',f:['Soteska Vintgar je ozka dolina, po kateri teče reka Radovna.','Po lesenih mostovih se sprehodiš tik nad vodo.']},
  {id:'pericnik',c:'zanim',e:'💦',n:'Slap Peričnik',at:[13.875,46.442],snd:'water',f:['Slap Peričnik pada čez skalni previs, zato lahko greš za slapom!']},
  {id:'zelenci',c:'zanim',e:'💚',n:'Zelenci',at:[13.735,46.493],snd:'water',f:['Zelenci so smaragdno zeleno jezerce, kjer izvira Sava Dolinka.']},
+ {id:'kanal',c:'zanim',e:'🌉',n:'Most v Kanalu',at:[13.633,46.086],snd:'splash',f:['Most v Kanalu ob Soči je star kamniti most z velikim lokom.','Vsako poletje pogumni skakalci skačejo z mostu v Sočo – kar 17 metrov globoko!','Soča je smaragdno zelene barve, ker je zelo čista.']},
  {id:'solkan',c:'zanim',e:'🌉',n:'Solkanski most',at:[13.655,45.975],snd:'train',f:['Solkanski most je največji kamniti železniški most z enim lokom na svetu.']},
  {id:'rakov',c:'zanim',e:'🪨',n:'Rakov Škocjan',at:[14.29,45.795],snd:'cave',f:['V Rakovem Škocjanu sta dva naravna mostova iz skal.']},
  {id:'zoo',c:'zanim',e:'🦒',n:'Živalski vrt',at:[14.472,46.052],snd:'pop',f:['V živalskem vrtu v Ljubljani živijo žirafe, morski levi in še veliko drugih živali.']},
@@ -369,7 +370,7 @@ const ITEMS=[
  {id:'cebela',c:'zival',e:'🐝',n:'Kranjska čebela',model:'bee',at:[14.25,46.40],snd:'buzz',mv:{k:'fly',r:2,alt:2.5,s:.5},f:['Kranjska čebela je naša domača čebela.','20. maj je svetovni dan čebel – takrat se je rodil slovenski čebelar Anton Janša.','Čebele si s plesom povedo, kje so cvetovi.']},
  {id:'storklja',c:'zival',e:'STORK',n:'Štorklja',model:'stork',at:[16.08,46.76],snd:'clatter',mv:{k:'fly',r:7,alt:7,s:.12},f:['Štorklje gnezdijo na dimnikih in drogovih v Prekmurju.','Štorklje ne pojejo – klopotajo s kljunom.','Pozimi štorklje odletijo v Afriko.']},
  {id:'delfin',c:'zival',e:'🐬',n:'Delfin',model:'dolphin',at:[13.47,45.62],snd:'dolphin',mv:{k:'jump',r:5,s:.12},f:['V našem morju živijo delfini velike pliskavke.','Delfini dihajo zrak, zato morajo priplavati na površje.','Ko delfin spi, počiva samo pol možganov.']},
- {id:'postrv',c:'zival',e:'🐟',n:'Soška postrv',model:'trout',at:[13.555,46.31],snd:'splash',mv:{k:'leap'},f:['Soška postrv lahko zraste več kot en meter!','Soška postrv živi skoraj samo v Soči in njenih pritokih.']},
+ {id:'postrv',c:'zival',e:'🐟',n:'Soška postrv',model:'trout',at:[13.6335,46.0835],snd:'splash',mv:{k:'leap'},f:['Soška postrv lahko zraste več kot en meter!','Soška postrv živi skoraj samo v Soči in njenih pritokih.']},
  {id:'ribica',c:'zival',e:'🦎',n:'Človeška ribica',model:'olm',at:[14.30,45.83],snd:'drip',mv:{k:'wander',r:.6,s:.03},filter:'hue-rotate(215deg) saturate(.8) brightness(1.35)',f:['Človeška ribica živi v temnih jamah in je slepa.','Človeška ribica lahko živi več kot sto let!','Lahko zdrži do deset let brez hrane.','Nekoč so ljudje mislili, da so to zmajevi mladiči.']},
  {id:'jelen',c:'zival',e:'🦌',n:'Jelen',model:'reddeer',at:[14.42,45.68],snd:'goat',mv:{k:'wander',r:4,s:.05},f:['Jelen je največja divja žival v naših gozdovih. Samci imajo velika rogovja.','Rogovje jelenu vsako leto odpade in zraste novo.','Jeseni jeleni glasno rukajo.']},
  {id:'prasic',c:'zival',e:'🐗',n:'Divji prašič',model:'boar',at:[15.05,45.76],snd:'growl',mv:{k:'wander',r:4,s:.06},f:['Divji prašič rije po zemlji z rilcem in išče hrano.','Mladiči divjega prašiča imajo progast kožuh.']},
@@ -1332,6 +1333,7 @@ const LANDMARKS=[
  {item:'vintgar',at:[14.083,46.394],f:F=>vintgarLM(F,T),s:.4,yaw:.3,h:1.2,clear:.8},
  {item:'pericnik',at:[13.875,46.442],f:F=>waterfall(F,T),s:.9,yaw:-.3,h:2.2,clear:.6},
  {item:'zelenci',at:[13.735,46.493],f:zelenciLM,s:.9,yaw:0,h:.6,clear:.5},
+ {item:'kanal',at:[13.633,46.086],f:kanalBridge,s:.42,yaw:-.785,h:1.0,clear:.4},
  {item:'solkan',at:[13.655,45.975],f:archBridge,s:.9,yaw:1.2,h:1.5,clear:.6},
  {item:'rakov',at:[14.29,45.795],f:naturalBridge,s:.9,yaw:.4,h:1.6,clear:.8},
  {item:'zoo',at:[14.472,46.052],f:F=>zooB(F,T),s:.9,yaw:.2,h:1.6,clear:.8},
@@ -1527,6 +1529,17 @@ function vintgarLM(F,t){ t=t||0;
   for(let k=0;k<6;k++){ const q=(t*.9+k/6)%1; put('sphere',fr(F,[(k%3-1)*.08,.8-q*.75,1.65]),[.1,.2,.06],[.85,.95,1,.6]); } }
 
 function zelenciLM(F){ put('cyl',F,[1.0,.03,.8],[.2,.75,.6,.9]); for(let k=0;k<8;k++) put('cone',fr(F,[Math.cos(k*.8)*1.25,0,Math.sin(k*.8)*1.0]),[.16,.7,.16],[.12,.38,.18]); }
+function kanalBridge(F){ const S1=[.82,.79,.72,.1], S2=[.74,.71,.64,.1], R=[.35,.33,.32,.3];
+  for(let i=0;i<=14;i++){ const a=Math.PI*i/14; put('box',fr(F,[Math.cos(a)*1.25,Math.sin(a)*1.05,0],[0,0,a-Math.PI/2]),[.3,.2,.62],i%2?S1:S2); }
+  for(const sx of [1,-1]){ put('box',fr(F,[sx*1.75,.55,0]),[.9,1.3,.7],S2); for(let k=0;k<3;k++){ const x=sx*(.55+k*.32); const h=1.32-Math.sqrt(Math.max(0,1.25*1.25-x*x))*.84; put('box',fr(F,[x,1.3-h/2,0]),[.34,h,.6],S1); } }
+  put('box',fr(F,[0,1.36,0]),[4.3,.14,.66],[.55,.53,.5,.1]);
+  for(const sz of [1,-1]){ put('box',fr(F,[0,1.5,sz*.31]),[4.3,.16,.06],S1); for(let i=0;i<9;i++) put('box',fr(F,[i*.5-2,1.62,sz*.31]),[.08,.1,.08],S2); }
+  // diver: stands on the parapet, then jumps into the Soča
+  const c=(T*.22)%1; const P=fr(F,[0,0,.31]);
+  if(c<.55){ person(M4.mul(fr(P,[0,1.58,0],[0,Math.PI/2,0]),mS(.32,.32,.32)),{shirt:[.95,.3,.25],pants:[.2,.4,.85],hair:HAIRC[0],armL:-2.9,armR:-2.9,spread:.15},0); }
+  else if(c<.8){ const u=(c-.55)/.25; const y=1.58+Math.sin(u*Math.PI*.35)*.35-u*u*2.6; person(M4.mul(fr(P,[0,y,.25+u*.5],[u*2.4,Math.PI/2,0]),mS(.32,.32,.32)),{shirt:[.95,.3,.25],pants:[.2,.4,.85],hair:HAIRC[0],armL:-2.9,armR:-2.9,spread:.1},0); }
+  else { const u=(c-.8)/.2; for(let k=0;k<8;k++){ const a=k*.785; put('sphere',fr(P,[Math.cos(a)*(.1+u*.35),-.2+Math.sin(u*Math.PI)*.35,.75+Math.sin(a)*(.1+u*.35)]),[.05,.09,.05],[.85,.95,1,.0]); } put('cyl',fr(P,[0,-.24,.75]),[.15+u*.4,.01,.15+u*.4],[.9,.97,1,.0]); }
+}
 function archBridge(F){ const S2=[.85,.82,.74,.1]; for(let i=0;i<=10;i++){ const a=Math.PI*i/10; put('box',fr(F,[Math.cos(a)*1.2,Math.sin(a)*1.1+.1,0],[0,0,a-Math.PI/2]),[.32,.2,.4],S2); }
   put('box',fr(F,[0,1.32,0]),[3.2,.12,.42],S2); for(const x of [-1.4,1.4]) put('box',fr(F,[x,.65,0]),[.4,1.3,.42],S2); put('box',fr(F,[0,.02,0]),[2,.04,.9],[.2,.7,.6,.8]); }
 function naturalBridge(F){ const R=[.6,.58,.53,.1], R2=[.52,.5,.46,.1];
@@ -2977,8 +2990,8 @@ function showCard(it,fact){ fact=fact||curFact(it); it._shown=fact; $('cEmo').in
   { const bm=document.createElement('button'); bm.textContent='Povej mi več'; bm.onclick=()=>showMore(it); b.appendChild(bm); }
   $('cMore').style.display='none';
   if(it.c==='vozilo'){ const br=document.createElement('button'); br.textContent='Pelji se'; br.title='Pelji se'; br.onclick=()=>startRide(it); b.appendChild(br); }
-  $('card').classList.add('show'); requestAnimationFrame(()=>document.documentElement.style.setProperty('--cardH',($('card').offsetHeight+18)+'px')); }
-function closeCard(){ $('card').classList.remove('show'); document.documentElement.style.setProperty('--cardH','0px'); }
+  hornSync(it); $('card').classList.add('show'); requestAnimationFrame(()=>document.documentElement.style.setProperty('--cardH',($('card').offsetHeight+18)+'px')); }
+function closeCard(){ $('card').classList.remove('show'); try{ hornSync(null); }catch(e){} document.documentElement.style.setProperty('--cardH','0px'); }
 $('cardX').onclick=closeCard;
 function collect(it){ if(it.kraj||found.has(it.id)) return false; found.add(it.id); saveFound(); updateBag(); setTimeout(()=>play('sticker'),700); if(ITEMS.every(i=>i.kraj||found.has(i.id))){ confetti(); setTimeout(()=>play('cheer'),900);} return true; }
 
@@ -3036,7 +3049,9 @@ function startFlightSound(it){ stopFlightSound(); if(!AC||!(it.id==='letalo'||it
   if(it.id==='balon'){ const bt=setInterval(()=>{ if(AC) SND.whoosh(AC.currentTime); },9000); nodes.push({stop(){clearInterval(bt);}}); }
   flightSnd={g,nodes}; }
 function stopFlightSound(){ if(!flightSnd) return; const s=flightSnd; flightSnd=null; s.g.gain.setTargetAtTime(0,AC.currentTime,.4); setTimeout(()=>{ s.nodes.forEach(n=>{ try{n.stop();}catch(e){} }); s.g.disconnect(); },2000); }
-function startRide(it){ fpFrom={e:eye?eye.slice():[0,100,100],t:[cam.X,cam.TY,cam.Z]}; fpTrans=0; fpStart=performance.now(); follow=it; rideFP=!!FPV[it.id]; lookYaw=0; lookPitch=it.id==='letalo'?-.38:it.id==='balon'?-.6:-.1; fpYaw=null; startFlightSound(it); cam.dist=it.id==='letalo'?60:it.id==='balon'?40:28; cam.pitch=.42; $('rideBtn').classList.add('show'); $('viewBtn').classList.add('show'); setBtnTxt(); $('hornBtn').classList.toggle('show',['vlak','vlak2','avto','ladja','traktor'].includes(it.id)); $('hornBtn').textContent=it.model==='train'?'📯 Ču-čuuu!':'📯 Hupa'; if(it.model==='train'){ audioInit(); play('whistle'); setTimeout(()=>{ if(follow===it) startTrainMusic(); },1600); } }
+const HORNV=['vlak','vlak2','avto','ladja','traktor'];
+function hornSync(cardIt){ $('hornBtn').classList.toggle('show',!!follow&&!pilot&&HORNV.includes(follow.id)&&(!cardIt||cardIt===follow)); }
+function startRide(it){ fpFrom={e:eye?eye.slice():[0,100,100],t:[cam.X,cam.TY,cam.Z]}; fpTrans=0; fpStart=performance.now(); follow=it; rideFP=!!FPV[it.id]; lookYaw=0; lookPitch=it.id==='letalo'?-.38:it.id==='balon'?-.6:-.1; fpYaw=null; startFlightSound(it); cam.dist=it.id==='letalo'?60:it.id==='balon'?40:28; cam.pitch=.42; $('rideBtn').classList.add('show'); $('viewBtn').classList.add('show'); setBtnTxt(); $('hornBtn').classList.toggle('show',HORNV.includes(it.id)); $('hornBtn').textContent=it.model==='train'?'📯 Ču-čuuu!':'📯 Hupa'; if(it.model==='train'){ audioInit(); play('whistle'); setTimeout(()=>{ if(follow===it) startTrainMusic(); },1600); } }
 function toggleView(){ fpFrom={e:eye.slice(),t:[cam.X,cam.TY,cam.Z]}; fpTrans=rideFP?1:0; fpStart=performance.now(); rideFP=!rideFP; if(!rideFP){ cam.yaw=(fpYaw||0)+Math.PI; cam.pitch=.42; cam.dist=follow&&follow.id==='letalo'?60:28; snapCam(); } setBtnTxt(); }
 function setBtnTxt(){ $('viewBtn').textContent=rideFP?'🎥 Pogled od zunaj':'👀 Pogled iz vozila'; }
 function stopRide(){ if(pilot||!follow) return; stopTrainMusic(); stopFlightSound(); const wasFP=rideFP; follow=null; rideFP=false; $('rideBtn').classList.remove('show'); $('viewBtn').classList.remove('show'); $('hornBtn').classList.remove('show'); northUp(); if(wasFP){ cam.dist=40; cam.pitch=.7; snapCam(); } }
@@ -3114,7 +3129,7 @@ $('bPass').onclick=()=>{ const g=$('passGrid'); g.innerHTML=''; const towns=ITEM
   $('passCount').textContent=`${stamps.size} / ${towns.length}`; $('pass').classList.add('show'); audioInit(); play('pop'); };
 $('passX').onclick=()=>$('pass').classList.remove('show');
 $('pass').onclick=e=>{ if(e.target===$('pass')) $('pass').classList.remove('show'); };
-function startGame(animals){ audioInit(); stopPost(); stopPilot(); const was=game&&!!game.animalsOnly===!!animals; if(game){ clearTimeout(game.timer); game=null; $('quest').classList.remove('show'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); game=null; if(was) return; }
+function startGame(animals){ audioInit(); stopPost(); stopPilot(); stopRide(); const was=game&&!!game.animalsOnly===!!animals; if(game){ clearTimeout(game.timer); game=null; $('quest').classList.remove('show'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); game=null; if(was) return; }
   game={score:0,target:null,tries:0,recent:[],animalsOnly:!!animals}; $(animals?'bAnimals':'bGame').classList.add('on'); closeCard(); stopRide(); setHome(); nextQ(); }
 $('bAnimals').onclick=()=>startGame(true);
 $('bGame').onclick=()=>startGame(false);
