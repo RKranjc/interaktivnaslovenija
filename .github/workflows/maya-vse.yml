@@ -1,10 +1,17 @@
-name: Maya1 vzorec
-on: { workflow_dispatch: {}, push: { branches: [main], paths: ['tools/maya_sample.py', '.github/workflows/maya-vzorec.yml'] } }
+name: Glas Maya1 (vsi stavki)
+on:
+  workflow_dispatch: {}
+  push: { branches: [main], paths: ['.github/workflows/maya-vse.yml'] }
 permissions: { contents: write }
+concurrency: { group: maya-vse, cancel-in-progress: false }
 jobs:
-  vzorec:
+  zapeci:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 355
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: { shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29] }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -13,10 +20,7 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq espeak-ng ffmpeg
           pip install -q torch --index-url https://download.pytorch.org/whl/cpu
           pip install -q transformers peft snac soundfile phonemizer accelerate
-      - run: python tools/maya_sample.py
-        timeout-minutes: 270
-      - if: always()
+      - env: { SHARD: '${{ matrix.shard }}', SHARDS: '30' }
         run: |
           git config user.name "github-actions[bot]"; git config user.email "41898281+github-actions[bot]@users.noreply.github.com"
-          git add tools/maya/vzorci || true
-          git diff --cached --quiet || (git commit -qm "Maya1: vzorci" && git pull -q --rebase origin main && git push -q origin HEAD:main)
+          python tools/maya_bake.py
