@@ -2981,8 +2981,24 @@ function thunder(t){ const s=AC.createBufferSource(); const b=AC.createBuffer(1,
 // voice
 let slVoice=null; function findVoice(){ try{ const v=speechSynthesis.getVoices(); slVoice=v.find(x=>/^sl/i.test(x.lang))||null; }catch(e){} }
 try{ findVoice(); speechSynthesis.onvoiceschanged=findVoice; }catch(e){}
+// ---- recorded Slovenian voice (audio/<hash>.mp3, one clip per sentence) ----
+function splitS(t){ const out=[]; let cur=''; t=String(t).replace(/\s+/g,' ').trim(); for(let i=0;i<t.length;i++){ cur+=t[i]; if('.!?'.includes(t[i])&&(i+1>=t.length||t[i+1]===' ')){ if(cur.trim()) out.push(cur.trim()); cur=''; } } if(cur.trim()) out.push(cur.trim()); return out; }
+function h32(s){ let h=0x811c9dc5; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return ('0000000'+h.toString(16)).slice(-8); }
+let AUD=null, sayQ=null;
+try{ if(location.protocol.startsWith('http')) fetch('audio/index.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{ if(Array.isArray(j)) AUD=new Set(j); }).catch(()=>{}); }catch(e){}
+function stopSay(){ if(sayQ&&sayQ.a){ try{ sayQ.a.pause(); }catch(e){} } sayQ=null; try{ speechSynthesis.cancel(); }catch(e){} }
+function sayRec(txt){ if(!AUD) return false; const S=splitS(txt); if(!S.length||!S.every(x=>AUD.has(h32(x)))) return false; stopSay(); const tok={}; sayQ=tok; let i=0;
+  const next=()=>{ if(sayQ!==tok||i>=S.length) return; const a=new Audio('audio/'+h32(S[i++])+'.mp3'); tok.a=a; a.onended=()=>setTimeout(next,90); a.onerror=()=>next(); const p=a.play(); if(p&&p.catch) p.catch(()=>{}); };
+  next(); return true; }
+function allPhrases(){ const T=new Set(); const add=x=>{ if(x) for(const s2 of splitS(x)) T.add(s2); };
+  for(const it of ITEMS){ const n=it.n; add(n+'.'); add(n+'!'); (it.f||[]).forEach(add); (MORE[it.id]||[]).forEach(add); const nb=nearby(it,3); if(nb.length) add('V bližini so '+nb.join(', ')+'.');
+    add('Kje je '+n+'?'); add('Kje so '+n+'?'); add('Poišči: '+n); add('To je '+n+'.'); add('Pismo za '+n+'!'); add('Pismo je za '+n+'.'); }
+  for(const k in FKIND){ const K=FKIND[k]; add(K.n+'.'); (K.f||[]).forEach(add); add('Poišči: '+K.n); }
+  for(const t of TREASURES){ add(t.n+'.'); (t.f||[]).forEach(add); add('Poišči: '+t.n); }
+  ['Kam ga odpeljemo?','Pismo je dostavljeno!','Poskusi še enkrat!','Bravo!','Poleti in poberi zvezdice! S puščicami levo in desno obračaš, gor in dol pa letiš višje ali nižje.','Bravo, pilot! Pobral si vse zvezdice!'].forEach(add);
+  return [...T].map(t=>({h:h32(t),t})); }
 let noVoiceWarned=false;
-function say(txt){ if(!slVoice&&sfxOn&&!noVoiceWarned){ findVoice(); if(!slVoice){ noVoiceWarned=true; setTimeout(()=>toast('Ta brskalnik nima slovenskega glasu 🙁 Za branje odpri zemljevid v Edgeu ali Chromu.'),1200); } } if(!slVoice||!sfxOn) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.voice=slVoice; u.lang=slVoice.lang; u.rate=.95; u.pitch=1.1; speechSynthesis.speak(u); }catch(e){} }
+function say(txt){ if(!sfxOn) return; if(sayRec(txt)) return; if(!slVoice&&sfxOn&&!noVoiceWarned){ findVoice(); if(!slVoice){ noVoiceWarned=true; setTimeout(()=>toast('Ta brskalnik nima slovenskega glasu 🙁 Za branje odpri zemljevid v Edgeu ali Chromu.'),1200); } } if(!slVoice||!sfxOn) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.voice=slVoice; u.lang=slVoice.lang; u.rate=.95; u.pitch=1.1; speechSynthesis.speak(u); }catch(e){} }
 
 // =====================================================================
 //  UI
@@ -2995,7 +3011,7 @@ function curFact(it){ return it.f[it.fi==null?0:it.fi]; }
 function showCard(it,fact){ fact=fact||curFact(it); it._shown=fact; $('cEmo').innerHTML=''; const im=document.createElement('img'); im.src=it.icon.toDataURL(); im.style.width='96px'; im.style.height='96px'; $('cEmo').appendChild(im);
   $('cName').textContent=it.n; $('cText').textContent=fact; const b=$('cBtns'); b.innerHTML='';
   const bs=document.createElement('button'); bs.textContent='Zvok'; bs.title='Zvok'; bs.onclick=()=>{audioInit(); play(it.snd);}; b.appendChild(bs);
-  if(slVoice){ const bv=document.createElement('button'); bv.textContent='Preberi'; bv.title='Preberi'; bv.onclick=()=>say(it.n+'. '+fact); b.appendChild(bv); }
+  if(slVoice||AUD){ const bv=document.createElement('button'); bv.textContent='Preberi'; bv.title='Preberi'; bv.onclick=()=>say(it.n+'. '+fact); b.appendChild(bv); }
   if(it.id==='t_povodni'){ const bp=document.createElement('button'); bp.textContent='📜 Pesmica'; bp.onclick=openPoem; b.appendChild(bp); }
   { const bm=document.createElement('button'); bm.textContent='Povej mi več'; bm.onclick=()=>showMore(it); b.appendChild(bm); }
   $('cMore').style.display='none';
@@ -3153,7 +3169,7 @@ function nextQ(){ const pool=ITEMS.filter(i=>!i.labelOnly && !i.kraj && (!game.a
   $('quest').classList.add('show'); say((t.plural?'Kje so ':'Kje je ')+t.n+'?');
   const R=t.mv&&t.mv.k!=='path'?Math.max(8,(t.mv.r||0)+5):7; const a=Math.random()*6.283, off=Math.random()*R*.45; const p=t.mv&&t.mv.k==='path'?t.pos:[t.home[0],0,t.home[1]];
   game.area={x:p[0]+Math.cos(a)*off,z:p[2]+Math.sin(a)*off,r:R,a:0}; flyTo(game.area.x,game.area.z,R*7,null); cam.pitch=.85; }
-function gameAdvance(){ if(!game||!game.waiting) return; game.waiting=false; clearTimeout(game.timer); try{speechSynthesis.cancel();}catch(e){} closeCard(); setHome(); nextQ(); }
+function gameAdvance(){ if(!game||!game.waiting) return; game.waiting=false; clearTimeout(game.timer); stopSay(); closeCard(); setHome(); nextQ(); }
 function gameClick(it){ if(game.waiting) return; const t=game.target; if(!t) return;
   if(it===t){ game.score++; play('cheer'); it.pulse=1; collect(it); burst(); game.target=null; flyTo(it.pos[0],it.pos[2],it.mv?30:55,it.pos[1]);
     game.area=null; game.waiting=true; game.paused=false; const fact=nextFact(it); showCard(it,fact); $('qStars').textContent='Najdeno: '+game.score;

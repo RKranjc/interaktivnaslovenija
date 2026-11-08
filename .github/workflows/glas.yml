@@ -1,0 +1,23 @@
+name: Slovenski glas
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['phrases.json', 'tools/glas.py']
+permissions:
+  contents: write
+concurrency: { group: glas, cancel-in-progress: false }
+jobs:
+  posnemi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Posnemi manjkajoče stavke
+        env:
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898281+github-actions[bot]@users.noreply.github.com"
+          python3 tools/glas.py
