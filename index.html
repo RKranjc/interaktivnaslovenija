@@ -3236,7 +3236,7 @@ function setCommon(P,E,t){ const u=P.u; gl.useProgram(P.p); if(u.uVP) gl.uniform
 let last=performance.now(), T=0, lastEnv=null, lastDt=.016;
 // ===================== SLIKANICA (živi akvarel) =====================
 function wcInit(){
-  const LIGHTQ=(innerWidth<760||/Android|iPhone|iPad/i.test(navigator.userAgent));
+  const LIGHTQ=(innerWidth<760||/Android|iPhone|iPad/i.test(navigator.userAgent)); wc.LQ=LIGHTQ;
   wc.P=prog(`out vec2 vUV; void main(){ vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2); vUV=p; gl_Position=vec4(p*2.-1.,0.,1.); }`,
 (LIGHTQ?'#define LQ 1\n':'')+`uniform sampler2D uC; uniform sampler2D uD; uniform vec2 uRes; uniform vec2 uNF; uniform float uNight; uniform float uFocus; in vec2 vUV; out vec4 o;
 float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
@@ -3247,9 +3247,9 @@ float lum(vec3 c){ return dot(c,vec3(.299,.587,.114)); }
 vec3 sat(vec3 c,float s){ return mix(vec3(lum(c)),c,s); }
 void main(){
   vec2 px=gl_FragCoord.xy, tx=1./uRes; float sc=max(uRes.y/900.,.6); vec2 uv=vUV;
-  vec2 wob=(vec2(fbm(px/(16.*sc)),fbm(px/(16.*sc)+9.3))-.5)*2.4*sc*tx;
+  vec2 wob=(vec2(fbm(px/(16.*sc)),fbm(px/(16.*sc)+9.3))-.5)*.6*sc*tx;
   // Kuwahara (4 kvadranti) – ploskve kot s čopičem
-  vec3 best=vec3(0.); float bv=1e9; float r=2.6*sc;
+  vec3 best=vec3(0.); float bv=1e9; float r=1.7*sc;
   for(int k=0;k<4;k++){ vec2 sg=vec2(k==1||k==3?-1.:1., k>=2?-1.:1.); vec3 m=vec3(0.), m2=vec3(0.);
 #ifdef LQ
     for(int j=0;j<2;j++){ vec2 off=vec2(float(j),1.-float(j))*r+vec2(.5*r); vec3 t=texture(uC,uv+wob+sg*off*tx).rgb; m+=t; m2+=t*t; }
@@ -3259,13 +3259,13 @@ void main(){
     m*=.25; m2*=.25;
 #endif
     vec3 va=m2-m*m; float vs=va.r+va.g+va.b; if(vs<bv){ bv=vs; best=m; } }
-  vec3 c=mix(texture(uC,uv+wob).rgb,best,.75);
+  vec3 c0=texture(uC,uv+wob).rgb; vec3 c=mix(c0,best,.42);
 #ifdef LQ
   vec3 b=(texture(uC,uv+wob+vec2(3.,1.)*sc*tx).rgb+texture(uC,uv+wob-vec2(3.,1.)*sc*tx).rgb+texture(uC,uv+wob+vec2(-1.,3.)*sc*tx).rgb+texture(uC,uv+wob+vec2(1.,-3.)*sc*tx).rgb)*.25;
 #else
   vec3 b=vec3(0.); for(int i=0;i<6;i++){ float a=float(i)*1.0472+.5; b+=texture(uC,uv+wob+vec2(cos(a),sin(a))*3.4*sc*tx).rgb; } b/=6.;
 #endif
-  c=mix(c,b,.2);
+  c=mix(c,b,.08); c=clamp(c+(c0-b)*.35,0.,1.);
   float d0=texture(uD,uv).r; bool sky=d0>.99999; float L0=lin(d0);
   vec2 e1=vec2(1.5*sc,0.)*tx, e2=vec2(0.,1.5*sc)*tx;
   float dl=lin(texture(uD,uv-e1).r), dr=lin(texture(uD,uv+e1).r), dd=lin(texture(uD,uv-e2).r), du=lin(texture(uD,uv+e2).r);
@@ -3303,8 +3303,20 @@ function wcEnsure(){
   gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,wc.ct,0); gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.TEXTURE_2D,wc.dt,0);
   if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE){ gl.bindFramebuffer(gl.FRAMEBUFFER,null); gl.deleteFramebuffer(wc.fb); wc.fb=null; WC=false; throw new Error('Slikanica: FBO ni podprt'); }
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+  if(wc.ms){ gl.deleteFramebuffer(wc.ms); gl.deleteRenderbuffer(wc.mc); gl.deleteRenderbuffer(wc.md); wc.ms=null; }
+  try{ const S=Math.min(wc.LQ?2:4, gl.getParameter(gl.MAX_SAMPLES)||0);
+    if(S>1){ wc.mc=gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER,wc.mc); gl.renderbufferStorageMultisample(gl.RENDERBUFFER,S,gl.RGBA8,w,h);
+      wc.md=gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER,wc.md); gl.renderbufferStorageMultisample(gl.RENDERBUFFER,S,gl.DEPTH_COMPONENT24,w,h);
+      wc.ms=gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER,wc.ms);
+      gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.RENDERBUFFER,wc.mc); gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,wc.md);
+      if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE) throw 0; }
+  }catch(e){ if(wc.ms) gl.deleteFramebuffer(wc.ms); wc.ms=null; }
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null); gl.bindRenderbuffer(gl.RENDERBUFFER,null);
 }
-function wcCompose(E){
+function wcResolve(){ if(!wc.ms) return; while(gl.getError()!==gl.NO_ERROR){} try{ gl.bindFramebuffer(gl.READ_FRAMEBUFFER,wc.ms); gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,wc.fb);
+  gl.blitFramebuffer(0,0,wc.w,wc.h,0,0,wc.w,wc.h,gl.COLOR_BUFFER_BIT,gl.LINEAR); gl.blitFramebuffer(0,0,wc.w,wc.h,0,0,wc.w,wc.h,gl.DEPTH_BUFFER_BIT,gl.NEAREST);
+  if(gl.getError()!==gl.NO_ERROR) throw 0; }catch(e){ gl.deleteFramebuffer(wc.ms); wc.ms=null; } gl.bindFramebuffer(gl.READ_FRAMEBUFFER,null); gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,null); }
+function wcCompose(E){ wcResolve();
   gl.bindFramebuffer(gl.FRAMEBUFFER,null); gl.viewport(0,0,cv.width,cv.height);
   gl.useProgram(wc.P.p); gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D,wc.ct); gl.uniform1i(wc.P.u.uC,6);
   gl.activeTexture(gl.TEXTURE7); gl.bindTexture(gl.TEXTURE_2D,wc.dt); gl.uniform1i(wc.P.u.uD,7); gl.activeTexture(gl.TEXTURE0);
@@ -3322,7 +3334,7 @@ function frameInner(now){
   updateCam(dt); const E=envState(); lastEnv=E;
   updFauna(dt); updSeasonal(dt); updPost(dt); updPilot(dt); checkStamps(dt);
   for(const it of ITEMS){ updateItem(it,T,dt); } if(window.__sc){ const s=window.__sc; s.pos=[Math.sin(T*.25)*3,40+(s.__y||0),Math.cos(T*.25)*3]; } kinematics(dt);
-  if(WC){ try{ wcEnsure(); }catch(e){ setWC(false); } if(WC&&wc.fb) gl.bindFramebuffer(gl.FRAMEBUFFER,wc.fb); }
+  if(WC){ try{ wcEnsure(); }catch(e){ setWC(false); } if(WC&&wc.fb) gl.bindFramebuffer(gl.FRAMEBUFFER,wc.ms||wc.fb); }
   gl.clearColor(E.hor[0],E.hor[1],E.hor[2],1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
   // sky
   gl.disable(gl.DEPTH_TEST); gl.useProgram(sky.P.p); gl.uniformMatrix4fv(sky.P.u.uInv,false,M4.inv(VP)); gl.uniform3fv(sky.P.u.uSun,E.sun); gl.uniform3fv(sky.P.u.uTop,E.top); gl.uniform3fv(sky.P.u.uHor,E.hor); gl.uniform1f(sky.P.u.uNight,E.night); gl.uniform1f(sky.P.u.uTime,T); gl.uniform1f(sky.P.u.uCloudy,E.cloudy);
