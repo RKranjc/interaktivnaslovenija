@@ -35,23 +35,20 @@ ACC = 'áéíóúàèìòùâêîôûŕ'
 VOW_T = 'aeiouáéíóúàèìòùâêîôûə'
 VOW_I = 'aeiouɛɔəɐæɪʊɑ'
 def restress(tok, naglas):
-    """premakne naglas v espeakovem zapisu besede na zlog, ki je v 'naglas' označen s strešico/ostrivcem"""
-    word = naglas.lower(); n = None; k = 0
+    """premakne naglas po espeakovem slogu: 'ˈ' tik pred naglašenim samoglasnikom, dolžina 'ː' samo na njem"""
+    word = naglas.lower(); n = None; k = 0; short = False
     for c in word:
         if c in VOW_T:
-            if c in ACC: n = k; break
+            if c in ACC: n = k; short = c in 'àèìòù'; break
             k += 1
     if n is None: return tok
-    t = tok.replace('ˈ', '').replace('ˌ', '')
+    t = tok.replace('ˈ', '').replace('ˌ', '').replace('ː', '')
     k = 0
     for i, c in enumerate(t):
         if c in VOW_I:
             if k == n:
-                j = i
-                if j > 0 and t[j-1] not in VOW_I + 'ː': j -= 1
-                return t[:j] + 'ˈ' + t[j:]
+                return t[:i] + 'ˈ' + c + ('' if short else 'ː') + t[i+1:]
             k += 1
-            while i + 1 < len(t) and t[i+1] in 'ː': i += 1
     return tok
 def phon(text):
     ph = phonemize_sl(text, be)

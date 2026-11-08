@@ -1,4 +1,12 @@
 [
- {"stavek": "Poleti in poberi zvezdice!", "beseda": "Poleti", "naglas": "poletí"},
- {"stavek": "Poleti in poberi zvezdice!", "beseda": "poberi", "naglas": "pobêri"}
+ {
+  "stavek": "Poleti in poberi zvezdice!",
+  "beseda": "Poleti",
+  "naglas": "poletí"
+ },
+ {
+  "stavek": "Poleti in poberi zvezdice!",
+  "beseda": "poberi",
+  "naglas": "pobêri"
+ }
 ]
