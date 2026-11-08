@@ -1,0 +1,56 @@
+{
+ "load_s": 53.4,
+ "cpus": 4,
+ "dtype": "torch.bfloat16",
+ "items": [
+  {
+   "spk": "Artur-B-G0911",
+   "text": "Ljubljana.",
+   "tokens": 149,
+   "sec": 1.79,
+   "time": 67.0
+  },
+  {
+   "spk": "Artur-B-G0911",
+   "text": "Ljubljana je glavno mesto Slovenije.",
+   "tokens": 247,
+   "sec": 2.99,
+   "time": 114.1
+  },
+  {
+   "spk": "Artur-B-G0911",
+   "text": "Kje je rjavi medved?",
+   "tokens": 240,
+   "sec": 2.9,
+   "time": 105.4
+  },
+  {
+   "spk": "Artur-B-G0911",
+   "text": "Soška postrv lahko zraste več kot en meter!",
+   "tokens": 387,
+   "sec": 4.69,
+   "time": 173.5
+  },
+  {
+   "spk": "Artur-B-G0911",
+   "text": "Ime Prekmurje pomeni dežela preko reke Mure.",
+   "tokens": 345,
+   "sec": 4.18,
+   "time": 157.2
+  },
+  {
+   "spk": "Artur-B-G0911",
+   "text": "Bravo!",
+   "tokens": 135,
+   "sec": 1.62,
+   "time": 62.5
+  },
+  {
+   "spk": "Artur-B-G0911",
+   "text": "Poleti in poberi zvezdice!",
+   "tokens": 275,
+   "sec": 3.33,
+   "time": 123.2
+  }
+ ]
+}
