@@ -41,6 +41,12 @@
   .card .more ul{margin:6px 0 0;padding-left:20px}
   .pctl{position:fixed;left:50%;bottom:20px;transform:translate(-50%,200%);display:flex;gap:10px;align-items:center;z-index:7;transition:transform .3s}
   .pctl.show{transform:translate(-50%,0)}
+  .phelp{position:fixed;left:50%;bottom:150px;transform:translate(-50%,0) scale(.9);opacity:0;pointer-events:none;z-index:7;background:#fffdf7;border-radius:22px;padding:10px 18px;font-family:'Grandstander',sans-serif;font-weight:700;font-size:20px;box-shadow:0 5px 0 #0002;transition:.35s;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:92vw;text-align:center}
+  .phelp.show{opacity:1;transform:translate(-50%,0) scale(1)}
+  .phelp span{background:#eef6ff;border-radius:12px;padding:2px 10px}
+  .parrow{position:fixed;left:50%;top:116px;width:84px;height:84px;margin-left:-42px;z-index:7;display:none;pointer-events:none}
+  .parrow.show{display:grid;place-items:center}
+  .parrow div{width:84px;height:84px;border-radius:50%;background:#fffdf7;box-shadow:0 5px 0 #0002;display:grid;place-items:center;font-size:48px;color:#f2a50c;line-height:1}
   .pctl button{width:64px;height:56px;border:0;border-radius:16px;background:#fff;font-size:26px;box-shadow:0 4px 0 #0002;cursor:pointer;margin:2px}
   .pctl div{display:flex;flex-direction:column}
   .pctl .pexit{width:auto;padding:0 18px;font-family:'Grandstander',sans-serif;font-size:18px;background:#ff5d5d;color:#fff}
@@ -129,6 +135,8 @@
     .ride.horn{left:8px!important;bottom:calc(150px + var(--cardH,0px))!important;font-size:16px!important;padding:6px 14px!important}
     .ride.horn:not(.show){transform:translate(0,600%)!important}
     .pctl button{width:56px!important;height:50px!important}
+    .phelp{bottom:200px!important;font-size:15px!important;gap:6px!important}
+    .parrow{top:110px!important;width:64px!important;height:64px!important;margin-left:-32px!important}.parrow div{width:64px!important;height:64px!important;font-size:36px!important}
     .help{display:none!important}
     .book .in{padding:14px!important}
     .pgrid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))!important}
@@ -170,7 +178,7 @@
   <button class="tb game" id="bPilot"><span class="ic">✈️</span><span class="tx">Pilot</span></button>
 </div>
 <div class="card" id="card"><button class="x" id="cardX">✖</button><div class="emo" id="cEmo"></div><h2 id="cName"></h2><p id="cText"></p><div class="more" id="cMore"></div><div class="btns" id="cBtns"></div></div>
-<div class="pctl" id="pctl"><button data-k="l">◀</button><div><button data-k="u">▲</button><button data-k="d">▼</button></div><button data-k="r">▶</button><button class="pexit" id="pExit">Pristani</button></div>
+<div class="phelp" id="pHelp"><b>Kako letiš:</b> <span>◀ ▶ obračaj</span> <span>▲ ▼ gor in dol</span> <span>Sledi puščici do ⭐</span></div><div class="parrow" id="pArrow"><div>➤</div></div><div class="pctl" id="pctl"><button data-k="l">◀</button><div><button data-k="u">▲</button><button data-k="d">▼</button></div><button data-k="r">▶</button><button class="pexit" id="pExit">Pristani</button></div>
 <div class="quest" id="quest"><div class="q" id="qEmo"></div><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div><div class="stars" id="qStars"></div></div></div>
 <button class="ride" id="rideBtn">🚪 Izstopi</button>
 <button class="ride view" id="viewBtn">Pogled od zunaj</button>
@@ -279,7 +287,7 @@ const ITEMS=[
  {id:'sava',c:'voda',e:'🌊',n:'Sava',at:[14.82,46.06],snd:'river',f:['Sava je najdaljša reka v Sloveniji.','Sava nastane iz dveh rek: Save Dolinke in Save Bohinjke.','Sava teče vse do Beograda, kjer se izlije v Donavo.']},
  {id:'soca',c:'voda',e:'💎',n:'Soča',at:[13.70,46.12],snd:'river',f:['Soča je smaragdno zelena reka – ena najlepših na svetu.','Voda v Soči je zelo mrzla, tudi poleti.','Po Soči se ljudje spuščajo s kajaki in gumijastimi čolni.']},
  {id:'drava',c:'voda',e:'🌊',n:'Drava',at:[15.30,46.615],snd:'river',f:['Drava teče skozi Maribor in Ptuj.','Drava izvira v Italiji in teče čez Avstrijo v Slovenijo.','Na Dravi stojijo elektrarne, ki iz vode delajo elektriko.']},
- {id:'mura',c:'voda',e:'⚙️',n:'Mura',at:[16.32,46.51],snd:'river',f:['Prekmurje pomeni pokrajina pred Muro.','Na Muri stojijo plavajoči mlini, ki jih poganja kar reka.','Čez Muro vozi brod, ki ljudi prepelje na drugi breg.']},
+ {id:'mura',c:'voda',e:'⚙️',n:'Mura',at:[16.32,46.51],snd:'river',f:['Ime Prekmurje pomeni dežela preko reke Mure.','Na Muri stojijo plavajoči mlini, ki jih poganja kar reka.','Čez Muro vozi brod, ki ljudi prepelje na drugi breg.']},
  {id:'krka',c:'voda',e:'🌊',n:'Krka',at:[14.95,45.83],snd:'river',f:['Krka je mirna reka z majhnimi slapovi.','Na otoku sredi Krke stoji grad Otočec.','Krka izvira iz jame.']},
  {id:'kolpa',c:'voda',e:'🏊',n:'Kolpa',at:[15.00,45.50],snd:'river',f:['Kolpa je najtoplejša slovenska reka.','Kolpa dela mejo med Slovenijo in Hrvaško.','Po Kolpi se poleti vozimo s kanuji.']},
  {id:'morje',c:'voda',e:'🐚',n:'Morje',at:[13.45,45.68],snd:'waves',f:['Slovenska obala je dolga samo okoli 47 kilometrov.','V našem morju živijo delfini, ribe, rakci in morski ježki.','Naše morje je del Jadranskega morja.']},
@@ -2440,22 +2448,23 @@ function startPilot(){ stopPost(); if(game){ clearTimeout(game.timer); game=null
   const [x,z]=ll(14.46,46.22); const rnd=Math.random;
   const pool=ITEMS.filter(i=>i.lm&&!i.kraj&&!i.det&&i.c!=='drzava'); const pick=[]; while(pick.length<12&&pool.length){ pick.push(pool.splice(Math.floor(rnd()*pool.length),1)[0]); }
   pilot={pos:[x,groundY(x,z)+7,z],yaw:Math.PI*.6,roll:0,speed:3.2,alt:7,base:0,score:0,stars:pick.map(it=>{ const q=ll(...it.lm.at); return {it,x:q[0],z:q[1],y:groundY(q[0],q[1])+6,got:false}; })};
-  follow={pos:pilot.pos}; cam.dist=24; cam.pitch=.38; $('bPilot').classList.add('on'); $('pctl').classList.add('show');
+  follow={pos:pilot.pos}; cam.dist=24; cam.pitch=.38; $('bPilot').classList.add('on'); $('pctl').classList.add('show'); $('pHelp').classList.add('show'); $('pArrow').classList.add('show');
   $('qEmo').innerHTML=''; $('qKind').textContent='Pilot'; $('qName').textContent='Poberi zvezdice'; $('qStars').textContent='Zvezdice: 0 / '+pilot.stars.length; $('quest').classList.add('show');
   say('Poleti in poberi zvezdice! S puščicami levo in desno obračaš, gor in dol pa letiš višje ali nižje.'); play('plane'); }
-function stopPilot(){ if(!pilot) return; pilot=null; follow=null; closeCard(); $('bPilot').classList.remove('on'); $('pctl').classList.remove('show'); $('quest').classList.remove('show'); setHome(); }
+function stopPilot(){ if(!pilot) return; pilot=null; follow=null; closeCard(); $('bPilot').classList.remove('on'); $('pctl').classList.remove('show'); $('pHelp').classList.remove('show'); $('pArrow').classList.remove('show'); $('quest').classList.remove('show'); setHome(); }
 function updPilot(dt){ if(!pilot) return; const P=pilot; const turn=(pkeys.l?1:0)-(pkeys.r?1:0);
   P.yaw+=turn*1.0*dt; P.roll=lerp(P.roll,-turn*.45,1-Math.pow(.02,dt)); P.alt=clamp((P.alt||5.5)+((pkeys.u?1:0)-(pkeys.d?1:0))*dt*4,2,22); P.pitchV=lerp(P.pitchV||0,((pkeys.u?1:0)-(pkeys.d?1:0))*.3,1-Math.pow(.02,dt));
   let x=P.pos[0]+Math.sin(P.yaw)*P.speed*dt, z=P.pos[2]+Math.cos(P.yaw)*P.speed*dt;
   if(Math.abs(x)>BX*.97||Math.abs(z)>BZ*.97){ P.yaw+=Math.PI*dt*1.5; x=clamp(x,-BX*.97,BX*.97); z=clamp(z,-BZ*.97,BZ*.97); }
   let gmax=0; for(const k of [0,3,6,9]) gmax=Math.max(gmax,groundY(x+Math.sin(P.yaw)*k,z+Math.cos(P.yaw)*k));
   const y=lerp(P.pos[1],Math.max(gmax+2,(P.base==null?(P.base=P.pos[1]-5.5):P.base)+P.alt),1-Math.pow(.3,dt)); P.pos=[x,y,z]; follow.pos=P.pos;
-  const want=P.yaw+Math.PI; let dy=((want-cam.yaw+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI; cam.yaw+=dy*(1-Math.pow(.15,dt)); cam.pitch=.38;
-  for(const s of P.stars){ if(s.got) continue; if(Math.hypot(s.x-x,s.z-z)<3.2 && Math.abs(s.y-y)<5){ s.got=true; P.score++; play('sticker'); burst(); collect(s.it);
+  const want=P.yaw+Math.PI; let dy=((want-cam.yaw+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI; cam.yaw+=dy*(1-Math.pow(.15,dt)); cam.pitch=.38; { let best=null,bd=1e9; for(const st of P.stars){ if(st.got) continue; const d=Math.hypot(st.x-x,st.z-z); if(d<bd){bd=d;best=st;} } const A=$('pArrow');
+    if(best){ A.style.display=''; const rel=Math.atan2(best.x-x,best.z-z)-P.yaw; const r=Math.atan2(Math.sin(rel),Math.cos(rel)); A.firstChild.style.transform='rotate('+(-r*180/Math.PI-90)+'deg)'; } else A.style.display='none'; }
+  for(const s of P.stars){ if(s.got) continue; if(Math.hypot(s.x-x,s.z-z)<3.2 && Math.abs(s.y-y)<5){ s.got=true; P.score++; if(P.score>=1) $('pHelp').classList.remove('show'); play('sticker'); burst(); collect(s.it);
       $('qStars').textContent='Zvezdice: '+P.score+' / '+P.stars.length; const f=nextFact(s.it); showCard(s.it,f); setTimeout(()=>say(s.it.n+'! '+f),300);
       if(P.score===P.stars.length){ confetti(); play('cheer'); setTimeout(()=>say('Bravo, pilot! Pobral si vse zvezdice!'),2500); } } } }
 function drawPilot(){ if(!pilot) return; const P=pilot; const F=M4.mul(M4.mul(M4.mul(M4.mul(mT(P.pos[0],P.pos[1],P.pos[2]),mRy(P.yaw)),mRx(-(P.pitchV||0))),mRz(P.roll)),mS(.42,.42,.42)); plane(F);
-  for(const s of P.stars){ if(s.got) continue; const S=M4.mul(M4.mul(mT(s.x,s.y+Math.sin(T*2+s.x)*.3,s.z),mRy(T*1.5)),mS(1.1,1.1,1.1)); const G=[1,.82,.15,1];
+  for(const s of P.stars){ if(s.got) continue; const dd=Math.hypot(s.x-P.pos[0],s.z-P.pos[2]); const ks=1.1+clamp((dd-15)*.025,0,2.2); const S=M4.mul(M4.mul(mT(s.x,s.y+Math.sin(T*2+s.x)*.3,s.z),mRy(T*1.5)),mS(ks,ks,ks)); const G=[1,.82,.15,1];
     put('sphere',S,[.35,.35,.12],G); for(let k=0;k<5;k++){ const a=k/5*Math.PI*2; put('cone',fr(S,[Math.sin(a)*.3,Math.cos(a)*.3,0],[0,0,-a]),[.16,.45,.08],G); } } }
 function drawRainbow(){ }
 function smoothLine(P,it=3){ let p=P; for(let k=0;k<it;k++){ const o=[p[0]]; for(let i=0;i<p.length-1;i++){ const a=p[i],b=p[i+1]; o.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]); } o.push(p[p.length-1]); p=o; } return p; }
@@ -3199,6 +3208,9 @@ function drawSprites(E){
   const nShadow=n;
   // night glows over cities
   if(E.night>.02){ const hl=houses.list; for(let i=0;i<hl.length;i+=6*3){ pushS(hl[i],hl[i+1]+.6,hl[i+2],2.4,GLOW,E.night*.75,1,1); if(n>600) break; } }
+  if(pilot) for(const st of pilot.stars){ if(st.got) continue; const d=Math.hypot(st.x-pilot.pos[0],st.z-pilot.pos[2]); const g=groundY(st.x,st.z);
+    pushS(st.x,st.y,st.z,3.2+d*.05,GLOW,.95,1,1);
+    for(let k=0;k<8;k++){ const yy=g+(st.y-g)*k/8; pushS(st.x,yy,st.z,1.4+d*.02,GLOW,.55+.2*Math.sin(T*4-k),1,1); } }
   if(false) for(const tr of treasureVisible){ if(found.has(tr.id)) continue; for(let k=0;k<3;k++){ const a=T*1.5+k*2.1; pushS(tr.pos[0]+Math.cos(a)*.35,tr.pos[1]+.5+Math.sin(T*3+k)*.2,tr.pos[2]+Math.sin(a)*.35,.6+.3*Math.sin(T*5+k),GLOW,.9,1,1); } }
   if(E.night>.3 && cam.D<90){ const R=Math.min(cam.D*.9,40); for(let i=0;i<60;i++){ const hx=Math.sin(i*12.9898)*43758.5453, hz=Math.sin(i*78.233)*43758.5453; const fx=(hx-Math.floor(hx))*2-1, fz=(hz-Math.floor(hz))*2-1;
       const x=cam.X+fx*R+Math.sin(T*.3+i)*1.5, z=cam.Z+fz*R+Math.cos(T*.25+i*1.7)*1.5; const o=ovAt(x,z); if(o[2]<.35&&o[1]<.3) continue; const fl=Math.max(0,Math.sin(T*2.5+i*3.1));

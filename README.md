@@ -16,3 +16,5 @@ Interaktivni 3D zemljevid Slovenije za male raziskovalce (od 4. leta naprej).
 Glas, ki bere imena in zanimivosti, uporablja slovenski glas brskalnika (najbolje deluje v brskalniku Microsoft Edge).
 
 Zemljevid je ena sama datoteka `index.html` in deluje v vsakem sodobnem brskalniku, tudi na tablici in telefonu.
+
+Posnetek pesmi *Povodni mož* bere Polde Bibič (vir: [preseren.net](https://www.preseren.net/)), uporabljen z dovoljenjem.
