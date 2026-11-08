@@ -1,0 +1,22 @@
+name: Glas Maya1 (popravki naglasov)
+on:
+  workflow_dispatch: {}
+  push: { branches: [main], paths: ['tools/naglasi.json'] }
+permissions: { contents: write }
+jobs:
+  popravi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq espeak-ng ffmpeg
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q transformers peft snac soundfile phonemizer accelerate
+      - env: { SHARD: '99', SHARDS: '1' }
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898281+github-actions[bot]@users.noreply.github.com"
+          python -c "import json;json.dump(sorted({r['stavek'] for r in json.load(open('tools/naglasi.json',encoding='utf-8'))}),open('/tmp/only.json','w'),ensure_ascii=False)"
+          ONLY=/tmp/only.json python tools/maya_bake.py

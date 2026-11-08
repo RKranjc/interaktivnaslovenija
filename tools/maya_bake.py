@@ -14,7 +14,13 @@ torch.set_num_threads(os.cpu_count())
 done_f = f'audio/maya/shard_{SH:02d}.txt'
 os.makedirs('audio/maya', exist_ok=True)
 done = set(open(done_f).read().split()) if os.path.exists(done_f) else set()
-phrases = [p for i, p in enumerate(json.load(open('phrases.json', encoding='utf-8'))) if i % N == SH and p['h'] not in done]
+ONLY = os.environ.get('ONLY', '').strip()
+ALL = json.load(open('phrases.json', encoding='utf-8'))
+if ONLY:
+    want = set(json.load(open(ONLY, encoding='utf-8')))
+    phrases = [p for p in ALL if p['t'] in want]
+else:
+    phrases = [p for i, p in enumerate(ALL) if i % N == SH and p['h'] not in done]
 print(f'shard {SH}/{N}: {len(phrases)} stavkov', flush=True)
 if not phrases: sys.exit(0)
 
@@ -24,8 +30,22 @@ model = PeftModel.from_pretrained(model, "texdata/Maya1-Slovenian-TTS").merge_an
 snac = SNAC.from_pretrained("hubertsiuzdak/snac_24khz").eval()
 be = EspeakBackend("sl", with_stress=True, preserve_punctuation=True)
 
-def synth(text):
+NAGL = json.load(open('tools/naglasi.json', encoding='utf-8')) if os.path.exists('tools/naglasi.json') else []
+def phon(text):
     ph = phonemize_sl(text, be)
+    rules = [r for r in NAGL if r.get('stavek') in (None, text) or (r.get('stavek') and r['stavek'] in text)]
+    if not rules: return ph
+    words = text.split(); toks = ph.split(' ')
+    if len(words) == len(toks):
+        for r in rules:
+            for i, w in enumerate(words):
+                if w.strip('.,!?:;') == r['beseda']:
+                    tail = ''.join(c for c in toks[i] if c in '.,!?:;'); toks[i] = r['ipa'] + tail
+        ph = ' '.join(toks)
+    print('fonemi:', text, '->', ph, flush=True)
+    return ph
+def synth(text):
+    ph = phon(text)
     prompt = tok.apply_chat_template([{"role": "user", "content": f'<description="A Slovenian voice, speaker {SPK}."> {ph}'}], tokenize=False, add_generation_prompt=True)
     ids = tok(prompt, add_special_tokens=False, return_tensors="pt").input_ids
     mx = min(1800, 240 + len(text) * 12)
