@@ -738,10 +738,10 @@ plesáje v valove šumeče planila.
 Vrtinec so vidli čolnarji dereč;
 al Uršike videl nobeden ni več.`;
 let poemIdx=-1, poemOn=false;
-function openPoem(){ const st=POVODNI.split('\n\n'); const box=$('poemText'); box.innerHTML='';
+function openPoem(){ stopSay(); const st=POVODNI.split('\n\n'); const box=$('poemText'); box.innerHTML='';
   st.forEach((s,i)=>{ const d=document.createElement('div'); d.className='kit'; d.id='kit'+i; d.textContent=s; d.onclick=()=>{ const a=$('poemAud'); if(a&&!a.paused){ audSeekKit(i); } else readPoem(i,true); }; box.appendChild(d); });
   $('poem').classList.add('show'); audioInit(); audInit(); }
-function readPoem(i,single){ const st=POVODNI.split('\n\n'); if(i>=st.length){ poemOn=false; hl(-1); return; } poemIdx=i; hl(i);
+function readPoem(i,single){ if(sayQ) stopSay(); const st=POVODNI.split('\n\n'); if(i>=st.length){ poemOn=false; hl(-1); return; } poemIdx=i; hl(i);
   const el=$('kit'+i); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
   if(!slVoice){ return; } try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(st[i].replace(/[-–]\s*$/gm,'').replace(/'/g,'')); u.voice=slVoice; u.lang=slVoice.lang; u.rate=.9; u.pitch=1;
     u.onend=()=>{ if(poemOn&&!single) readPoem(i+1,false); }; speechSynthesis.speak(u); }catch(e){} }
@@ -755,7 +755,7 @@ function audInit(){ const a=$('poemAud'); if(!a||a._i) return; a._i=1;
   a.addEventListener('ended',()=>{ hl(-1); poemIdx=-1; $('poemListen').classList.remove('playing'); $('poemListen').textContent='🎧 Poslušaj'; });
   a.addEventListener('pause',()=>{ $('poemListen').classList.remove('playing'); $('poemListen').textContent='🎧 Poslušaj'; });
   a.addEventListener('play',()=>{ $('poemListen').classList.add('playing'); $('poemListen').textContent='⏸ Premor'; });
-  $('poemListen').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){} poemOn=false; if(a.paused){ a.play().catch(()=>$('poem').classList.add('noaud')); } else a.pause(); }; }
+  $('poemListen').onclick=()=>{ stopSay(); try{ speechSynthesis.cancel(); }catch(e){} poemOn=false; if(a.paused){ a.play().catch(()=>$('poem').classList.add('noaud')); } else a.pause(); }; }
 function audSeekKit(i){ const a=$('poemAud'); if(!a||$('poem').classList.contains('noaud')) return false; const st=POVODNI.split('\n\n');
   let t; if(AUD_T) t=AUD_T[i]; else { const L=st.map(x=>x.length), tot=L.reduce((p,c)=>p+c,0); t=L.slice(0,i).reduce((p,c)=>p+c,0)/tot*(a.duration||0); }
   if(!isFinite(t)) return false; a.currentTime=t; a.play().catch(()=>{}); return true; }
