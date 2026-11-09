@@ -2777,7 +2777,7 @@ function initRiverLabels(){ const L=[]; const cvs=document.createElement('canvas
   attr(gl.getAttribLocation(P.p,'aP'),b,3,24,0); attr(gl.getAttribLocation(P.p,'aT'),b,2,24,12); attr(gl.getAttribLocation(P.p,'aA'),b,1,24,20); gl.bindVertexArray(null); rivLab.P=P; rivLab.vao=vao; rivLab.b=b; }
 function pAt(P,S,s){ s=clamp(s,0,S[S.length-1]); let lo=0,hi=S.length-1; while(hi-lo>1){ const m=(lo+hi)>>1; if(S[m]<=s) lo=m; else hi=m; } const t=(s-S[lo])/((S[hi]-S[lo])||1); return [lerp(P[lo][0],P[hi][0],t),lerp(P[lo][1],P[hi][1],t)]; }
 function drawRiverLabels(E){ if(!rivLab||cam.D>170||game||postal) return; const a=clamp((170-cam.D)/30,0,1)*(follow&&rideFP?0:1); if(a<=0) return; const D=[]; const NS=24;
-  for(const lb of rivLab.L){ const c0=pAt(lb.P,lb.S,lb.s0); if(Math.hypot(c0[0]-cam.X,c0[1]-cam.Z)>cam.D*1.6+10) continue; const dE=Math.hypot(c0[0]-eye[0],groundY(c0[0],c0[1])-eye[1],c0[1]-eye[2]); const H=clamp(dE*.027,.2,3);
+  for(const lb of rivLab.L){ const c0=pAt(lb.P,lb.S,lb.s0); if(Math.hypot(c0[0]-cam.X,c0[1]-cam.Z)>cam.D*1.6+10) continue; const dE=Math.hypot(c0[0]-eyeF[0],groundY(c0[0],c0[1])-eyeF[1],c0[1]-eyeF[2]); const H=clamp(dE*.027,.2,3);
     const len=H*16*lb.frac; if(len>lb.S[lb.S.length-1]*.9) continue;
     // reading direction: left->right on screen
     const pA=pAt(lb.P,lb.S,lb.s0-len/2), pB=pAt(lb.P,lb.S,lb.s0+len/2); const sa=M4.xf(VP,pA[0],groundY(pA[0],pA[1]),pA[1]), sb=M4.xf(VP,pB[0],groundY(pB[0],pB[1]),pB[1]); const flip=sb[0]<sa[0];
@@ -2809,16 +2809,19 @@ function drawLandmarks(){
 //  CAMERA & INPUT
 // =====================================================================
 const cam={yaw:0,pitch:.95,dist:230,tx:0,ty:0,tz:8, Y:0,P:.95,D:230,X:0,Z:8,TY:0, snap:false};
+const ISO25=!/[?&]3d/.test(location.search), ISOK=4.5;
 const HOME={yaw:.08,pitch:.9,dist:222,tx:-9,ty:0,tz:3};
-let VP, eye, camR, camU, W=1,H=1, follow=null;
+let VP, eye, eyeF=[0,100,100], isoK=1, camR, camU, W=1,H=1, follow=null;
 const DMIN=8, DMAX=380;
 function setHome(){ flying=true; const asp=innerWidth/innerHeight; Object.assign(cam,{yaw:HOME.yaw,pitch:asp<1?1.05:HOME.pitch,dist:HOME.dist*(asp<1?clamp(1.15/asp,1,2.4):1),tx:HOME.tx,ty:HOME.ty,tz:HOME.tz}); }
 function flyTo(x,z,dist=55,y=null){ flying=true; cam.tx=x; cam.tz=z; cam.ty=(y==null?groundY(x,z):y); cam.dist=dist; cam.pitch=clamp(cam.pitch,.5,.9); }
 function computeVP(){
-  const cp=Math.cos(cam.P), sp=Math.sin(cam.P);
-  eye=[cam.X+Math.sin(cam.Y)*cp*cam.D, cam.TY+sp*cam.D, cam.Z+Math.cos(cam.Y)*cp*cam.D];
-  const minY=groundY(eye[0],eye[2])+1.5; if(eye[1]<minY) eye[1]=minY;
-  const Pm=M4.persp(.78,W/H,.3,2000), V=M4.look(eye,[cam.X,cam.TY,cam.Z],[0,1,0]); NEARFAR=[.3,2000];
+  const cp=Math.cos(cam.P), sp=Math.sin(cam.P), k=isoK, D=cam.D*k;
+  eyeF=[cam.X+Math.sin(cam.Y)*cp*cam.D, cam.TY+sp*cam.D, cam.Z+Math.cos(cam.Y)*cp*cam.D];
+  const minY=groundY(eyeF[0],eyeF[2])+1.5; if(eyeF[1]<minY) eyeF[1]=minY;
+  const tg=[cam.X,cam.TY,cam.Z]; eye=[tg[0]+(eyeF[0]-tg[0])*k, tg[1]+(eyeF[1]-tg[1])*k, tg[2]+(eyeF[2]-tg[2])*k];
+  const nr=Math.max(.3,D-cam.D*1.2), fr=Math.min(2000+D,D+cam.D*6+400);
+  const Pm=M4.persp(2*Math.atan(Math.tan(.39)/k),W/H,nr,fr), V=M4.look(eye,tg,[0,1,0]); NEARFAR=[nr,fr];
   VP=M4.mul(Pm,V); camR=[V[0],V[4],V[8]]; camU=[V[1],V[5],V[9]];
 }
 function snapCam(){ cam.Y=cam.yaw; cam.P=cam.pitch; cam.D=cam.dist; cam.X=cam.tx; cam.Z=cam.tz; cam.TY=cam.ty; computeVP(); }
@@ -2832,12 +2835,14 @@ function fpCam(dt){ const it=follow; const S=it.S||1; const o=FPV[it.id]||[.5,.8
   let E2=[ex,ey,ez], Tg=[ex+dir[0],ey+dir[1],ez+dir[2]], fov=W<H?1.5:1.1;
   if(fpTrans<1){ fpTrans=Math.min(1,(performance.now()-fpStart)/1800); const e=fpTrans*fpTrans*(3-2*fpTrans); const e2=1-Math.pow(1-fpTrans,3);
     E2=[lerp(fpFrom.e[0],E2[0],e),lerp(fpFrom.e[1],E2[1],e)+Math.sin(fpTrans*Math.PI)*2,lerp(fpFrom.e[2],E2[2],e)]; Tg=[lerp(fpFrom.t[0],Tg[0],e2),lerp(fpFrom.t[1],Tg[1],e2),lerp(fpFrom.t[2],Tg[2],e2)]; fov=lerp(.78,fov,e); }
-  eye=E2; const Pm=M4.persp(fov,W/H,.05,1500), V=M4.look(eye,Tg,[0,1,0]); NEARFAR=[.05,1500];
+  eye=E2; eyeF=E2; const Pm=M4.persp(fov,W/H,.12,1500), V=M4.look(eye,Tg,[0,1,0]); NEARFAR=[.12,1500];
   VP=M4.mul(Pm,V); camR=[V[0],V[4],V[8]]; camU=[V[1],V[5],V[9]];
   cam.X=cam.tx=p[0]; cam.Z=cam.tz=p[2]; cam.D=cam.dist=12; cam.TY=p[1]; cam.Y=fpYaw+Math.PI; }
 function updateCam(dt){
   if(follow&&rideFP&&!pilot&&follow.model){ fpCam(dt); return; }
   if(follow){ cam.tx=follow.pos[0]; cam.tz=follow.pos[2]; cam.ty=follow.pos[1]; }
+  const iso=ISO25&&!follow&&!pilot; isoK=lerp(isoK,iso?ISOK:1,1-Math.pow(.02,dt)); if(Math.abs(isoK-(iso?ISOK:1))<.01) isoK=iso?ISOK:1;
+  if(iso){ cam.yaw=HOME.yaw; cam.pitch=innerWidth<innerHeight?1.02:.86; }
   if(!dragging){ const k=1-Math.pow(.003,dt); const kf=follow?1-Math.pow(.02,dt):k;
     cam.Y=lerp(cam.Y,cam.yaw,k); cam.P=lerp(cam.P,cam.pitch,k); cam.D=lerp(cam.D,cam.dist,k); cam.X=lerp(cam.X,cam.tx,kf); cam.Z=lerp(cam.Z,cam.tz,kf); cam.TY=lerp(cam.TY,cam.ty,k);
     if(flying && Math.abs(cam.D-cam.dist)<.5 && Math.hypot(cam.X-cam.tx,cam.Z-cam.tz)<.3) flying=false;
@@ -3100,7 +3105,7 @@ function startFlightSound(it){ stopFlightSound(); if(!AC||!(it.id==='letalo'||it
 function stopFlightSound(){ if(!flightSnd) return; const s=flightSnd; flightSnd=null; s.g.gain.setTargetAtTime(0,AC.currentTime,.4); setTimeout(()=>{ s.nodes.forEach(n=>{ try{n.stop();}catch(e){} }); s.g.disconnect(); },2000); }
 const HORNV=['vlak','vlak2','avto','ladja','traktor'];
 function hornSync(cardIt){ $('hornBtn').classList.toggle('show',!!follow&&!pilot&&HORNV.includes(follow.id)&&(!cardIt||cardIt===follow)); }
-function startRide(it){ fpFrom={e:eye?eye.slice():[0,100,100],t:[cam.X,cam.TY,cam.Z]}; fpTrans=0; fpStart=performance.now(); follow=it; rideFP=!!FPV[it.id]; lookYaw=0; lookPitch=it.id==='letalo'?-.38:it.id==='balon'?-.6:-.1; fpYaw=null; startFlightSound(it); cam.dist=it.id==='letalo'?60:it.id==='balon'?40:28; cam.pitch=.42; $('rideBtn').classList.add('show'); $('viewBtn').classList.add('show'); setBtnTxt(); $('hornBtn').classList.toggle('show',HORNV.includes(it.id)); $('hornBtn').textContent=it.model==='train'?'📯 Ču-čuuu!':'📯 Hupa'; if(it.model==='train'){ audioInit(); play('whistle'); setTimeout(()=>{ if(follow===it) startTrainMusic(); },1600); } }
+function startRide(it){ fpFrom={e:eyeF?eyeF.slice():[0,100,100],t:[cam.X,cam.TY,cam.Z]}; fpTrans=0; fpStart=performance.now(); follow=it; rideFP=!!FPV[it.id]; lookYaw=0; lookPitch=it.id==='letalo'?-.38:it.id==='balon'?-.6:-.1; fpYaw=null; startFlightSound(it); cam.dist=it.id==='letalo'?60:it.id==='balon'?40:28; cam.pitch=.42; $('rideBtn').classList.add('show'); $('viewBtn').classList.add('show'); setBtnTxt(); $('hornBtn').classList.toggle('show',HORNV.includes(it.id)); $('hornBtn').textContent=it.model==='train'?'📯 Ču-čuuu!':'📯 Hupa'; if(it.model==='train'){ audioInit(); play('whistle'); setTimeout(()=>{ if(follow===it) startTrainMusic(); },1600); } }
 function toggleView(){ fpFrom={e:eye.slice(),t:[cam.X,cam.TY,cam.Z]}; fpTrans=rideFP?1:0; fpStart=performance.now(); rideFP=!rideFP; if(!rideFP){ cam.yaw=(fpYaw||0)+Math.PI; cam.pitch=.42; cam.dist=follow&&follow.id==='letalo'?60:28; snapCam(); } setBtnTxt(); }
 function setBtnTxt(){ $('viewBtn').textContent=rideFP?'🎥 Pogled od zunaj':'👀 Pogled iz vozila'; }
 function stopRide(){ if(pilot||!follow) return; stopTrainMusic(); stopFlightSound(); const wasFP=rideFP; follow=null; rideFP=false; $('rideBtn').classList.remove('show'); $('viewBtn').classList.remove('show'); $('hornBtn').classList.remove('show'); northUp(); if(wasFP){ cam.dist=40; cam.pitch=.7; snapCam(); } }
@@ -3231,7 +3236,7 @@ function envState(){ // sun/sky depending on day & weather
 }
 function setCommon(P,E,t){ const u=P.u; gl.useProgram(P.p); if(u.uVP) gl.uniformMatrix4fv(u.uVP,false,VP);
   if(u.uSun) gl.uniform3fv(u.uSun,E.lightDir); if(u.uSunCol) gl.uniform3fv(u.uSunCol,E.sunCol); if(u.uAmbSky) gl.uniform3fv(u.uAmbSky,E.ambS); if(u.uAmbGnd) gl.uniform3fv(u.uAmbGnd,E.ambG);
-  if(u.uFogCol) gl.uniform3fv(u.uFogCol,E.hor); if(u.uFogK) gl.uniform1f(u.uFogK,.0016+E.cloudy*.002); if(u.uCam) gl.uniform3fv(u.uCam,eye); if(u.uNight) gl.uniform1f(u.uNight,E.night); if(u.uSnow) gl.uniform1f(u.uSnow,weatherT[2]); if(u.uTime) gl.uniform1f(u.uTime,t); if(u.uSeason) gl.uniform3f(u.uSeason,seasonT[1],seasonT[3],seasonT[2]); }
+  if(u.uFogCol) gl.uniform3fv(u.uFogCol,E.hor); if(u.uFogK) gl.uniform1f(u.uFogK,.0016+E.cloudy*.002); if(u.uCam) gl.uniform3fv(u.uCam,eyeF); if(u.uNight) gl.uniform1f(u.uNight,E.night); if(u.uSnow) gl.uniform1f(u.uSnow,weatherT[2]); if(u.uTime) gl.uniform1f(u.uTime,t); if(u.uSeason) gl.uniform3f(u.uSeason,seasonT[1],seasonT[3],seasonT[2]); }
 
 let last=performance.now(), T=0, lastEnv=null, lastDt=.016;
 // ===================== SLIKANICA (živi akvarel) =====================
@@ -3267,22 +3272,22 @@ void main(){
 #endif
   c=mix(c,b,.08); c=clamp(c+(c0-b)*.35,0.,1.);
   float d0=texture(uD,uv).r; bool sky=d0>.99999; float L0=lin(d0);
-  vec2 e1=vec2(1.5*sc,0.)*tx, e2=vec2(0.,1.5*sc)*tx;
+  vec2 e1=vec2(1.9*sc,0.)*tx, e2=vec2(0.,1.9*sc)*tx;
   float dl=lin(texture(uD,uv-e1).r), dr=lin(texture(uD,uv+e1).r), dd=lin(texture(uD,uv-e2).r), du=lin(texture(uD,uv+e2).r);
-  float de=(abs(dl-dr)+abs(du-dd))/max(L0,.001); float dEdge=smoothstep(.02,.07,de);
+  float iL=1./max(L0,.001); float de=(abs(1./dl+1./dr-2.*iL)+abs(1./du+1./dd-2.*iL))/iL*.5; float dEdge=smoothstep(.04,.13,de);
   vec3 cl=texture(uC,uv-e1).rgb, cr=texture(uC,uv+e1).rgb, cd=texture(uC,uv-e2).rgb, cu=texture(uC,uv+e2).rgb;
   float le=abs(lum(cl)-lum(cr))+abs(lum(cu)-lum(cd)); float lEdge=smoothstep(.08,.24,le);
-  float ink=max(dEdge,lEdge*.7)*(.65+.6*vn(px/(5.*sc)))*(1.-smoothstep(uFocus*1.3,uFocus*2.6,L0));
+  float ink=max(dEdge,lEdge*.75)*(.85+.3*vn(px/(5.*sc)))*(1.-smoothstep(uFocus*2.2,uFocus*4.5,L0));
   float lap=abs(lum(cl)+lum(cr)+lum(cu)+lum(cd)-4.*lum(c));
   // živa paleta
-  c=pow(max(c,0.),vec3(.9)); c=sat(c,1.45);
+  c=pow(max(c,0.),vec3(.9)); { float l=max(lum(c),.001); float lq=(floor(l*5.+.5))/5.; float lb=mix(l,lq,.45); c*=lb/l; } c=sat(c,1.55);
   float g=clamp(c.g-max(c.r,c.b),0.,1.); c.r+=g*.16; c.b-=g*.05;
   float bl=clamp(c.b-max(c.r,c.g),0.,1.); c.g+=bl*.25;
   c*=vec3(1.05,1.,.93); c=clamp(c+.02,0.,1.);
   c*=1.-.3*clamp(lap*3.5,0.,1.);
   float pn=fbm(px/(3.2*sc)), gr=vn(px/(1.1*sc));
-  c+=(pn-.5)*.14*(1.-c)+(gr-.5)*.045;
-  if(!sky) c=mix(c,vec3(.30,.19,.11)*(1.-uNight*.45),clamp(ink,0.,1.)*mix(.78,.3,smoothstep(35.,130.,uFocus)));
+  c+=(pn-.5)*.08*(1.-c)+(gr-.5)*.025;
+  if(!sky) c=mix(c,vec3(.30,.19,.11)*(1.-uNight*.45),clamp(ink,0.,1.)*mix(.9,.45,smoothstep(45.,200.,uFocus)));
   vec2 q=uv-.5; float v=clamp(dot(q,q)*2.3,0.,1.); v*=v;
   vec3 cream=mix(vec3(.985,.945,.865),vec3(.32,.33,.45),uNight*.75);
   c=mix(c,cream,clamp(v*.55*(.75+.5*pn),0.,1.));
@@ -3351,7 +3356,7 @@ function frameInner(now){
   drawModels(E);
   // water
   gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-  setCommon(water.P,E,T); gl.bindVertexArray(water.vao); gl.depthMask(false); gl.drawArrays(gl.TRIANGLES,0,6); gl.depthMask(true); drawRiverLabels(E); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+  setCommon(water.P,E,T); gl.bindVertexArray(water.vao); gl.depthMask(!!(WC&&wc.fb)); gl.drawArrays(gl.TRIANGLES,0,6); gl.depthMask(true); drawRiverLabels(E); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
   // sprites
   if(WC&&wc.fb) wcCompose(E);
   drawSprites(E);
@@ -3363,7 +3368,7 @@ function frameInner(now){
   requestAnimationFrame(frame);
 }
 
-function labSz(x,y,z,f){ return clamp(Math.hypot(x-eye[0],y-eye[1],z-eye[2])*.03,.08,(follow&&!pilot)?((follow.id==='letalo'||follow.id==='balon')?3.2:2.2):9)*f; }
+function labSz(x,y,z,f){ return clamp(Math.hypot(x-eyeF[0],y-eyeF[1],z-eyeF[2])*.03,.08,(follow&&!pilot)?((follow.id==='letalo'||follow.id==='balon')?3.2:2.2):9)*f; }
 let labA=1;
 function drawSprites(E){
   const D=sprites.data; let n=0; const R=camR,U=camU;
