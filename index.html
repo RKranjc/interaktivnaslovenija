@@ -818,7 +818,8 @@ addEventListener('keydown',e=>{ const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U
 addEventListener('keyup',e=>{ const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[e.key]; if(m) KEYS[m]=false; });
 for(const b of document.querySelectorAll('#pad button')){ const k=b.dataset.k; const on=e=>{ e.preventDefault(); KEYS[k]=true; audioInit(); }, off=e=>{ e.preventDefault(); KEYS[k]=false; };
   b.addEventListener('pointerdown',on); b.addEventListener('pointerup',off); b.addEventListener('pointerleave',off); b.addEventListener('pointercancel',off); }
-function stepPilot(dt){ if(!pilot) return; const p=pilot; if(KEYS.L) p.ang-=2.2*dt; if(KEYS.R) p.ang+=2.2*dt; if(KEYS.U) p.v=Math.min(600,p.v+300*dt); if(KEYS.D) p.v=Math.max(120,p.v-300*dt);
+function stepPilot(dt){ if(!pilot) return; const p=pilot; const dx=(KEYS.R?1:0)-(KEYS.L?1:0), dy=(KEYS.D?1:0)-(KEYS.U?1:0);
+  if(dx||dy){ const ta=Math.atan2(dx,-dy); let d=ta-p.ang; d=Math.atan2(Math.sin(d),Math.cos(d)); const mx=6*dt; p.ang+=Math.max(-mx,Math.min(mx,d)); p.v=Math.min(380,p.v+400*dt); } else p.v=Math.max(220,p.v-150*dt);
   p.x+=Math.sin(p.ang)*p.v*dt; p.y-=Math.cos(p.ang)*p.v*dt; p.x=Math.max(SL[0]-300,Math.min(SL[2]+300,p.x)); p.y=Math.max(SL[1]-300,Math.min(SL[3]+300,p.y));
   tgt.cx=p.x; tgt.cy=p.y; cam.cx+=(p.x-cam.cx)*Math.min(1,dt*4); cam.cy+=(p.y-cam.cy)*Math.min(1,dt*4); tgt.cx=cam.cx; tgt.cy=cam.cy;
   for(const st of p.stars){ if(st.got) continue; if(Math.hypot(st.x-p.x,st.y-p.y)<70){ st.got=true; p.score++; $('pscore').textContent='⭐ '+p.score; play('sticker'); toast(st.it.n+'!'); say(st.it.n+'.');
