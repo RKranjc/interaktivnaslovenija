@@ -449,13 +449,14 @@ function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a
 //  GL SETUP
 // =====================================================================
 const cv=document.getElementById('gl');
-let LITE=false; try{ LITE=localStorage.getItem('ms3d_lite')==='1'; }catch(e){}
+let LITE=false; try{ localStorage.removeItem('ms3d_lite'); LITE=sessionStorage.getItem('ms3d_lite')==='1'; }catch(e){}
+let WCBAD=false; try{ if(/[?&]slikanica/.test(location.search)) localStorage.removeItem('ms3d_wcbad'); WCBAD=localStorage.getItem('ms3d_wcbad')==='1'; }catch(e){}
 let WC=false; try{ localStorage.removeItem('ms3d_style'); }catch(e){}
 let NEARFAR=[.3,2000];
 const wc={fb:null,ct:null,dt:null,w:0,h:0,P:null,vao:null};
 const gl=cv.getContext('webgl2',{antialias:!LITE,alpha:false,powerPreference:LITE?'low-power':'default'});
 function fail(msg){const e=document.getElementById('err');e.style.display='grid';e.textContent=msg;}
-cv.addEventListener('webglcontextlost',e=>{ e.preventDefault(); if(!LITE){ try{ localStorage.setItem('ms3d_lite','1'); }catch(_){} setTimeout(()=>location.reload(),300); } else fail('Tej napravi je zmanjkalo pomnilnika za 3D zemljevid. Odpri povezavo v Safariju ali Chromu in zapri druge zavihke.'); });
+cv.addEventListener('webglcontextlost',e=>{ e.preventDefault(); if(WC||wc.trying){ try{ localStorage.setItem('ms3d_wcbad','1'); }catch(_){} setTimeout(()=>location.reload(),300); return; } if(!LITE){ try{ sessionStorage.setItem('ms3d_lite','1'); }catch(_){} setTimeout(()=>location.reload(),300); } else fail('Tej napravi je zmanjkalo pomnilnika za 3D zemljevid. Odpri povezavo v Safariju ali Chromu in zapri druge zavihke.'); });
 if(!gl){fail('Ta brskalnik ne podpira 3D grafike (WebGL2). Poskusi z novejšim Chromom ali Edgeom.');throw new Error('no webgl2');}
 
 function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.error(src.split('\n').map((l,i)=>(i+1)+': '+l).join('\n'));throw new Error(gl.getShaderInfoLog(s));}return s;}
@@ -3309,7 +3310,7 @@ function wcEnsure(){
   if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE){ gl.bindFramebuffer(gl.FRAMEBUFFER,null); gl.deleteFramebuffer(wc.fb); wc.fb=null; WC=false; throw new Error('Slikanica: FBO ni podprt'); }
   gl.bindFramebuffer(gl.FRAMEBUFFER,null);
   if(wc.ms){ gl.deleteFramebuffer(wc.ms); gl.deleteRenderbuffer(wc.mc); gl.deleteRenderbuffer(wc.md); wc.ms=null; }
-  try{ const S=Math.min(wc.LQ?2:4, gl.getParameter(gl.MAX_SAMPLES)||0);
+  try{ const S=Math.min(wc.LQ?0:4, gl.getParameter(gl.MAX_SAMPLES)||0);
     if(S>1){ wc.mc=gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER,wc.mc); gl.renderbufferStorageMultisample(gl.RENDERBUFFER,S,gl.RGBA8,w,h);
       wc.md=gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER,wc.md); gl.renderbufferStorageMultisample(gl.RENDERBUFFER,S,gl.DEPTH_COMPONENT24,w,h);
       wc.ms=gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER,wc.ms);
@@ -3485,9 +3486,9 @@ const INAPP=/FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|Line\/|MicroMessenger|Sn
     window.__ready=true;
     setTimeout(()=>{ toast('Klikni na živali, reke, gore in kraje!'); },1500);
     // Slikanica je privzeti videz; navadni 3D ostane le kot rezerva za naprave, ki je ne zmorejo
-    if(!LITE && !/[?&]navadno/.test(location.search)) setTimeout(()=>{ try{ wcEnsure(); if(!wc.fb) throw new Error('fbo'); setWC(true); }catch(e){ console.warn('slikanica',e); WC=false; document.body.classList.remove('wc'); } },1200);
+    if(!LITE && !WCBAD && !/[?&]navadno/.test(location.search)) setTimeout(()=>{ wc.trying=true; setTimeout(()=>{ wc.trying=false; },8000); try{ wcEnsure(); if(!wc.fb) throw new Error('fbo'); setWC(true); }catch(e){ console.warn('slikanica',e); WC=false; document.body.classList.remove('wc'); } },1200);
   }catch(e){ console.error(e); const lost=gl.isContextLost&&gl.isContextLost();
-    if(!LITE){ try{ localStorage.setItem('ms3d_lite','1'); location.reload(); return; }catch(_){} }
+    if(!LITE){ try{ sessionStorage.setItem('ms3d_lite','1'); location.reload(); return; }catch(_){} }
     fail(lost||e.message==null||e.message==='null' ? 'Tej napravi je zmanjkalo pomnilnika za 3D zemljevid. Odpri povezavo v Safariju ali Chromu (v Messengerju: ⋯ → Odpri v brskalniku) in zapri druge zavihke.' : 'Ups, nekaj je šlo narobe pri risanju karte: '+e.message); }
 })();
 </script>
