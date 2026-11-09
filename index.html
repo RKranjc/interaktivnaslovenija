@@ -737,8 +737,8 @@ function drawRegion(){ drawBorders(); if(!regShow) return; const a=Math.min(1,(T
   const [lx,ly]=w2s(...CFG.reglab[regShow.k]); const n=REGINFO[regShow.k][0]; ctx.font='800 34px Grandstander,Nunito,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.lineWidth=8; ctx.strokeStyle='#fff8ec'; ctx.strokeText(n,lx,ly); ctx.fillStyle='#8a3b12'; ctx.fillText(n,lx,ly); ctx.restore(); }
 function regionTap(x,y){ const [wx,wy]=s2w(x,y); if(wx<SL[0]||wx>SL[2]||wy<SL[1]||wy>SL[3]) return false; const r=regionAtW(wx,wy); if(!r) return false;
   const q=game.q; const n=REGINFO[r][0];
-  if(r===q.reg){ play('cheer'); game.score++; game.n++; if(q.cnt) game.done.add(r); regShow={k:r,t:T,until:T+2.5}; say(q.item?'Bravo! '+q.item.n+' je v pokrajini '+n+'.':'Bravo! To je '+n+'.'); toast('Bravo! '+n+' ⭐'); setTimeout(()=>{ if(game&&game.kind==='regions') nextRegion(); },1800); }
-  else { play('boing'); regShow={k:r,t:T,until:T+2.2}; toast('To je '+n+'. Poskusi še enkrat!'); say('To je '+n+'. Poskusi še enkrat.'); }
+  if(r===q.reg){ play('cheer'); game.score++; game.n++; if(!q.miss) game.ok=(game.ok||0)+1; if(q.cnt) game.done.add(r); regShow={k:r,t:T,until:T+2.5}; say(q.item?'Bravo! '+q.item.n+' je v pokrajini '+n+'.':'Bravo! To je '+n+'.'); toast('Bravo! '+n+' ⭐'); setTimeout(()=>{ if(game&&game.kind==='regions') nextRegion(); },1800); }
+  else { play('boing'); q.miss=true; regShow={k:r,t:T,until:T+2.2}; toast('To je '+n+'. Poskusi še enkrat!'); say('To je '+n+'. Poskusi še enkrat.'); }
   return true; }
 const RQ=10;
 const RCHAR=[['Kje rastejo oljke in je morje?','primorska'],['Kje je najvišja gora Triglav?','gorenjska'],['Kje gnezdi največ štorkelj?','prekmurje'],['Kje je ravno kot miza in rastejo sončnice?','prekmurje'],
@@ -749,16 +749,16 @@ const RCHAR=[['Kje rastejo oljke in je morje?','primorska'],['Kje je najvišja g
  ['Kje je Ptuj, najstarejše mesto?','stajerska'],['Kje je Peca, kjer spi kralj Matjaž?','koroska'],['Kje je Kočevski rog z medvedi?','dolenjska'],['Kje plešejo belokranjsko kolo?','belakrajina']];
 function winModal(t,p,cb){ $('wT').textContent=t; $('wP').textContent=p; $('win').classList.add('show'); $('wB').onclick=()=>{ $('win').classList.remove('show'); cb(); }; }
 function nextRegion(){ const all=Object.keys(REGINFO);
-  if(game.round===1&&game.done.size>=all.length){ play('cheer'); say('Čestitam! Našel si vse pokrajine!'); winModal('Čestitam!','Našel si vseh 9 pokrajin! Zdaj pa runda 2: značilnosti pokrajin.',()=>{ game.round=2; game.n=0; game.used=new Set(); nextRegion(); }); return; }
-  if(game.round===2&&game.n>=RQ){ play('cheer'); say('Čestitam! Poznaš značilnosti pokrajin!'); winModal('Čestitam!','Poznaš značilnosti pokrajin! Runda 3: v kateri pokrajini je …?',()=>{ game.round=3; game.n=0; game.used=new Set(); nextRegion(); }); return; }
-  if(game.round===3&&game.n>=RQ){ play('cheer'); say('Čestitam! Pravi poznavalec Slovenije si!'); winModal('Bravo, pravi poznavalec Slovenije!','Rešil si vse tri runde! 🎉',()=>{ game.round=1; game.done=new Set(); game.n=0; nextRegion(); }); return; }
+  if(game.round===1&&game.done.size>=all.length){ play('cheer'); say('Čestitam! Našel si vse pokrajine! Pravilno v prvo: '+(game.ok||0)+' od 9.'); const ok1=game.ok||0; winModal('Čestitam!','Našel si vseh 9 pokrajin! V prvo si jih zadel '+ok1+' od 9. Zdaj pa runda 2: značilnosti pokrajin.',()=>{ game.ok=0; game.round=2; game.n=0; game.used=new Set(); nextRegion(); }); return; }
+  if(game.round===2&&game.n>=RQ){ play('cheer'); say('Čestitam! Pravilno si odgovoril na '+(game.ok||0)+' od '+RQ+' vprašanj.'); const ok2=game.ok||0; winModal('Čestitam!','Pravilno si odgovoril na '+ok2+' od '+RQ+' vprašanj! Runda 3: v kateri pokrajini je …?',()=>{ game.ok=0; game.round=3; game.n=0; game.used=new Set(); nextRegion(); }); return; }
+  if(game.round===3&&game.n>=RQ){ play('cheer'); say('Čestitam! Pravilno si odgovoril na '+(game.ok||0)+' od '+RQ+' vprašanj. Pravi poznavalec Slovenije si!'); const ok3=game.ok||0; winModal('Bravo, pravi poznavalec Slovenije!','Pravilno si odgovoril na '+ok3+' od '+RQ+' vprašanj. Rešil si vse tri runde! 🎉',()=>{ game.ok=0; game.round=1; game.done=new Set(); game.n=0; nextRegion(); }); return; }
   $('qPic').innerHTML='';
   if(game.round===1){ const ks=all.filter(k=>!game.done.has(k)); const k=ks[Math.floor(Math.random()*ks.length)]; game.q={reg:k,cnt:true};
-    $('qKind').textContent='Runda 1 · Poišči pokrajino · '+game.done.size+'/'+all.length; $('qName').textContent=REGINFO[k][0]; say('Poišči pokrajino '+REGINFO[k][0]+'.'); }
+    $('qKind').textContent='Runda 1 · Poišči pokrajino · '+game.done.size+'/'+all.length+' · ✅ '+(game.ok||0); $('qName').textContent=REGINFO[k][0]; say('Poišči pokrajino '+REGINFO[k][0]+'.'); }
   else if(game.round===2){ const pool=RCHAR.filter(c=>!game.used.has(c[0])); const c=pool[Math.floor(Math.random()*pool.length)]; game.used.add(c[0]); game.q={reg:c[1],text:c[0]};
-    $('qKind').textContent='Runda 2 · Značilnosti · '+(game.n+1)+'/'+RQ; $('qName').textContent=c[0]; say(c[0]); }
+    $('qKind').textContent='Runda 2 · Značilnosti · '+(game.n+1)+'/'+RQ+' · ✅ '+(game.ok||0); $('qName').textContent=c[0]; say(c[0]); }
   else { let it,reg,t=0; do{ it=game.pool[Math.floor(Math.random()*game.pool.length)]; reg=regionAtW(it.home[0],it.home[1]); t++; }while((!reg||game.used.has(it.id))&&t<200); game.used.add(it.id); game.q={reg,item:it};
-    $('qKind').textContent='Runda 3 · V kateri pokrajini je … · '+(game.n+1)+'/'+RQ; $('qName').textContent=it.n; const src=picFor(it); if(src){ const im=new Image(); im.src=src; $('qPic').appendChild(im); } say('V kateri pokrajini je '+it.n+'?'); }
+    $('qKind').textContent='Runda 3 · V kateri pokrajini je … · '+(game.n+1)+'/'+RQ+' · ✅ '+(game.ok||0); $('qName').textContent=it.n; const src=picFor(it); if(src){ const im=new Image(); im.src=src; $('qPic').appendChild(im); } say('V kateri pokrajini je '+it.n+'?'); }
   $('quest').classList.add('show'); home(); }
 $('bRegions').onclick=()=>{ audioInit(); if(game&&game.kind==='regions') stopGame(); else { closeCard(); stopPilot&&stopPilot(); game={kind:'regions',score:0,round:1,n:0,done:new Set(),used:new Set(),pool:ITEMS.filter(it=>it.home&&!it.country&&it.c!=='drzava'&&it.c!=='gorovje'&&it.c!=='vozilo'&&it.id!=='morje'&&!/jezera$/.test(it.n))}; $('bRegions').classList.add('on'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); nextRegion(); } };
 const POVODNI=`Od nékdej lepé so Ljubljanke slovele,
