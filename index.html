@@ -519,6 +519,9 @@ function step(dt){
   for(const c of CLOUDS){ c.x+=c.v*dt; if(c.x>SL[2]+1500) c.x=SL[0]-1500; }
 }
 function visibleObj(o){ const s=cam.s; if(o.kind==='dec') return true; if(o.kind==='animal') return s>.09; if(o.kind==='veh') return s>.07; return true; }
+const LOWC=new Map();
+function lowres(im,w){ w=Math.max(4,Math.round(w)); const k=im.src+'|'+w; let c=LOWC.get(k); if(c) return c; const h=Math.max(4,Math.round(w*im.naturalHeight/im.naturalWidth));
+  c=document.createElement('canvas'); c.width=w; c.height=h; const g=c.getContext('2d'); g.imageSmoothingQuality='high'; g.drawImage(im,0,0,w,h); LOWC.set(k,c); if(LOWC.size>3000) LOWC.clear(); return c; }
 function drawObj(o){ if(!o.img.complete||!o.img.naturalWidth) return; const s=cam.s; const far=Math.max(0,Math.min(1,(s-.08)/.2));
   if(o.kind==='lm'&&o.it&&o.it.c!=='mesto'&&far<.05&&!(game&&game.cur===o.it)) { o.sb=null; return; }
   let w=o.w*s; if(o.kind==='farm'||o.kind==='car'||o.kind==='boat'){ w=o.w*s; } const minw=(o.kind==='farm'||o.kind==='car'||o.kind==='boat')?0:o.kind==='lm'?(o.it&&o.it.c==='mesto'?20:14)+14*far:o.kind==='dec'?0:16+10*far; w=Math.max(w,minw);
@@ -527,7 +530,8 @@ function drawObj(o){ if(!o.img.complete||!o.img.naturalWidth) return; const s=ca
   if(o.kind==='animal'&&o.it.mv&&o.it.mv.k==='fly') bob=-h*.5-Math.sin(T*2+o.x)*4;
   // senca
   ctx.fillStyle='rgba(30,40,20,.28)'; ctx.beginPath(); ctx.ellipse(sx+2,sy,w*.38,w*.11,0,0,6.283); ctx.fill();
-  if(o.flip){ ctx.save(); ctx.translate(sx,0); ctx.scale(-1,1); ctx.drawImage(o.img,-w/2,sy-h+bob,w,h); ctx.restore(); } else ctx.drawImage(o.img,sx-w/2,sy-h+bob,w,h);
+  const src=(s*DPR>1.05&&o.kind!=='lm')?lowres(o.img,w/s):o.img;
+  if(o.flip){ ctx.save(); ctx.translate(sx,0); ctx.scale(-1,1); ctx.drawImage(src,-w/2,sy-h+bob,w,h); ctx.restore(); } else ctx.drawImage(src,sx-w/2,sy-h+bob,w,h);
   o.sb=[sx-w/2,sy-h+bob,w,h];
   if(o.pulse>0){ ctx.strokeStyle=`rgba(255,215,80,${o.pulse})`; ctx.lineWidth=5; ctx.beginPath(); ctx.ellipse(sx,sy,w*.6*(2-o.pulse),w*.2*(2-o.pulse),0,0,6.283); ctx.stroke(); }
 }
