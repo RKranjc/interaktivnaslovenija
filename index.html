@@ -939,7 +939,7 @@ addEventListener('resize',()=>{ resize(); MINS=fitS()*.85; clampCam(tgt); });
 resize(); home(); Object.assign(cam,tgt); updBag();
 // pred-naloži najgrobejše ploščice
 (function pre(){ const z=NZ-1; const nx=Math.ceil(CFG.NTX/2**z), ny=Math.ceil(CFG.NTY/2**z); let n=nx*ny, k=0; for(let y=0;y<ny;y++) for(let x=0;x<nx;x++){ const t=getTile(z,x,y); if(t) t.img.addEventListener('load',()=>{ if(++k>=n) done(); }); }
-  let fin=false; function done(){ if(fin) return; fin=true; $('loading').style.opacity=0; setTimeout(()=>$('loading').remove(),700); setTimeout(()=>toast('Klikni na gradove, živali, gore in kraje!'),900); } setTimeout(done,6000); })();
+  let fin=false; function done(){ if(fin) return; fin=true; $('loading').style.opacity=0; setTimeout(()=>$('loading').remove(),700);  } setTimeout(done,6000); })();
 requestAnimationFrame(t=>{ last=t; frame(t); });
 window.__ready=true;
 </script></body></html>
