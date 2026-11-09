@@ -723,7 +723,10 @@ function regionAtW(x,y){ for(const k in CFG.regpoly){ let c=false; for(const p o
 function regionAt(lon,lat){ const [x,y]=ll2w(lon,lat); return regionAtW(x,y); }
 const w2ll=(x,y)=>[LON0+x/(KX*P),LAT1-y/(KY*P)];
 let regShow=null;
-function drawRegion(){ if(!regShow) return; const a=Math.min(1,(T-regShow.t)*2)*(regShow.until?Math.max(0,Math.min(1,(regShow.until-T))):1); if(a<=0){ regShow=null; return; }
+function drawBorders(){ if(!(game&&game.kind==='regions')) return; ctx.save(); ctx.lineJoin='round';
+  for(const k in CFG.regpoly){ ctx.beginPath(); for(const poly of CFG.regpoly[k]){ poly.forEach(([x,y],i)=>{ const [sx,sy]=w2s(x,y); if(i) ctx.lineTo(sx,sy); else ctx.moveTo(sx,sy); }); ctx.closePath(); }
+    ctx.lineWidth=5; ctx.strokeStyle='rgba(255,255,255,.75)'; ctx.stroke(); ctx.lineWidth=2.2; ctx.strokeStyle='rgba(110,50,20,.85)'; ctx.setLineDash([8,5]); ctx.stroke(); ctx.setLineDash([]); } ctx.restore(); }
+function drawRegion(){ drawBorders(); if(!regShow) return; const a=Math.min(1,(T-regShow.t)*2)*(regShow.until?Math.max(0,Math.min(1,(regShow.until-T))):1); if(a<=0){ regShow=null; return; }
   const P_=CFG.regpoly[regShow.k]; ctx.save(); ctx.beginPath(); for(const poly of P_){ poly.forEach(([x,y],i)=>{ const [sx,sy]=w2s(x,y); if(i) ctx.lineTo(sx,sy); else ctx.moveTo(sx,sy); }); ctx.closePath(); }
   ctx.globalAlpha=a; ctx.fillStyle=`rgba(255,160,0,${.55+.3*Math.sin(T*6)})`; ctx.fill('evenodd'); ctx.lineJoin='round'; ctx.lineWidth=7; ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.stroke(); ctx.lineWidth=3.5; ctx.strokeStyle='#c2410c'; ctx.setLineDash([12,6]); ctx.stroke(); ctx.setLineDash([]);
   const [lx,ly]=w2s(...CFG.reglab[regShow.k]); const n=REGINFO[regShow.k][0]; ctx.font='800 34px Grandstander,Nunito,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.lineWidth=8; ctx.strokeStyle='#fff8ec'; ctx.strokeText(n,lx,ly); ctx.fillStyle='#8a3b12'; ctx.fillText(n,lx,ly); ctx.restore(); }
