@@ -731,14 +731,21 @@ function drawRegion(){ drawBorders(); if(!regShow) return; const a=Math.min(1,(T
   ctx.globalAlpha=a; ctx.fillStyle=`rgba(255,160,0,${.55+.3*Math.sin(T*6)})`; ctx.fill('evenodd'); ctx.lineJoin='round'; ctx.lineWidth=7; ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.stroke(); ctx.lineWidth=3.5; ctx.strokeStyle='#c2410c'; ctx.setLineDash([12,6]); ctx.stroke(); ctx.setLineDash([]);
   const [lx,ly]=w2s(...CFG.reglab[regShow.k]); const n=REGINFO[regShow.k][0]; ctx.font='800 34px Grandstander,Nunito,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.lineWidth=8; ctx.strokeStyle='#fff8ec'; ctx.strokeText(n,lx,ly); ctx.fillStyle='#8a3b12'; ctx.fillText(n,lx,ly); ctx.restore(); }
 function regionTap(x,y){ const [wx,wy]=s2w(x,y); if(wx<SL[0]||wx>SL[2]||wy<SL[1]||wy>SL[3]) return false; const r=regionAtW(wx,wy); if(!r) return false;
-  if(r===game.cur){ play('cheer'); game.score++; regShow={k:r,t:T}; game.done.add(r); $('qKind').textContent='Poišči pokrajino · '+game.done.size+'/'+Object.keys(REGINFO).length; const [n,f]=REGINFO[r]; $('cPic').innerHTML=''; showCard({n,f:[f]},f); $('cPic').textContent='🗺️'; $('cPic').style.fontSize='72px'; say('Bravo! To je '+n+'. '+f);
-    const nx=document.createElement('button'); nx.textContent='Naprej ➜'; nx.style.background='#bfe8a0'; nx.onclick=()=>{ closeCard(); regShow=null; nextRegion(); }; $('cBtns').appendChild(nx); }
-  else { play('boing'); regShow={k:r,t:T,until:T+2.2}; const n=REGINFO[r][0]; toast('To je '+n+'. Poišči '+REGINFO[game.cur][0]+'!'); say('To je '+n+'. Poišči '+REGINFO[game.cur][0]+'.'); }
+  const q=game.q; const n=REGINFO[r][0];
+  if(r===q.reg){ play('cheer'); game.score++; game.n++; regShow={k:r,t:T,until:T+2.5}; say(q.item?'Bravo! '+q.item.n+' je v pokrajini '+n+'.':'Bravo! To je '+n+'.'); toast('Bravo! '+n+' ⭐'); setTimeout(()=>{ if(game&&game.kind==='regions') nextRegion(); },1800); }
+  else { play('boing'); regShow={k:r,t:T,until:T+2.2}; toast('To je '+n+'. Poskusi še enkrat!'); say('To je '+n+'. Poskusi še enkrat.'); }
   return true; }
-function nextRegion(){ const all=Object.keys(REGINFO); if(!game.done) game.done=new Set(); if(game.done.size>=all.length){ play('cheer'); say('Bravo! Našel si vse pokrajine!'); toast('Bravo! Vse pokrajine! 🎉'); game.done=new Set(); }
-  const ks=all.filter(k=>!game.done.has(k)&&k!==game.cur); game.cur=ks[Math.floor(Math.random()*ks.length)]; $('qKind').textContent='Poišči pokrajino · '+game.done.size+'/'+all.length; $('qName').textContent=REGINFO[game.cur][0]; $('qPic').innerHTML='';
-  $('quest').classList.add('show'); say('Poišči pokrajino '+REGINFO[game.cur][0]+'.'); home(); }
-$('bRegions').onclick=()=>{ audioInit(); if(game&&game.kind==='regions') stopGame(); else { closeCard(); game={kind:'regions',score:0}; $('bRegions').classList.add('on'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); nextRegion(); } };
+const RQ=10;
+function nextRegion(){ const all=Object.keys(REGINFO);
+  if(game.round===1&&game.done.size>=all.length){ game.round=2; game.n=0; play('cheer'); say('Bravo! Našel si vse pokrajine! Zdaj pa težja runda.'); toast('Runda 2: V kateri pokrajini je …? 🏆'); }
+  else if(game.round===2&&game.n>=RQ){ play('cheer'); say('Bravo! Končal si tudi drugo rundo!'); toast('Bravo! Konec runde 2! 🎉'); game.round=1; game.done=new Set(); game.n=0; }
+  if(game.round===1){ const ks=all.filter(k=>!game.done.has(k)); const k=ks[Math.floor(Math.random()*ks.length)]; game.done.add(k); game.q={reg:k};
+    $('qKind').textContent='Runda 1 · Poišči pokrajino · '+(game.done.size)+'/'+all.length; $('qName').textContent=REGINFO[k][0]; $('qPic').innerHTML=''; say('Poišči pokrajino '+REGINFO[k][0]+'.'); }
+  else { let it,reg,t=0; do{ it=game.pool[Math.floor(Math.random()*game.pool.length)]; reg=regionAtW(it.home[0],it.home[1]); t++; }while((!reg||game.used.has(it.id))&&t<200); game.used.add(it.id); game.q={reg,item:it};
+    $('qKind').textContent='Runda 2 · V kateri pokrajini je … · '+(game.n+1)+'/'+RQ; $('qName').textContent=it.n; const p=$('qPic'); p.innerHTML=''; const src=picFor(it); if(src){ const im=new Image(); im.src=src; p.appendChild(im); }
+    say('V kateri pokrajini je '+it.n+'?'); }
+  $('quest').classList.add('show'); home(); }
+$('bRegions').onclick=()=>{ audioInit(); if(game&&game.kind==='regions') stopGame(); else { closeCard(); stopPilot&&stopPilot(); game={kind:'regions',score:0,round:1,n:0,done:new Set(),used:new Set(),pool:ITEMS.filter(it=>it.home&&!it.country&&it.c!=='drzava'&&it.c!=='gorovje'&&it.c!=='vozilo'&&it.id!=='morje'&&!/jezera$/.test(it.n))}; $('bRegions').classList.add('on'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); nextRegion(); } };
 const POVODNI=`Od nékdej lepé so Ljubljanke slovele,
 al lepši od Urške bilo ni nobene,
 nobene očem bilo bolj zaželene
