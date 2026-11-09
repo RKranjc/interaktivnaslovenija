@@ -36,6 +36,22 @@ canvas.drag{cursor:grabbing}
 .quest{position:fixed;left:50%;top:12px;transform:translate(-50%,-140px);transition:transform .35s;z-index:4;background:#ffe9b0;border:4px solid var(--brown);border-radius:22px;padding:6px 14px 6px 8px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
 .quest.show{transform:translate(-50%,0)}.quest img{height:54px}.quest .qk{font-weight:900;font-size:13px}.quest .qn{font:800 22px Grandstander,Nunito,sans-serif}.quest button{border:none;background:none;font:900 22px Nunito;color:var(--brown);cursor:pointer}
 @media (max-width:700px){.quest{top:auto;bottom:calc(12px + var(--cardH))}.quest.show{transform:translate(-50%,0)}.quest:not(.show){transform:translate(-50%,200px)}}
+  .book{position:fixed;inset:0;background:#0006;z-index:9;display:none;place-items:center}
+  .book.show{display:grid}
+  .book .in{background:#fffdf7;border-radius:30px;padding:20px 24px;width:min(820px,94vw);max-height:88vh;overflow:auto;position:relative}
+  .book h2{margin:0 0 10px;font-family:'Grandstander',sans-serif;font-weight:700;font-size:30px}
+  .poemin{max-width:560px}
+  .pbtn button{border:0;border-radius:14px;background:#eef6ff;font:inherit;font-weight:800;padding:6px 14px;margin-right:6px;cursor:pointer;box-shadow:0 3px 0 #0002}
+  .kit{white-space:pre-line;font-size:18px;line-height:1.45;padding:10px 12px;margin:8px 0;border-radius:14px;cursor:pointer;transition:background .3s}
+  .kit.on{background:#fff1b8}
+  .pimg svg{width:100%;height:auto;display:block;border-radius:22px;margin:4px 0 10px;box-shadow:0 4px 0 #0001}
+  .poemin .pbtn{position:sticky;top:-20px;background:#fffdf7;z-index:2;padding:8px 0 6px}
+  .pbtn button.big{background:#ffe27a;font-size:18px}
+  .pbtn button.playing{background:#ffb347}
+  #poemPlay,#poemStop{display:none} .noaud #poemPlay,.noaud #poemStop{display:inline-block}
+  .noaud #poemListen,.noaud #poemCred{display:none}
+  .book .x{position:absolute;right:16px;top:14px;border:0;background:#f1f1f1;border-radius:50%;width:46px;height:46px;font-size:24px;cursor:pointer}
+    .book .in{padding:14px!important}
 .zoom{position:fixed;right:10px;bottom:calc(14px + var(--cardH));display:flex;flex-direction:column;gap:6px;z-index:3}
 .zoom button{width:46px;height:46px;font:900 26px Nunito;color:var(--brown);background:var(--cream);border:3px solid var(--brown);border-radius:14px;box-shadow:0 3px 0 rgba(0,0,0,.22);cursor:pointer}
 </style></head><body>
@@ -47,12 +63,14 @@ canvas.drag{cursor:grabbing}
  <button class="tb" id="bLabels"><span class="ic">🏷️</span><span class="tx">Imena</span></button>
  <button class="tb" id="bSound"><span class="ic">🔊</span><span class="tx">Zvok</span></button>
  <button class="tb" id="bGame"><span class="ic">🔍</span><span class="tx">Poišči</span></button>
+ <button class="tb" id="bRegions"><span class="ic">🗺️</span><span class="tx">Pokrajine</span></button>
  <button class="tb" id="bAnimals"><span class="ic">🐾</span><span class="tx">Živali</span></button>
 </div>
 <div class="quest" id="quest"><span id="qPic"></span><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div></div><button id="qX">✕</button></div>
 <div class="zoom"><button id="zIn">+</button><button id="zOut">−</button></div>
 <div class="card" id="card"><button class="x" id="cardX">✕</button><div class="pic" id="cPic"></div><div style="flex:1;min-width:0"><h2 id="cName"></h2><p id="cText"></p><div class="btns" id="cBtns"></div><div class="more" id="cMore"></div></div></div>
 <div class="toast" id="toast"></div>
+<div class="book" id="poem"><div class="in poemin"><button class="x" id="poemX">✖</button><div class="pimg"><svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg"> <defs> <linearGradient id="pm_sky" x1="0" y1="0" x2="0" y2="1"> <stop offset="0" stop-color="#14204a"/><stop offset=".45" stop-color="#2f3f86"/><stop offset=".8" stop-color="#7b5aa6"/><stop offset="1" stop-color="#e48f9c"/> </linearGradient> <radialGradient id="pm_moonGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff7cf" stop-opacity=".75"/><stop offset=".4" stop-color="#fff2b0" stop-opacity=".25"/><stop offset="1" stop-color="#fff2b0" stop-opacity="0"/></radialGradient> <linearGradient id="pm_river" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a6f9e"/><stop offset=".5" stop-color="#174a75"/><stop offset="1" stop-color="#0c2c4d"/></linearGradient> <radialGradient id="pm_whirl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#05182c"/><stop offset=".55" stop-color="#0d3a63" stop-opacity=".9"/><stop offset="1" stop-color="#1d5a8a" stop-opacity="0"/></radialGradient> <linearGradient id="pm_square" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9a07a"/><stop offset="1" stop-color="#8d7556"/></linearGradient> <radialGradient id="pm_lantern" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe08a" stop-opacity=".9"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient> <radialGradient id="pm_stage" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd98a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient> <linearGradient id="pm_dress" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5d8f"/><stop offset="1" stop-color="#c42a62"/></linearGradient> <linearGradient id="pm_coat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2fb08e"/><stop offset="1" stop-color="#0f6b5a"/></linearGradient> <linearGradient id="pm_skinW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bff0dc"/><stop offset="1" stop-color="#8fd6bd"/></linearGradient> <linearGradient id="pm_castleWall" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d9c3a0"/><stop offset="1" stop-color="#b79d78"/></linearGradient> <filter id="pm_soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2"/></filter> <filter id="pm_glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter> <clipPath id="pm_frame"><rect width="900" height="520" rx="28"/></clipPath> </defs> <g clip-path="url(#pm_frame)"> <rect width="900" height="520" fill="url(#pm_sky)"/> <g fill="#fff"> <circle cx="60" cy="40" r="1.6"/><circle cx="140" cy="90" r="1.2"/><circle cx="210" cy="30" r="2"/><circle cx="290" cy="70" r="1.3"/><circle cx="360" cy="22" r="1.7"/><circle cx="430" cy="60" r="1.2"/><circle cx="520" cy="28" r="1.8"/><circle cx="600" cy="80" r="1.2"/><circle cx="820" cy="140" r="1.4"/><circle cx="870" cy="40" r="1.8"/><circle cx="40" cy="150" r="1.2"/><circle cx="250" cy="130" r="1"/><circle cx="480" cy="120" r="1.1"/> <path d="M110 55 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2Z" opacity=".9"/><path d="M560 50 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2Z" opacity=".9"/> <g filter="url(#pm_glow)"><path d="M392 92 l3 10 10 3 -10 3 -3 10 -3 -10 -10 -3 10 -3Z" fill="#fffbe0"/></g> </g> <circle cx="745" cy="95" r="95" fill="url(#pm_moonGlow)"/> <circle cx="745" cy="95" r="44" fill="#fff4c7"/> <g fill="#ecd99a" opacity=".7"><circle cx="730" cy="82" r="8"/><circle cx="758" cy="108" r="6"/><circle cx="752" cy="78" r="4"/></g> <path d="M-10 270 C80 170 170 150 260 170 C330 186 380 220 430 250 L430 300 L-10 300Z" fill="#23402f"/> <path d="M-10 280 C90 200 180 190 260 205 C320 216 370 240 420 262 L420 300 L-10 300Z" fill="#2e5a3d"/> <g fill="#1f3a2a"><circle cx="40" cy="240" r="16"/><circle cx="70" cy="226" r="18"/><circle cx="300" cy="200" r="14"/><circle cx="330" cy="212" r="15"/><circle cx="370" cy="236" r="13"/></g> <g transform="translate(120 112)"> <rect x="0" y="40" width="130" height="50" fill="url(#pm_castleWall)"/> <g fill="url(#pm_castleWall)"><rect x="0" y="32" width="12" height="10"/><rect x="22" y="32" width="12" height="10"/><rect x="44" y="32" width="12" height="10"/><rect x="66" y="32" width="12" height="10"/><rect x="88" y="32" width="12" height="10"/></g> <rect x="100" y="-6" width="34" height="96" fill="#cdb48e"/> <g fill="#cdb48e"><rect x="98" y="-14" width="9" height="10"/><rect x="113" y="-14" width="9" height="10"/><rect x="127" y="-14" width="9" height="10"/></g> <rect x="113" y="-50" width="8" height="38" fill="#cdb48e"/><path d="M110 -50 h14 l-7 -18Z" fill="#a84d3d"/> <path d="M117 -68 v-14 l14 5 -14 5" fill="#e6474f"/> <g fill="#ffd36b" filter="url(#pm_glow)"><rect x="112" y="10" width="9" height="13" rx="4"/><rect x="20" y="56" width="8" height="11" rx="3"/><rect x="50" y="56" width="8" height="11" rx="3"/><rect x="80" y="56" width="8" height="11" rx="3"/></g> </g> <g transform="translate(440 150)"> <rect x="0" y="40" width="80" height="120" fill="#e9d2b0"/><path d="M-6 44 L40 4 L86 44Z" fill="#b8473a"/> <rect x="84" y="20" width="90" height="140" fill="#f2c79a"/><path d="M78 24 L129 -22 L180 24Z" fill="#9f3d33"/> <rect x="178" y="50" width="80" height="110" fill="#e7b9b0"/><path d="M172 54 L218 14 L264 54Z" fill="#b8473a"/> <rect x="262" y="34" width="86" height="126" fill="#d9e0c4"/><path d="M256 38 L305 -6 L354 38Z" fill="#9f3d33"/> <rect x="352" y="60" width="120" height="100" fill="#f0dcb8"/><path d="M346 64 L412 20 L478 64Z" fill="#b8473a"/> <g fill="#ffd36b"> <rect x="14" y="62" width="16" height="22" rx="7"/><rect x="48" y="62" width="16" height="22" rx="7"/><rect x="14" y="100" width="16" height="20"/> <rect x="100" y="44" width="16" height="22" rx="7"/><rect x="140" y="44" width="16" height="22" rx="7"/><rect x="100" y="84" width="16" height="22"/><rect x="140" y="84" width="16" height="22"/> <rect x="194" y="72" width="16" height="20"/><rect x="228" y="72" width="16" height="20"/> <rect x="278" y="56" width="16" height="22" rx="7"/><rect x="316" y="56" width="16" height="22" rx="7"/><rect x="278" y="96" width="16" height="20"/> <rect x="370" y="84" width="16" height="20"/><rect x="404" y="84" width="16" height="20"/><rect x="438" y="84" width="16" height="20"/> </g> <g fill="#6b3f26"><rect x="112" y="124" width="26" height="36" rx="12"/><rect x="292" y="124" width="22" height="36" rx="10"/></g> <g fill="#000" opacity=".12"><rect x="0" y="140" width="472" height="20"/></g> </g> <g transform="translate(330 300)"> <path d="M-10 0 C-8 -60 -14 -90 -4 -120 L10 -120 C16 -90 8 -60 12 0Z" fill="#6a4128"/> <path d="M0 -100 C-30 -120 -50 -118 -64 -130 M4 -104 C30 -124 54 -122 70 -134" stroke="#6a4128" stroke-width="7" fill="none" stroke-linecap="round"/> <g> <circle cx="-70" cy="-160" r="48" fill="#2f6d3c"/><circle cx="70" cy="-162" r="50" fill="#2f6d3c"/><circle cx="0" cy="-196" r="62" fill="#3a8247"/> <circle cx="-40" cy="-200" r="40" fill="#4a9a55"/><circle cx="40" cy="-196" r="42" fill="#45924f"/><circle cx="-90" cy="-140" r="32" fill="#3a8247"/><circle cx="96" cy="-140" r="32" fill="#3a8247"/> <g fill="#9fd06b" opacity=".55"><circle cx="-30" cy="-220" r="10"/><circle cx="20" cy="-230" r="8"/><circle cx="60" cy="-210" r="7"/><circle cx="-70" cy="-180" r="7"/></g> <g fill="#f3f0a0"><circle cx="-56" cy="-170" r="3"/><circle cx="-12" cy="-236" r="3"/><circle cx="54" cy="-180" r="3"/><circle cx="90" cy="-150" r="3"/><circle cx="-92" cy="-150" r="3"/><circle cx="16" cy="-170" r="3"/></g> </g> </g> <path d="M240 160 Q330 200 420 168 Q520 140 640 176" stroke="#3b2a20" stroke-width="2" fill="none"/> <g> <g transform="translate(270 176)"><circle r="20" fill="url(#pm_lantern)"/><rect x="-6" y="-8" width="12" height="16" rx="5" fill="#ff7b5c"/></g> <g transform="translate(318 186)"><circle r="20" fill="url(#pm_lantern)"/><rect x="-6" y="-8" width="12" height="16" rx="5" fill="#ffd34d"/></g> <g transform="translate(372 184)"><circle r="20" fill="url(#pm_lantern)"/><rect x="-6" y="-8" width="12" height="16" rx="5" fill="#7fd1ff"/></g> <g transform="translate(470 160)"><circle r="20" fill="url(#pm_lantern)"/><rect x="-6" y="-8" width="12" height="16" rx="5" fill="#ff7b5c"/></g> <g transform="translate(530 158)"><circle r="20" fill="url(#pm_lantern)"/><rect x="-6" y="-8" width="12" height="16" rx="5" fill="#b78cff"/></g> <g transform="translate(592 166)"><circle r="20" fill="url(#pm_lantern)"/><rect x="-6" y="-8" width="12" height="16" rx="5" fill="#ffd34d"/></g> </g> <path d="M-10 296 L910 296 L910 372 L-10 372Z" fill="url(#pm_square)"/> <g stroke="#7a6347" stroke-width="1.2" opacity=".5" fill="none"> <path d="M-10 316 H910"/><path d="M-10 340 H910"/> <path d="M40 296 v20 M110 296 v20 M180 296 v20 M250 296 v20 M320 296 v20 M390 296 v20 M460 296 v20 M530 296 v20 M600 296 v20 M670 296 v20 M740 296 v20 M810 296 v20"/> <path d="M75 316 v24 M145 316 v24 M215 316 v24 M285 316 v24 M355 316 v24 M425 316 v24 M495 316 v24 M565 316 v24 M635 316 v24 M705 316 v24 M775 316 v24 M845 316 v24"/> </g> <ellipse cx="420" cy="340" rx="260" ry="40" fill="url(#pm_stage)"/> <g transform="translate(92 300)"> <ellipse cx="0" cy="44" rx="22" ry="5" fill="#000" opacity=".2"/> <rect x="-16" y="0" width="32" height="40" rx="10" fill="#3d5a99"/> <rect x="-12" y="34" width="9" height="12" fill="#2b2b3a"/><rect x="3" y="34" width="9" height="12" fill="#2b2b3a"/> <circle cx="0" cy="-16" r="16" fill="#f2c39c"/><path d="M-16 -20 Q0 -40 16 -20 Q16 -26 0 -28 Q-16 -26 -16 -20Z" fill="#5a3a22"/> <ellipse cx="0" cy="-30" rx="20" ry="5" fill="#2b2b3a"/><rect x="-11" y="-44" width="22" height="14" rx="4" fill="#2b2b3a"/> <circle cx="-5" cy="-15" r="2" fill="#2b1b10"/><circle cx="6" cy="-15" r="2" fill="#2b1b10"/><path d="M-4 -8 Q1 -5 6 -8" stroke="#8a3b2b" stroke-width="2" fill="none"/> <path d="M8 -4 L30 -18 L36 -10 L14 4Z" fill="#a8562a"/><path d="M-6 6 L40 -30" stroke="#e8d7b0" stroke-width="2"/> </g> <g transform="translate(162 306)"> <ellipse cx="0" cy="40" rx="22" ry="5" fill="#000" opacity=".2"/> <rect x="-16" y="0" width="32" height="36" rx="10" fill="#8a3b5c"/> <rect x="-11" y="30" width="9" height="12" fill="#2b2b3a"/><rect x="2" y="30" width="9" height="12" fill="#2b2b3a"/> <circle cx="0" cy="-14" r="15" fill="#e9b48c"/><path d="M-15 -18 Q0 -36 15 -18Z" fill="#c9a23c"/> <circle cx="-5" cy="-13" r="2" fill="#2b1b10"/><circle cx="5" cy="-13" r="2" fill="#2b1b10"/><path d="M-4 -6 Q0 -3 4 -6" stroke="#8a3b2b" stroke-width="2" fill="none"/> <rect x="-22" y="4" width="44" height="22" rx="4" fill="#d94a3a"/><g stroke="#7a1f16" stroke-width="2"><path d="M-12 4 v22 M-4 4 v22 M4 4 v22 M12 4 v22"/></g> <g fill="#fff"><rect x="-21" y="7" width="5" height="16"/><rect x="16" y="7" width="5" height="16"/></g> </g> <g fill="#fff3c4" filter="url(#pm_glow)" font-family="Arial, sans-serif" font-weight="700"> <text x="130" y="246" font-size="26">♪</text><text x="176" y="222" font-size="30">♫</text><text x="222" y="250" font-size="24">♪</text><text x="258" y="214" font-size="22">♬</text> </g> <g transform="translate(720 300)" fill="#3a2f4f" opacity=".85"> <circle cx="0" cy="-10" r="13"/><rect x="-14" y="2" width="28" height="40" rx="12"/> <circle cx="40" cy="-4" r="11"/><rect x="28" y="6" width="24" height="34" rx="10"/> <circle cx="78" cy="-14" r="14"/><rect x="63" y="0" width="30" height="44" rx="12"/> </g> <g transform="translate(470 336)"> <ellipse cx="0" cy="10" rx="120" ry="14" fill="#000" opacity=".22"/> <g transform="translate(-58 0)"> <path d="M-70 4 C-60 -40 -30 -66 0 -70 C30 -66 58 -40 66 6 C40 -4 22 14 0 2 C-22 14 -44 -4 -70 4Z" fill="url(#pm_dress)"/> <path d="M-60 -6 C-30 -12 -20 4 0 -6 C20 4 34 -12 58 -4" stroke="#ffd6e4" stroke-width="4" fill="none" opacity=".8"/> <g fill="#ffe36b"><circle cx="-36" cy="-20" r="4"/><circle cx="-12" cy="-30" r="4"/><circle cx="14" cy="-28" r="4"/><circle cx="38" cy="-18" r="4"/><circle cx="0" cy="-48" r="3.5"/><circle cx="-24" cy="-46" r="3"/><circle cx="24" cy="-46" r="3"/></g> <path d="M-16 -68 L16 -68 L22 -24 L-22 -24Z" fill="#fff4e6"/><path d="M-20 -30 h40" stroke="#e8c7d3" stroke-width="3"/> <path d="M-17 -112 Q0 -118 17 -112 L18 -68 L-18 -68Z" fill="#2b2b55"/> <path d="M-17 -112 L-6 -112 L0 -96 L6 -112 L17 -112" fill="none" stroke="#ffe36b" stroke-width="2.5"/> <g fill="#ffe36b"><circle cx="0" cy="-88" r="2.3"/><circle cx="0" cy="-78" r="2.3"/></g> <path d="M14 -104 C34 -100 48 -94 62 -96" stroke="#f6c9a6" stroke-width="9" stroke-linecap="round" fill="none"/> <path d="M-15 -104 C-34 -116 -40 -136 -34 -150" stroke="#f6c9a6" stroke-width="9" stroke-linecap="round" fill="none"/> <path d="M14 -110 c6 0 9 6 8 12" fill="#fff" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".95"/> <path d="M-14 -110 c-6 0 -9 6 -8 12" fill="#fff" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".95"/> <circle cx="0" cy="-138" r="26" fill="#f6c9a6"/> <path d="M-27 -138 C-30 -170 30 -172 27 -138 C24 -152 10 -160 0 -156 C-10 -160 -24 -152 -27 -138Z" fill="#c76b2b"/> <path d="M22 -146 C40 -136 44 -116 40 -96" stroke="#c76b2b" stroke-width="9" stroke-linecap="round" fill="none"/> <path d="M24 -140 l10 6 M30 -128 l10 4 M36 -114 l9 2" stroke="#a4561f" stroke-width="2.5"/> <circle cx="40" cy="-94" r="5" fill="#ff5d8f"/> <g><circle cx="-18" cy="-160" r="6" fill="#ff7aa8"/><circle cx="-6" cy="-166" r="6" fill="#fff"/><circle cx="7" cy="-166" r="6" fill="#ffd34d"/><circle cx="19" cy="-160" r="6" fill="#ff7aa8"/><g fill="#c42a62"><circle cx="-18" cy="-160" r="2"/><circle cx="19" cy="-160" r="2"/></g><g fill="#e3a000"><circle cx="7" cy="-166" r="2"/></g> <path d="M-26 -154 l-8 -4 M27 -154 l8 -4" stroke="#4a9a55" stroke-width="4" stroke-linecap="round"/></g> <path d="M-12 -140 q4 -3 8 0" stroke="#3a2214" stroke-width="2.6" fill="none" stroke-linecap="round"/> <path d="M5 -140 q4 -3 8 0" stroke="#3a2214" stroke-width="2.6" fill="none" stroke-linecap="round"/> <circle cx="-14" cy="-129" r="5" fill="#ff8fa8" opacity=".55"/><circle cx="15" cy="-129" r="5" fill="#ff8fa8" opacity=".55"/> <path d="M-6 -126 Q0 -120 7 -126" stroke="#b33a3a" stroke-width="2.6" fill="#fff" stroke-linecap="round"/> <path d="M0 -136 l1 4" stroke="#d9a07b" stroke-width="2" stroke-linecap="round"/> </g> <g transform="translate(62 0)"> <ellipse cx="2" cy="8" rx="40" ry="7" fill="#4fb3e6" opacity=".55"/> <path d="M-12 -46 L-16 0" stroke="#1c4c5e" stroke-width="13" stroke-linecap="round"/> <path d="M12 -46 L20 -2" stroke="#1c4c5e" stroke-width="13" stroke-linecap="round"/> <ellipse cx="-20" cy="2" rx="13" ry="6" fill="#16303b"/><ellipse cx="24" cy="2" rx="13" ry="6" fill="#16303b"/> <path d="M-26 -116 Q0 -126 26 -116 L34 -40 L22 -30 L12 -48 L-12 -48 L-22 -30 L-34 -40Z" fill="url(#pm_coat)"/> <path d="M0 -118 L0 -48" stroke="#0b4a3e" stroke-width="2"/> <path d="M-8 -118 L0 -98 L8 -118" fill="#e9fff7"/> <g fill="#ffd34d"><circle cx="-8" cy="-90" r="3"/><circle cx="-8" cy="-76" r="3"/><circle cx="-8" cy="-62" r="3"/><circle cx="8" cy="-90" r="3"/><circle cx="8" cy="-76" r="3"/><circle cx="8" cy="-62" r="3"/></g> <path d="M-34 -40 q4 8 0 14 M-22 -30 q-4 8 0 16 M22 -30 q4 8 0 14 M34 -40 q-4 8 0 14" stroke="#6fd18a" stroke-width="3" fill="none" stroke-linecap="round"/> <path d="M-22 -106 C-36 -100 -44 -96 -58 -96" stroke="url(#pm_coat)" stroke-width="12" stroke-linecap="round" fill="none"/> <circle cx="-62" cy="-96" r="8" fill="#a6e3cd"/> <path d="M22 -106 C40 -96 46 -78 56 -66" stroke="url(#pm_coat)" stroke-width="12" stroke-linecap="round" fill="none"/> <path d="M52 -70 l14 4 l-6 4 l10 6 l-12 0 l2 8 l-10 -8Z" fill="#a6e3cd"/> <circle cx="0" cy="-142" r="27" fill="url(#pm_skinW)"/> <path d="M-27 -146 l-12 -8 l4 10 l-8 2 l14 6Z" fill="#6fd18a"/><path d="M27 -146 l12 -8 l-4 10 l8 2 l-14 6Z" fill="#6fd18a"/> <path d="M-24 -154 C-20 -172 20 -174 24 -154 C14 -160 6 -158 0 -162 C-6 -158 -14 -160 -24 -154Z" fill="#1e6b78"/> <ellipse cx="0" cy="-166" rx="34" ry="8" fill="#123540"/> <path d="M-20 -166 L-17 -206 Q0 -212 17 -206 L20 -166Z" fill="#123540"/> <rect x="-19" y="-180" width="38" height="8" fill="#2fb08e"/> <path d="M10 -196 q10 -8 18 0 q-8 8 -18 0Z M28 -196 l6 -5 v10Z" fill="#ff9d3a"/> <ellipse cx="-10" cy="-144" rx="6" ry="7" fill="#fff"/><ellipse cx="10" cy="-144" rx="6" ry="7" fill="#fff"/> <circle cx="-9" cy="-143" r="3.4" fill="#0d3b4a"/><circle cx="11" cy="-143" r="3.4" fill="#0d3b4a"/> <circle cx="-8" cy="-145" r="1.2" fill="#fff"/><circle cx="12" cy="-145" r="1.2" fill="#fff"/> <path d="M-16 -154 l10 2 M16 -154 l-10 2" stroke="#0d3b4a" stroke-width="2.5" stroke-linecap="round"/> <path d="M-10 -128 Q0 -120 12 -130" stroke="#0d3b4a" stroke-width="2.8" fill="none" stroke-linecap="round"/> <circle cx="-16" cy="-132" r="4.5" fill="#6fd1b8" opacity=".7"/><circle cx="17" cy="-132" r="4.5" fill="#6fd1b8" opacity=".7"/> <g fill="#8fe0ff"> <path d="M-30 -60 q3 6 0 9 q-3 -3 0 -9Z"/><path d="M36 -44 q3 6 0 9 q-3 -3 0 -9Z"/><path d="M-6 -20 q3 6 0 9 q-3 -3 0 -9Z"/><path d="M30 -150 q3 6 0 9 q-3 -3 0 -9Z"/><path d="M-36 -130 q3 6 0 9 q-3 -3 0 -9Z"/> </g> </g> <g fill="#fff6c0" filter="url(#pm_glow)"><path d="M2 -110 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2Z"/></g> </g> <path d="M-10 372 C150 362 300 380 450 372 C600 364 760 380 910 370 L910 530 L-10 530Z" fill="url(#pm_river)"/> <path d="M-10 372 C150 362 300 380 450 372 C600 364 760 380 910 370" stroke="#8a7458" stroke-width="7" fill="none"/> <g fill="#fff4c7" opacity=".55"><rect x="720" y="392" width="54" height="4" rx="2"/><rect x="730" y="408" width="38" height="4" rx="2"/><rect x="726" y="424" width="44" height="3" rx="2"/><rect x="738" y="440" width="24" height="3" rx="2"/></g> <g stroke="#7fc3ea" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"> <path d="M40 410 q20 -8 40 0"/><path d="M120 470 q20 -8 40 0"/><path d="M250 430 q20 -8 40 0"/><path d="M600 470 q20 -8 40 0"/><path d="M820 430 q20 -8 40 0"/><path d="M200 500 q20 -8 40 0"/> </g> <g transform="translate(500 450)"> <ellipse rx="110" ry="34" fill="url(#pm_whirl)"/> <g fill="none" stroke="#b8e6ff" stroke-width="3.5" stroke-linecap="round" opacity=".9"> <path d="M-92 4 C-80 -30 70 -34 92 -2 C100 24 -30 34 -60 12"/> <path d="M-60 6 C-50 -16 46 -20 58 0 C62 16 -10 22 -34 8"/> <path d="M-30 4 C-24 -8 22 -10 28 0 C30 8 -4 12 -14 4"/> </g> </g> <g transform="translate(160 440)"><path d="M0 0 q24 -16 44 0 q-20 16 -44 0Z" fill="#ff9d3a"/><path d="M44 0 l14 -10 v20Z" fill="#ff9d3a"/><circle cx="10" cy="-2" r="3" fill="#fff"/><circle cx="10" cy="-2" r="1.5" fill="#222"/></g> <g transform="translate(330 488) scale(-1 1)"><path d="M0 0 q18 -12 34 0 q-16 12 -34 0Z" fill="#ffd34d"/><path d="M34 0 l10 -8 v16Z" fill="#ffd34d"/><circle cx="8" cy="-2" r="2.5" fill="#fff"/><circle cx="8" cy="-2" r="1.2" fill="#222"/></g> <g transform="translate(680 470)"> <ellipse cx="0" cy="10" rx="34" ry="10" fill="#3f9a4e"/><path d="M0 10 L-30 6" stroke="#2c7a3a" stroke-width="2"/> <ellipse cx="2" cy="-2" rx="16" ry="11" fill="#7bd36b"/><circle cx="-7" cy="-11" r="6" fill="#7bd36b"/><circle cx="9" cy="-11" r="6" fill="#7bd36b"/> <circle cx="-7" cy="-12" r="3" fill="#fff"/><circle cx="9" cy="-12" r="3" fill="#fff"/><circle cx="-7" cy="-12" r="1.6" fill="#222"/><circle cx="9" cy="-12" r="1.6" fill="#222"/> <path d="M-6 0 Q2 6 10 0" stroke="#2c6a2a" stroke-width="2" fill="none"/> </g> <g transform="translate(70 490)"><ellipse rx="26" ry="8" fill="#3f9a4e"/><circle cx="4" cy="-4" r="6" fill="#fff"/><circle cx="4" cy="-4" r="2.5" fill="#ffd34d"/></g> <g transform="translate(860 486)"><ellipse rx="22" ry="7" fill="#3f9a4e"/><circle cx="-2" cy="-4" r="5" fill="#ffb3cf"/></g> <g fill="#fff59a" filter="url(#pm_glow)"><circle cx="560" cy="250" r="2.5"/><circle cx="610" cy="290" r="2"/><circle cx="250" cy="282" r="2.2"/><circle cx="680" cy="250" r="2"/><circle cx="420" cy="230" r="2"/></g> </g> </svg> </div><h2>Povodni mož</h2><div class="pauth">France Prešeren</div><div class="pbtn"><button id="poemListen" class="big">🎧 Poslušaj</button><button id="poemPlay">▶ Preberi vse</button><button id="poemStop">⏸ Ustavi</button></div><div class="pcred" id="poemCred">Bere: <b>Polde Bibič</b> · posnetek: <a href="https://www.preseren.net/slo/3-2_recitacije.asp.html" target="_blank" rel="noopener">preseren.net</a></div><audio id="poemAud" preload="metadata" src="povodni.mp3"></audio><div id="poemText"></div></div></div>
 <div class="loading" id="loading"><div class="bee">🐝</div>Rišem Slovenijo …</div>
 <script>
 const ITEMS=[
@@ -530,7 +548,7 @@ function draw(){
   drawTiles();
   const extra=[]; if(cam.s>.22) for(const o of LIFE) extra.push(o); if(cam.s>.14) for(const o of CARS) extra.push(o); if(cam.s>.12) for(const o of BOATS) extra.push(o);
   const vis=OBJ.filter(visibleObj).concat(extra).sort((a,b)=>a.y-b.y); for(const o of vis) drawObj(o);
-  drawSmoke();
+  drawSmoke(); drawTreasures();
   for(const b of BIRDS){ if(!b.img.complete||!b.img.naturalWidth) continue; const [sx,sy]=w2s(b.x,b.y); const w=b.w*Math.min(1,Math.max(.5,cam.s*2)), h=w*b.img.naturalHeight/b.img.naturalWidth; const fl=Math.sin(b.t*9)*.15+1; ctx.save(); ctx.translate(sx,sy); ctx.scale(-1,fl); ctx.drawImage(b.img,-w/2,-h/2,w,h); ctx.restore(); }
   drawSigns();
   if(cam.s<.16&&cloudImg.complete&&cloudImg.naturalWidth){ ctx.globalAlpha=Math.min(1,(.16-cam.s)/.06)*.6; for(const c of CLOUDS){ const [sx,sy]=w2s(c.x,c.y); const w=c.w*cam.s, h=w*cloudImg.naturalHeight/cloudImg.naturalWidth; ctx.drawImage(cloudImg,sx-w/2,sy-h/2,w,h); } ctx.globalAlpha=1; }
@@ -557,7 +575,7 @@ function inb(b,x,y){ return b&&x>=b[0]&&x<=b[0]+b[2]&&y>=b[1]&&y<=b[1]+b[3]; }
 let game=null;
 function pickable(kind){ return ITEMS.filter(it=>it.home&&!it.kraj&&it.c!=='drzava'&&(kind==='animals'?it.c==='zival':it.c!=='zival'&&it.c!=='vozilo'&&it.c!=='gorovje')); }
 function startGame(kind){ closeCard(); game={kind,pool:pickable(kind).sort(()=>Math.random()-.5),score:0}; $('bGame').classList.toggle('on',kind==='find'); $('bAnimals').classList.toggle('on',kind==='animals'); nextQ(); }
-function stopGame(){ game=null; $('quest').classList.remove('show'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); }
+function stopGame(){ game=null; $('bRegions').classList.remove('on'); $('quest').classList.remove('show'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); }
 function nextQ(){ if(!game) return; if(!game.pool.length) game.pool=pickable(game.kind).sort(()=>Math.random()-.5); game.cur=game.pool.pop();
   const it=game.cur; $('qKind').textContent=game.kind==='animals'?'Poišči žival':'Poišči'; $('qName').textContent=it.n; const p=$('qPic'); p.innerHTML=''; const src=picFor(it); if(src&&game.kind==='animals'){ const im=new Image(); im.src=src; p.appendChild(im); }
   $('quest').classList.add('show'); say('Poišči: '+it.n); }
@@ -569,9 +587,174 @@ $('bGame').onclick=()=>{ audioInit(); if(game&&game.kind==='find') stopGame(); e
 $('bAnimals').onclick=()=>{ audioInit(); if(game&&game.kind==='animals') stopGame(); else startGame('animals'); };
 $('qX').onclick=stopGame;
 $('quest').onclick=e=>{ if(e.target.id==='qX'||!game) return; say('Poišči: '+game.cur.n); };
+const TREASURES=[
+ {id:'t_zlatorog',n:'Zlatorogov zaklad',at:[13.775,46.292],k:'chest',f:['Po pripovedki je pod goro Bogatin skrit zaklad, ki ga je čuval Zlatorog. Našel si ga!']},
+ {id:'t_belezene',n:'Bele žene',at:[13.745,46.362],k:'fairies',f:['Bele žene so bile dobre vile iz pripovedk. Živele so pod Triglavom in pasle Zlatoroga.']},
+ {id:'t_povodni',n:'Klobuk povodnega moža',at:[14.497,46.032],k:'hat',f:['Pripovedka pravi, da je v Ljubljanici živel povodni mož. Na plesu je odpeljal lepo Urško. France Prešeren je o tem napisal pesem – odpri jo s tipko Pesmica!']},
+ {id:'t_perkmandeljc',n:'Perkmandeljčeva svetilka',at:[14.028,46.003],k:'lantern',f:['V rudniku v Idriji je po pripovedki živel škrat Perkmandeljc, ki je pomagal rudarjem.']},
+ {id:'t_krpan',n:'Krpanova vreča soli',at:[14.46,45.785],k:'sack',f:['Martin Krpan je s svojo kobilico prenašal sol. Doma je bil na Vrhu pri Sveti Trojici.']},
+ {id:'t_zmaj',n:'Zmajevo jajce',at:[14.535,46.062],k:'egg',f:['Legenda pravi, da je ob Ljubljanici živel zmaj. Je morda pustil to jajce?']},
+ {id:'t_skoljke',n:'Skrinjica z biseri',at:[13.612,45.527],k:'pearls',f:['Na obali si našel skrinjico s školjkami in biseri!']},
+ {id:'t_skrat',n:'Škratova hišica',at:[14.98,45.67],k:'mushroom',f:['V kočevskih gozdovih po pripovedkah živijo palčki in škratje. Ups, prestrašil si jih – zbežali so v gozd! Počakaj malo, pa se vrnejo.']},
+];
+const TEMOJI={chest:'💰',fairies:'🧚',hat:'🎩',lantern:'🏮',sack:'🧂',egg:'🥚',pearls:'🐚',mushroom:'🍄'};
+for(const t of TREASURES){ t.treasure=1; t.c='skrivnost'; t.home=ll2w(t.at[0],t.at[1]); }
+const starImg=img('ig_zvezda');
+let tfound=new Set(); try{ JSON.parse(localStorage.getItem('ms2d-tre')||'[]').forEach(x=>tfound.add(x)); }catch(e){}
+function drawTreasures(){ if(cam.s<.38||!starImg.complete||!starImg.naturalWidth) return; const a=Math.min(1,(cam.s-.38)/.12);
+  for(const t of TREASURES){ const [sx,sy]=w2s(t.home[0],t.home[1]); if(sx<-40||sx>VW+40||sy<-40||sy>VH+40){ t.sb=null; continue; }
+    const tw=.75+.25*Math.sin(T*4+t.home[0]); const w=(tfound.has(t.id)?18:26)*tw; ctx.globalAlpha=a*(tfound.has(t.id)?.5:1);
+    ctx.drawImage(starImg,sx-w/2,sy-w,w,w); ctx.globalAlpha=1; t.sb=[sx-20,sy-34,40,40]; } }
+function openTreasure(t){ play('sticker'); const first=!tfound.has(t.id); tfound.add(t.id); try{ localStorage.setItem('ms2d-tre',JSON.stringify([...tfound])); }catch(e){}
+  showCard(t,t.f[0]); $('cPic').innerHTML=''; $('cPic').textContent=TEMOJI[t.k]||'⭐'; $('cPic').style.fontSize='72px';
+  if(t.id==='t_povodni'){ const bp=document.createElement('button'); bp.textContent='📜 Pesmica'; bp.onclick=openPoem; $('cBtns').appendChild(bp); }
+  say(t.n+'. '+t.f[0]); if(first) setTimeout(()=>toast('Našel si skriti zaklad! ('+tfound.size+'/'+TREASURES.length+')'),400); }
+// ---------------- pokrajine ----------------
+const REGINFO={gorenjska:['Gorenjska','Gorenjska je dežela visokih gora. Tu so Triglav, Bled in Bohinj.'],stajerska:['Štajerska','Štajerska ima veliko vinogradov in reko Dravo. Tu sta Maribor in Ptuj.'],
+ primorska:['Primorska','Primorska leži ob morju in ob reki Soči. Tu rastejo oljke in je Kras s kamnitimi hišami.'],notranjska:['Notranjska','Notranjska ima podzemne jame in presihajoče Cerkniško jezero.'],
+ dolenjska:['Dolenjska','Dolenjska ima griče z zidanicami in reko Krko. Tu je Novo mesto.'],belakrajina:['Bela krajina','Bela krajina ima breze in toplo reko Kolpo, kjer se poleti kopamo.'],
+ prekmurje:['Prekmurje','Prekmurje je ravno kot miza. Tu gnezdijo štorklje in rastejo sončnice.'],koroska:['Koroška','Koroška ima velike gozdove in hribe ob reki Dravi.'],osrednja:['Osrednja Slovenija','Sredi Slovenije je glavno mesto Ljubljana.']};
+function regionAt(lon,lat){
+  if(lat<45.68&&lon<13.98) return 'primorska'; if(lat<45.95&&lon<14.35&&lat>45.55) return 'primorska'; if(lon<13.95&&lat<46.2) return 'primorska';
+  if(lon>15.95&&lat>46.47) return 'prekmurje'; if(lat<45.72&&lon>14.95&&lon<15.5) return 'belakrajina'; if(lat>46.45&&lon>14.75&&lon<15.25) return 'koroska';
+  if(lon>15.0&&lat>46.12) return 'stajerska'; if(lon>14.55&&lon<15.7&&lat<46.05) return 'dolenjska'; if(lat>46.2&&lon<14.75) return 'gorenjska'; if(lat<45.85) return 'notranjska'; return 'osrednja'; }
+const w2ll=(x,y)=>[LON0+x/(KX*P),LAT1-y/(KY*P)];
+function regionTap(x,y){ const [wx,wy]=s2w(x,y); if(wx<SL[0]||wx>SL[2]||wy<SL[1]||wy>SL[3]) return false; const [lo,la]=w2ll(wx,wy); const r=regionAt(lo,la);
+  if(r===game.cur){ play('cheer'); game.score++; const [n,f]=REGINFO[r]; $('cPic').innerHTML=''; showCard({n,f:[f]},f); $('cPic').textContent='🗺️'; $('cPic').style.fontSize='72px'; say('Bravo! To je '+n+'. '+f);
+    const nx=document.createElement('button'); nx.textContent='Naprej ➜'; nx.style.background='#bfe8a0'; nx.onclick=()=>{ closeCard(); nextRegion(); }; $('cBtns').appendChild(nx); }
+  else { play('boing'); const n=REGINFO[r][0]; toast('To je '+n+'. Poišči '+REGINFO[game.cur][0]+'!'); say('To je '+n+'. Poišči '+REGINFO[game.cur][0]+'.'); }
+  return true; }
+function nextRegion(){ const ks=Object.keys(REGINFO).filter(k=>k!==game.cur); game.cur=ks[Math.floor(Math.random()*ks.length)]; $('qKind').textContent='Poišči pokrajino'; $('qName').textContent=REGINFO[game.cur][0]; $('qPic').innerHTML='';
+  $('quest').classList.add('show'); say('Poišči pokrajino '+REGINFO[game.cur][0]+'.'); home(); }
+$('bRegions').onclick=()=>{ audioInit(); if(game&&game.kind==='regions') stopGame(); else { closeCard(); game={kind:'regions',score:0}; $('bRegions').classList.add('on'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); nextRegion(); } };
+const POVODNI=`Od nékdej lepé so Ljubljanke slovele,
+al lepši od Urške bilo ni nobene,
+nobene očem bilo bolj zaželene
+ob času nje cvetja dekleta ne žene. -
+Ko nárbolj iz zvezd je danica svetla,
+narlepši iz deklic je Urška bila.
+
+Mnogtére device, mnogtére ženice
+oko je na skrivnem solzé preliválo,
+ker Urški srce se je ljubega vdalo;
+al ljubih bilo je nji vedno premalo.
+Kar slišala moških okrog je slovét,
+skušála jih v mreže razpete je ujet.
+
+Je znala obljúbit, je znalá odreči,
+in biti priljudna, in biti prevzetna,
+mladenče unémat, bit staršim prijetna;
+modrij in zvijač je bila vseh umetna;
+možake je dolgo vodila za nos,
+ga stakne nazadnje, ki bil ji je kos.
+
+Na Starem so trgu pod lipo zeleno
+trobente in gosli, in cimbale pele,
+plesále lepote 'z Ljubljane so cele
+v nedeljo popoldan z mladenči vesele;
+bila je kraljica njih Urška brhka,
+plesáti ni dolgo nje volja bila.
+
+Jih dókaj jo prosi, al vsakmu odreče,
+prešerna se brani in ples odlašuje,
+si vedno izgovore nove zmišljuje,
+že sonce zahaja, se mrak približuje;
+že sedem odbila je ura in čez,
+ko jela ravnat se je Urška na ples.
+
+Al, ker se ozira, plesavca si zbira,
+zagleda pri mizi rumeni junaka;
+enacga pod soncam mu ni korenjaka,
+želi si plesáti z njim deklica vsaka -
+omrežit ga Uršika lepa želi,
+zaljubljeno v njega obrača oči.
+
+To videt, mladenič se Urški približa:
+"Al hôtla bi z mano plesati?" ji pravi,
+"kjer Donava bistri pridruži se Savi,
+od tvoje lepote zaslišal sem davi,
+že, Uršika zala! pred tabo sem zdaj,
+že, Uršika zala! pripravljen na raj!"
+
+To reče in se ji globoko prikloni,
+sladkó mu nasmeja se Uršika zala:
+"Nobene stopinjice še nisem plesala,
+de čákala tebe sem, res je, ni šala -
+zatorej le hitro mi roko podaj,
+lej, sonce zahaja, jenjuje že raj!" -
+
+Podal ji mladenič prelepi je rôko,
+in urno ta dvá sta po pódu zletela,
+ko de bi lohké peretnice imela,
+bila bi brez trupla okrog se vrtela,
+ne vidi se, kdaj de pod noga udar',
+plesala sta, ko bi ju nosil vihar.
+
+To videti, drugi so vsi ostrmeli,
+od čudeža godcam roké so zastale;
+ker niso trobente glasova več dale,
+mladenča nogé so trdó zaceptale;
+"Ne maram," zavpije, "za gosli, za bas,
+strun drugih, ko plešem, zapoje naj glas!"
+
+So brž pridrvili se črni oblaki,
+zasliši na nebu se strašno gromenje,
+zasliši vetrov se sovražno vršenje,
+zasliši potokov derečih šumenje,
+pričjóčim po koncu so vstali lasje -
+oh, Uršika zala, zdaj tebi gorje!
+
+"Ne boj se, ti Urška! le hitro mi stópi,
+ne boj se," ji reče, "ne boj se gromenja,
+ne boj se potokov ti mojih šumenja,
+ne boj se vetrov mi prijaznih vršenja;
+le urno, le urno obrni peté,
+le urno, le urno, ker pozno je že!"
+
+"Ah, majhno postojva, preljubi plesavec!
+de jaz se oddahnem, de noga počije."
+"Ni blizo, ni blizo do bele Turčíje,
+kjer v Donavo Sava se bistra izlije;
+valovi šumeči te, Urška! želé,
+le úrno, le urno obrni peté!" -
+
+To reče, hitreje sta se zasukála,
+in dalje in dalje od pôda spustila,
+na bregu Ljubljance se trikrat zavila,
+plesáje v valove šumeče planila.
+Vrtinec so vidli čolnarji dereč;
+al Uršike videl nobeden ni več.`;
+let poemIdx=-1, poemOn=false;
+function openPoem(){ const st=POVODNI.split('\n\n'); const box=$('poemText'); box.innerHTML='';
+  st.forEach((s,i)=>{ const d=document.createElement('div'); d.className='kit'; d.id='kit'+i; d.textContent=s; d.onclick=()=>{ const a=$('poemAud'); if(a&&!a.paused){ audSeekKit(i); } else readPoem(i,true); }; box.appendChild(d); });
+  $('poem').classList.add('show'); audioInit(); audInit(); }
+function readPoem(i,single){ const st=POVODNI.split('\n\n'); if(i>=st.length){ poemOn=false; hl(-1); return; } poemIdx=i; hl(i);
+  const el=$('kit'+i); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  if(!slVoice){ return; } try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(st[i].replace(/[-–]\s*$/gm,'').replace(/'/g,'')); u.voice=slVoice; u.lang=slVoice.lang; u.rate=.9; u.pitch=1;
+    u.onend=()=>{ if(poemOn&&!single) readPoem(i+1,false); }; speechSynthesis.speak(u); }catch(e){} }
+let AUD_T=[3.83, 27.41, 48.39, 71.01, 89.23, 108.49, 129.62, 146.65, 168.3, 199.29, 219.3, 238.56, 255.45, 274.15]; // stanza start times (s), filled after analysing the recording
+function audInit(){ const a=$('poemAud'); if(!a||a._i) return; a._i=1;
+  a.addEventListener('error',()=>$('poem').classList.add('noaud'));
+  a.addEventListener('timeupdate',()=>{ if(a.paused) return; const st=POVODNI.split('\n\n'); let i;
+    if(AUD_T){ i=0; while(i+1<AUD_T.length&&a.currentTime>=AUD_T[i+1]) i++; }
+    else { const L=st.map(x=>x.length), tot=L.reduce((p,c)=>p+c,0); let acc=0; const f=a.currentTime/(a.duration||1)*tot; i=0; for(;i<L.length;i++){ acc+=L[i]; if(f<acc) break; } }
+    i=Math.min(i,st.length-1); if(i!==poemIdx){ poemIdx=i; hl(i); const el=$('kit'+i); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); } });
+  a.addEventListener('ended',()=>{ hl(-1); poemIdx=-1; $('poemListen').classList.remove('playing'); $('poemListen').textContent='🎧 Poslušaj'; });
+  a.addEventListener('pause',()=>{ $('poemListen').classList.remove('playing'); $('poemListen').textContent='🎧 Poslušaj'; });
+  a.addEventListener('play',()=>{ $('poemListen').classList.add('playing'); $('poemListen').textContent='⏸ Premor'; });
+  $('poemListen').onclick=()=>{ try{ speechSynthesis.cancel(); }catch(e){} poemOn=false; if(a.paused){ a.play().catch(()=>$('poem').classList.add('noaud')); } else a.pause(); }; }
+function audSeekKit(i){ const a=$('poemAud'); if(!a||$('poem').classList.contains('noaud')) return false; const st=POVODNI.split('\n\n');
+  let t; if(AUD_T) t=AUD_T[i]; else { const L=st.map(x=>x.length), tot=L.reduce((p,c)=>p+c,0); t=L.slice(0,i).reduce((p,c)=>p+c,0)/tot*(a.duration||0); }
+  if(!isFinite(t)) return false; a.currentTime=t; a.play().catch(()=>{}); return true; }
+function hl(i){ document.querySelectorAll('.kit').forEach((d,k)=>d.classList.toggle('on',k===i)); }
+$('poemX').onclick=()=>{ poemOn=false; try{$('poemAud').pause();}catch(e){} try{speechSynthesis.cancel();}catch(e){} $('poem').classList.remove('show'); };
+$('poemPlay').onclick=()=>{ poemOn=true; readPoem(Math.max(poemIdx,0),false); if(!slVoice) toast('Glas za branje deluje v brskalniku Edge'); };
+$('poemStop').onclick=()=>{ poemOn=false; try{$('poemAud').pause();}catch(e){} try{speechSynthesis.cancel();}catch(e){} };
 function tap(x,y){ // najprej sličice (od spredaj nazaj), nato table
   const vis=OBJ.filter(o=>o.it&&visibleObj(o)&&o.sb).sort((a,b)=>b.y-a.y);
-  for(const o of vis) if(inb(o.sb,x,y)){ select(o.it,o); return; }
+  if(!(game&&game.kind==='regions')) for(const o of vis) if(inb(o.sb,x,y)){ select(o.it,o); return; }
+  for(const t of TREASURES) if(t.sb&&inb(t.sb,x,y)){ openTreasure(t); return; }
+  if(game&&game.kind==='regions'&&regionTap(x,y)) return;
   for(const g of SIGNS) if(g.sb&&inb(g.sb,x,y)){ select(g.it); return; }
   closeCard(); }
 // ---------------- kartica ----------------
