@@ -29,12 +29,12 @@ canvas.drag{cursor:grabbing}
 .card .x{position:absolute;right:10px;top:6px;border:none;background:none;font:900 26px Nunito;color:var(--brown);cursor:pointer}
 .more{display:none;font-size:15px;margin-top:6px}.more ul{margin:4px 0 0 18px;padding:0}.more .mi{font-weight:900}
 @media (max-width:520px){.card{flex-direction:column;align-items:center;text-align:center}.card .pic{width:90px;height:90px}.card .pic img{max-width:90px;max-height:90px}.card .btns{justify-content:center}}
-.toast{position:fixed;left:50%;top:92px;transform:translate(-50%,-90px);background:var(--cream);border:3px solid var(--brown);border-radius:18px;padding:8px 16px;font-weight:900;z-index:6;transition:transform .3s;max-width:88vw;text-align:center}
+.toast{position:fixed;left:50%;top:104px;transform:translate(-50%,-90px);background:var(--cream);border:3px solid var(--brown);border-radius:18px;padding:8px 16px;font-weight:900;z-index:6;transition:transform .3s;max-width:88vw;text-align:center}
 .toast.show{transform:translate(-50%,0);opacity:1}
 .loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#cfe6ea;z-index:9;font:800 24px Grandstander,Nunito,sans-serif;transition:opacity .6s}
 .loading .bee{font-size:56px;animation:b 1s infinite alternate}@keyframes b{to{transform:translateY(-12px)}}
 .quest{position:fixed;left:50%;top:12px;transform:translate(-50%,-140px);transition:transform .35s;z-index:4;background:#ffe9b0;border:4px solid var(--brown);border-radius:22px;padding:6px 14px 6px 8px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
-.quest.show{transform:translate(-50%,0)}.quest img{height:54px}.quest .qk{font-weight:900;font-size:13px}.quest .qn{font:800 22px Grandstander,Nunito,sans-serif}.quest button{border:none;background:none;font:900 22px Nunito;color:var(--brown);cursor:pointer}
+.quest.show{transform:translate(-50%,0)}.quest img{height:54px}.quest .qk{font-weight:900;font-size:13px}.quest .qn{font:800 22px Grandstander,Nunito,sans-serif;max-width:62vw}.quest button{border:none;background:none;font:900 22px Nunito;color:var(--brown);cursor:pointer}
 @media (max-width:700px){.quest{top:auto;bottom:calc(12px + var(--cardH))}.quest.show{transform:translate(-50%,0)}.quest:not(.show){transform:translate(-50%,200px)}}
   .book{position:fixed;inset:0;background:#0006;z-index:9;display:none;place-items:center}
   .book.show{display:grid}
@@ -57,6 +57,10 @@ canvas.drag{cursor:grabbing}
 .pad button[data-k=L]{grid-column:1;grid-row:2}.pad button[data-k=U]{grid-column:2;grid-row:1}.pad button[data-k=D]{grid-column:2;grid-row:2}.pad button[data-k=R]{grid-column:3;grid-row:2}
 .pscore{position:fixed;left:14px;top:92px;display:none;z-index:4;background:#ffe9b0;border:4px solid var(--brown);border-radius:20px;padding:4px 16px;font:800 24px Grandstander,Nunito}
 .pscore.show{display:block}
+.win{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(40,30,20,.45);z-index:8}.win.show{display:flex}
+.wbox{background:var(--cream);border:5px solid var(--brown);border-radius:30px;padding:22px 30px;text-align:center;max-width:88vw;box-shadow:0 8px 0 rgba(0,0,0,.25);animation:pop .4s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.5)}to{transform:scale(1)}}.wst{font-size:70px}.wbox h2{margin:4px 0;font:800 36px Grandstander,Nunito}.wbox p{font-size:19px;font-weight:800;margin:6px 0 14px}
+.wbox button{font:900 20px Nunito;color:var(--brown);background:#bfe8a0;border:4px solid var(--brown);border-radius:18px;padding:8px 22px;cursor:pointer}
 .zoom{position:fixed;right:10px;bottom:calc(14px + var(--cardH));display:flex;flex-direction:column;gap:6px;z-index:3}
 .zoom button{width:46px;height:46px;font:900 26px Nunito;color:var(--brown);background:var(--cream);border:3px solid var(--brown);border-radius:14px;box-shadow:0 3px 0 rgba(0,0,0,.22);cursor:pointer}
 </style></head><body>
@@ -76,6 +80,7 @@ canvas.drag{cursor:grabbing}
 <div class="zoom"><button id="zIn">+</button><button id="zOut">−</button></div>
 <div class="card" id="card"><button class="x" id="cardX">✕</button><div class="pic" id="cPic"></div><div style="flex:1;min-width:0"><h2 id="cName"></h2><p id="cText"></p><div class="btns" id="cBtns"></div><div class="more" id="cMore"></div></div></div>
 <div class="toast" id="toast"></div>
+<div class="win" id="win"><div class="wbox"><div class="wst">🏆</div><h2 id="wT">Čestitam!</h2><p id="wP"></p><button id="wB">Naprej ➜</button></div></div>
 <div class="pad" id="pad"><button data-k="L">◀</button><button data-k="U">⏫</button><button data-k="D">⏬</button><button data-k="R">▶</button></div>
 <div class="pscore" id="pscore">⭐ 0</div>
 <div class="book" id="poem"><div class="in poemin"><button class="x" id="poemX">✖</button><div class="pimg"><img src="s/povodni_moz.webp" alt="Povodni mož in Urška" style="width:100%;border-radius:22px;display:block;margin:4px 0 10px;box-shadow:0 4px 0 #0001"></div><h2>Povodni mož</h2><div class="pauth">France Prešeren</div><div class="pbtn"><button id="poemListen" class="big">🎧 Poslušaj</button><button id="poemPlay">▶ Preberi vse</button><button id="poemStop">⏸ Ustavi</button></div><div class="pcred" id="poemCred">Bere: <b>Polde Bibič</b> · posnetek: <a href="https://www.preseren.net/slo/3-2_recitacije.asp.html" target="_blank" rel="noopener">preseren.net</a></div><audio id="poemAud" preload="metadata" src="povodni.mp3"></audio><div id="poemText"></div></div></div>
@@ -732,18 +737,28 @@ function drawRegion(){ drawBorders(); if(!regShow) return; const a=Math.min(1,(T
   const [lx,ly]=w2s(...CFG.reglab[regShow.k]); const n=REGINFO[regShow.k][0]; ctx.font='800 34px Grandstander,Nunito,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.lineWidth=8; ctx.strokeStyle='#fff8ec'; ctx.strokeText(n,lx,ly); ctx.fillStyle='#8a3b12'; ctx.fillText(n,lx,ly); ctx.restore(); }
 function regionTap(x,y){ const [wx,wy]=s2w(x,y); if(wx<SL[0]||wx>SL[2]||wy<SL[1]||wy>SL[3]) return false; const r=regionAtW(wx,wy); if(!r) return false;
   const q=game.q; const n=REGINFO[r][0];
-  if(r===q.reg){ play('cheer'); game.score++; game.n++; regShow={k:r,t:T,until:T+2.5}; say(q.item?'Bravo! '+q.item.n+' je v pokrajini '+n+'.':'Bravo! To je '+n+'.'); toast('Bravo! '+n+' ⭐'); setTimeout(()=>{ if(game&&game.kind==='regions') nextRegion(); },1800); }
+  if(r===q.reg){ play('cheer'); game.score++; game.n++; if(q.cnt) game.done.add(r); regShow={k:r,t:T,until:T+2.5}; say(q.item?'Bravo! '+q.item.n+' je v pokrajini '+n+'.':'Bravo! To je '+n+'.'); toast('Bravo! '+n+' ⭐'); setTimeout(()=>{ if(game&&game.kind==='regions') nextRegion(); },1800); }
   else { play('boing'); regShow={k:r,t:T,until:T+2.2}; toast('To je '+n+'. Poskusi še enkrat!'); say('To je '+n+'. Poskusi še enkrat.'); }
   return true; }
 const RQ=10;
+const RCHAR=[['Kje rastejo oljke in je morje?','primorska'],['Kje je najvišja gora Triglav?','gorenjska'],['Kje gnezdi največ štorkelj?','prekmurje'],['Kje je ravno kot miza in rastejo sončnice?','prekmurje'],
+ ['Kje je glavno mesto Ljubljana?','osrednja'],['Kje je Blejsko jezero?','gorenjska'],['Kje je Postojnska jama?','notranjska'],['Kje je presihajoče Cerkniško jezero?','notranjska'],
+ ['Kje rastejo breze in teče topla reka Kolpa?','belakrajina'],['Kje je Maribor in teče reka Drava?','stajerska'],['Kje je Pohorje in klopotec v vinogradih?','stajerska'],['Kje so veliki gozdovi ob reki Dravi in mesto Slovenj Gradec?','koroska'],
+ ['Kje so dolenjski griči z zidanicami in reka Krka?','dolenjska'],['Kje je Novo mesto?','dolenjska'],['Kje so Piran, Koper in soline?','primorska'],['Kje teče smaragdna reka Soča?','primorska'],
+ ['Kje je Kras s kamnitimi hišami in Lipica?','primorska'],['Kje je Planica s skakalnicami?','gorenjska'],['Kje je Murska Sobota?','prekmurje'],['Kje so Kamniške Alpe in Velika planina?','osrednja'],
+ ['Kje je Ptuj, najstarejše mesto?','stajerska'],['Kje je Peca, kjer spi kralj Matjaž?','koroska'],['Kje je Kočevski rog z medvedi?','dolenjska'],['Kje plešejo belokranjsko kolo?','belakrajina']];
+function winModal(t,p,cb){ $('wT').textContent=t; $('wP').textContent=p; $('win').classList.add('show'); $('wB').onclick=()=>{ $('win').classList.remove('show'); cb(); }; }
 function nextRegion(){ const all=Object.keys(REGINFO);
-  if(game.round===1&&game.done.size>=all.length){ game.round=2; game.n=0; play('cheer'); say('Bravo! Našel si vse pokrajine! Zdaj pa težja runda.'); toast('Runda 2: V kateri pokrajini je …? 🏆'); }
-  else if(game.round===2&&game.n>=RQ){ play('cheer'); say('Bravo! Končal si tudi drugo rundo!'); toast('Bravo! Konec runde 2! 🎉'); game.round=1; game.done=new Set(); game.n=0; }
-  if(game.round===1){ const ks=all.filter(k=>!game.done.has(k)); const k=ks[Math.floor(Math.random()*ks.length)]; game.done.add(k); game.q={reg:k};
-    $('qKind').textContent='Runda 1 · Poišči pokrajino · '+(game.done.size)+'/'+all.length; $('qName').textContent=REGINFO[k][0]; $('qPic').innerHTML=''; say('Poišči pokrajino '+REGINFO[k][0]+'.'); }
+  if(game.round===1&&game.done.size>=all.length){ play('cheer'); say('Čestitam! Našel si vse pokrajine!'); winModal('Čestitam!','Našel si vseh 9 pokrajin! Zdaj pa runda 2: značilnosti pokrajin.',()=>{ game.round=2; game.n=0; game.used=new Set(); nextRegion(); }); return; }
+  if(game.round===2&&game.n>=RQ){ play('cheer'); say('Čestitam! Poznaš značilnosti pokrajin!'); winModal('Čestitam!','Poznaš značilnosti pokrajin! Runda 3: v kateri pokrajini je …?',()=>{ game.round=3; game.n=0; game.used=new Set(); nextRegion(); }); return; }
+  if(game.round===3&&game.n>=RQ){ play('cheer'); say('Čestitam! Pravi poznavalec Slovenije si!'); winModal('Bravo, pravi poznavalec Slovenije!','Rešil si vse tri runde! 🎉',()=>{ game.round=1; game.done=new Set(); game.n=0; nextRegion(); }); return; }
+  $('qPic').innerHTML='';
+  if(game.round===1){ const ks=all.filter(k=>!game.done.has(k)); const k=ks[Math.floor(Math.random()*ks.length)]; game.q={reg:k,cnt:true};
+    $('qKind').textContent='Runda 1 · Poišči pokrajino · '+game.done.size+'/'+all.length; $('qName').textContent=REGINFO[k][0]; say('Poišči pokrajino '+REGINFO[k][0]+'.'); }
+  else if(game.round===2){ const pool=RCHAR.filter(c=>!game.used.has(c[0])); const c=pool[Math.floor(Math.random()*pool.length)]; game.used.add(c[0]); game.q={reg:c[1],text:c[0]};
+    $('qKind').textContent='Runda 2 · Značilnosti · '+(game.n+1)+'/'+RQ; $('qName').textContent=c[0]; say(c[0]); }
   else { let it,reg,t=0; do{ it=game.pool[Math.floor(Math.random()*game.pool.length)]; reg=regionAtW(it.home[0],it.home[1]); t++; }while((!reg||game.used.has(it.id))&&t<200); game.used.add(it.id); game.q={reg,item:it};
-    $('qKind').textContent='Runda 2 · V kateri pokrajini je … · '+(game.n+1)+'/'+RQ; $('qName').textContent=it.n; const p=$('qPic'); p.innerHTML=''; const src=picFor(it); if(src){ const im=new Image(); im.src=src; p.appendChild(im); }
-    say('V kateri pokrajini je '+it.n+'?'); }
+    $('qKind').textContent='Runda 3 · V kateri pokrajini je … · '+(game.n+1)+'/'+RQ; $('qName').textContent=it.n; const src=picFor(it); if(src){ const im=new Image(); im.src=src; $('qPic').appendChild(im); } say('V kateri pokrajini je '+it.n+'?'); }
   $('quest').classList.add('show'); home(); }
 $('bRegions').onclick=()=>{ audioInit(); if(game&&game.kind==='regions') stopGame(); else { closeCard(); stopPilot&&stopPilot(); game={kind:'regions',score:0,round:1,n:0,done:new Set(),used:new Set(),pool:ITEMS.filter(it=>it.home&&!it.country&&it.c!=='drzava'&&it.c!=='gorovje'&&it.c!=='vozilo'&&it.id!=='morje'&&!/jezera$/.test(it.n))}; $('bRegions').classList.add('on'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); nextRegion(); } };
 const POVODNI=`Od nékdej lepé so Ljubljanke slovele,
