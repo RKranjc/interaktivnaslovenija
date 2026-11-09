@@ -760,7 +760,7 @@ function nextRegion(){ const all=Object.keys(REGINFO);
   else { let it,reg,t=0; do{ it=game.pool[Math.floor(Math.random()*game.pool.length)]; reg=regionAtW(it.home[0],it.home[1]); t++; }while((!reg||game.used.has(it.id))&&t<200); game.used.add(it.id); game.q={reg,item:it};
     $('qKind').textContent='Runda 3 · V kateri pokrajini je … · '+(game.n+1)+'/'+RQ+' · ✅ '+(game.ok||0); $('qName').textContent=it.n; const src=picFor(it); if(src){ const im=new Image(); im.src=src; $('qPic').appendChild(im); } say('V kateri pokrajini je '+it.n+'?'); }
   $('quest').classList.add('show'); home(); }
-$('bRegions').onclick=()=>{ audioInit(); if(game&&game.kind==='regions') stopGame(); else { closeCard(); stopPilot&&stopPilot(); game={kind:'regions',score:0,round:1,n:0,done:new Set(),used:new Set(),pool:ITEMS.filter(it=>it.home&&!it.country&&it.c!=='drzava'&&it.c!=='gorovje'&&it.c!=='vozilo'&&it.id!=='morje'&&!/jezera$/.test(it.n))}; $('bRegions').classList.add('on'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); nextRegion(); } };
+$('bRegions').onclick=()=>{ audioInit(); if(game&&game.kind==='regions') stopGame(); else { closeCard(); stopPilot&&stopPilot(); game={kind:'regions',score:0,round:1,n:0,done:new Set(),used:new Set(),pool:ITEMS.filter(it=>it.home&&!it.country&&it.c!=='drzava'&&it.c!=='gorovje'&&it.c!=='vozilo'&&it.c!=='zival'&&!(CFG.rivp&&CFG.rivp[it.id])&&it.id!=='morje'&&!/jezera$/.test(it.n)&&!it.range)}; $('bRegions').classList.add('on'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); nextRegion(); } };
 const POVODNI=`Od nékdej lepé so Ljubljanke slovele,
 al lepši od Urške bilo ni nobene,
 nobene očem bilo bolj zaželene
