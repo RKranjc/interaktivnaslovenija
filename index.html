@@ -472,8 +472,10 @@ function step(dt){
   for(const c of CLOUDS){ c.x+=c.v*dt; if(c.x>SL[2]+1500) c.x=SL[0]-1500; }
 }
 function visibleObj(o){ const s=cam.s; if(o.kind==='dec') return true; if(o.kind==='animal') return s>.09; if(o.kind==='veh') return s>.07; return true; }
-function drawObj(o){ if(!o.img.complete||!o.img.naturalWidth) return; const s=cam.s; let w=o.w*s; const minw=o.kind==='lm'?30:o.kind==='dec'?0:26; w=Math.max(w,minw); if(o.kind==='lm'&&o.it&&o.it.c==='mesto') w=Math.max(w,40);
-  const h=w*o.img.naturalHeight/o.img.naturalWidth; const [sx,sy]=w2s(o.x,o.y); if(sx<-w||sx>VW+w||sy<-10||sy-h>VH+10) return;
+function drawObj(o){ if(!o.img.complete||!o.img.naturalWidth) return; const s=cam.s; const far=Math.max(0,Math.min(1,(s-.08)/.2));
+  if(o.kind==='lm'&&o.it&&o.it.c!=='mesto'&&far<.05&&!(game&&game.cur===o.it)) { o.sb=null; return; }
+  let w=o.w*s; const minw=o.kind==='lm'?(o.it&&o.it.c==='mesto'?20:14)+14*far:o.kind==='dec'?0:16+10*far; w=Math.max(w,minw);
+  let h=w*o.img.naturalHeight/o.img.naturalWidth; const maxh=(o.kind==='lm'?30:24)+300*s; if(h>maxh){ w*=maxh/h; h=maxh; } const [sx,sy]=w2s(o.x,o.y); if(sx<-w||sx>VW+w||sy<-10||sy-h>VH+10) return;
   let bob=0; if(o.kind==='veh'&&(o.it.id==='balon'||o.it.id==='letalo')) bob=-h*.6-Math.sin(T*1.5)*3;
   if(o.kind==='animal'&&o.it.mv&&o.it.mv.k==='fly') bob=-h*.5-Math.sin(T*2+o.x)*4;
   // senca
@@ -487,10 +489,10 @@ function overlap(a,b){ return a[0]<b[0]+b[2]&&b[0]<a[0]+a[2]&&a[1]<b[1]+b[3]&&b[
 function drawSigns(){ const s=cam.s; const placed=[]; const objR=OBJ.filter(o=>o.sb&&o.kind!=='dec'&&visibleObj(o)).map(o=>({r:o.sb,it:o.it}));
   const list=SIGNS.slice().sort((a,b)=>PRI[a.kind]-PRI[b.kind]);
   for(const g of list){ g.sb=null; const [sx,sy]=w2s(g.x,g.y); if(sx<-200||sx>VW+200||sy<-100||sy>VH+200) continue;
-    if(g.kind==='big'){ if(s>.12||!labels) continue; const fz=(g.it.c==='drzava'?20:16)*Math.min(1,Math.max(.7,VW/1100)); ctx.font=`800 ${fz}px Grandstander,Nunito,sans-serif`; const tw=ctx.measureText(g.it.n).width; const r=[sx-tw/2,sy-fz,tw,fz*1.3];
+    if(g.kind==='big'){ if(s>.12||!labels) continue; const fz=(g.it.c==='drzava'?17:13)*Math.min(1,Math.max(.75,VW/1100)); ctx.font=`800 ${fz}px Grandstander,Nunito,sans-serif`; const tw=ctx.measureText(g.it.n).width; const r=[sx-tw/2,sy-fz,tw,fz*1.3];
       if(placed.some(p=>overlap(p,r))) continue; placed.push(r); ctx.textAlign='center'; ctx.lineWidth=5; ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.fillStyle=g.it.c==='drzava'?'#8a6d5a':'#5a3a20'; ctx.strokeText(g.it.n,sx,sy); ctx.fillText(g.it.n,sx,sy); g.sb=r; continue; }
     if(!g.sc.ready) continue;
-    const SC=Math.min(1,Math.max(.62,VW/1100)); let w; if(g.kind==='mesto'){ if(!labels&&s>.2) continue; w=(s>.25?104:76)*SC; } else if(g.kind==='kraj'){ if(s<.16||!labels) continue; w=70*SC; } else { if(s<.2||!labels) continue; w=78*SC; }
+    const SC=Math.min(1,Math.max(.62,VW/1100)); let w; if(g.kind==='mesto'){ if(!labels&&s>.2) continue; w=(s>.25?100:s>.13?72:54)*SC; } else if(g.kind==='kraj'){ if(s<.16||!labels) continue; w=70*SC*(.7+.3*Math.min(1,(s-.16)/.4)); } else { if(s<.2||!labels) continue; w=78*SC*(.7+.3*Math.min(1,(s-.2)/.4)); }
     const c=g.sc.c, h=w*c.height/c.width;
     const cands=[[0,4],[0,h*.9+10],[-w*.8,4],[w*.8,4],[0,-h-30]];
     let best=null; for(const [dx,dy] of cands){ const r=[sx-w/2+dx,sy+dy-h,w,h]; const bad=placed.some(p=>overlap(p,r))||objR.some(o=>o.it!==g.it&&overlap(o.r,[r[0]+w*.1,r[1]+h*.1,w*.8,h*.8]))||objR.some(o=>o.it===g.it&&overlap(o.r,[r[0]+w*.15,r[1],w*.7,h*.7])); if(!bad){ best=r; break; } }
