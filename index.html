@@ -410,7 +410,7 @@ function resize(){ DPR=Math.min(window.devicePixelRatio||1,2); VW=innerWidth; VH
 const cam={cx:W0*.5,cy:H0*.5,s:.1}, tgt={cx:W0*.5,cy:H0*.5,s:.1};
 const SL=CFG.svnBox; // [x0,y0,x1,y1] Slovenija v svetu
 function fitS(){ return Math.min(VW/(SL[2]-SL[0]),(VH-40)/(SL[3]-SL[1]))*1.02; }
-let MINS=.05, MAXS=1.6;
+let MINS=.05, MAXS=3.2;
 function home(){ MINS=fitS()*.85; tgt.s=fitS(); tgt.cx=(SL[0]+SL[2])/2; tgt.cy=(SL[1]+SL[3])/2; }
 function clampCam(c){ c.s=Math.max(MINS,Math.min(MAXS,c.s)); const mx=VW/2/c.s, my=VH/2/c.s; c.cx=Math.max(SL[0]-mx*.5,Math.min(SL[2]+mx*.5,c.cx)); c.cy=Math.max(SL[1]-my*.5,Math.min(SL[3]+my*.5,c.cy)); }
 const w2s=(x,y)=>[(x-cam.cx)*cam.s+VW/2,(y-cam.cy)*cam.s+VH/2];
@@ -754,8 +754,8 @@ $('poemPlay').onclick=()=>{ poemOn=true; readPoem(Math.max(poemIdx,0),false); if
 $('poemStop').onclick=()=>{ poemOn=false; try{$('poemAud').pause();}catch(e){} try{speechSynthesis.cancel();}catch(e){} };
 function tap(x,y){ // najprej sličice (od spredaj nazaj), nato table
   const vis=OBJ.filter(o=>o.it&&visibleObj(o)&&o.sb).sort((a,b)=>b.y-a.y);
-  if(!(game&&game.kind==='regions')) for(const o of vis) if(inb(o.sb,x,y)){ select(o.it,o); return; }
   for(const t of TREASURES) if(t.sb&&inb(t.sb,x,y)){ openTreasure(t); return; }
+  if(!(game&&game.kind==='regions')) for(const o of vis) if(inb(o.sb,x,y)){ select(o.it,o); return; }
   if(game&&game.kind==='regions'&&regionTap(x,y)) return;
   for(const g of SIGNS) if(g.sb&&inb(g.sb,x,y)){ select(g.it); return; }
   closeCard(); }
