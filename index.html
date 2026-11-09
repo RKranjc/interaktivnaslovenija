@@ -52,6 +52,11 @@ canvas.drag{cursor:grabbing}
   .noaud #poemListen,.noaud #poemCred{display:none}
   .book .x{position:absolute;right:16px;top:14px;border:0;background:#f1f1f1;border-radius:50%;width:46px;height:46px;font-size:24px;cursor:pointer}
     .book .in{padding:14px!important}
+.pad{position:fixed;left:14px;bottom:14px;display:none;z-index:4;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,64px);gap:6px}
+.pad.show{display:grid}.pad button{font:900 28px Nunito;color:var(--brown);background:var(--cream);border:3px solid var(--brown);border-radius:18px;box-shadow:0 3px 0 rgba(0,0,0,.22);touch-action:none}
+.pad button[data-k=L]{grid-column:1;grid-row:2}.pad button[data-k=U]{grid-column:2;grid-row:1}.pad button[data-k=D]{grid-column:2;grid-row:2}.pad button[data-k=R]{grid-column:3;grid-row:2}
+.pscore{position:fixed;left:50%;top:12px;transform:translateX(-50%);display:none;z-index:4;background:#ffe9b0;border:4px solid var(--brown);border-radius:20px;padding:4px 16px;font:800 24px Grandstander,Nunito}
+.pscore.show{display:block}
 .zoom{position:fixed;right:10px;bottom:calc(14px + var(--cardH));display:flex;flex-direction:column;gap:6px;z-index:3}
 .zoom button{width:46px;height:46px;font:900 26px Nunito;color:var(--brown);background:var(--cream);border:3px solid var(--brown);border-radius:14px;box-shadow:0 3px 0 rgba(0,0,0,.22);cursor:pointer}
 </style></head><body>
@@ -64,12 +69,15 @@ canvas.drag{cursor:grabbing}
  <button class="tb" id="bSound"><span class="ic">🔊</span><span class="tx">Zvok</span></button>
  <button class="tb" id="bGame"><span class="ic">🔍</span><span class="tx">Poišči</span></button>
  <button class="tb" id="bRegions"><span class="ic">🗺️</span><span class="tx">Pokrajine</span></button>
+ <button class="tb" id="bPlane"><span class="ic">✈️</span><span class="tx">Letalo</span></button>
  <button class="tb" id="bAnimals"><span class="ic">🐾</span><span class="tx">Živali</span></button>
 </div>
 <div class="quest" id="quest"><span id="qPic"></span><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div></div><button id="qX">✕</button></div>
 <div class="zoom"><button id="zIn">+</button><button id="zOut">−</button></div>
 <div class="card" id="card"><button class="x" id="cardX">✕</button><div class="pic" id="cPic"></div><div style="flex:1;min-width:0"><h2 id="cName"></h2><p id="cText"></p><div class="btns" id="cBtns"></div><div class="more" id="cMore"></div></div></div>
 <div class="toast" id="toast"></div>
+<div class="pad" id="pad"><button data-k="L">◀</button><button data-k="U">▲</button><button data-k="D">▼</button><button data-k="R">▶</button></div>
+<div class="pscore" id="pscore">⭐ 0</div>
 <div class="book" id="poem"><div class="in poemin"><button class="x" id="poemX">✖</button><div class="pimg"><img src="s/povodni_moz.webp" alt="Povodni mož in Urška" style="width:100%;border-radius:22px;display:block;margin:4px 0 10px;box-shadow:0 4px 0 #0001"></div><h2>Povodni mož</h2><div class="pauth">France Prešeren</div><div class="pbtn"><button id="poemListen" class="big">🎧 Poslušaj</button><button id="poemPlay">▶ Preberi vse</button><button id="poemStop">⏸ Ustavi</button></div><div class="pcred" id="poemCred">Bere: <b>Polde Bibič</b> · posnetek: <a href="https://www.preseren.net/slo/3-2_recitacije.asp.html" target="_blank" rel="noopener">preseren.net</a></div><audio id="poemAud" preload="metadata" src="povodni.mp3"></audio><div id="poemText"></div></div></div>
 <div class="loading" id="loading"><div class="bee">🐝</div>Rišem Slovenijo …</div>
 <script>
@@ -521,7 +529,7 @@ function step(dt){
   for(let i=BIRDS.length-1;i>=0;i--){ const b=BIRDS[i]; b.t+=dt; b.x+=b.vx*dt; b.y+=b.vy*dt; if(b.t>20) BIRDS.splice(i,1); }
   for(const c of CLOUDS){ c.x+=c.v*dt; if(c.x>SL[2]+1500) c.x=SL[0]-1500; }
 }
-function visibleObj(o){ const s=cam.s; if(o.kind==='dec') return true; if(o.kind==='animal') return s>.09; if(o.kind==='veh') return s>.07; return true; }
+function visibleObj(o){ const s=cam.s; if(pilot&&o.it&&o.it.id==='letalo') return false; if(o.kind==='dec') return true; if(o.kind==='animal') return s>.09; if(o.kind==='veh') return s>.07; return true; }
 const LOWC=new Map();
 function lowres(im,w){ w=Math.max(4,Math.round(w)); const k=im.src+'|'+w; let c=LOWC.get(k); if(c) return c; const h=Math.max(4,Math.round(w*im.naturalHeight/im.naturalWidth));
   c=document.createElement('canvas'); c.width=w; c.height=h; const g=c.getContext('2d'); g.imageSmoothingQuality='high'; g.drawImage(im,0,0,w,h); LOWC.set(k,c); if(LOWC.size>3000) LOWC.clear(); return c; }
@@ -576,14 +584,14 @@ function draw(){
   const extra=[]; if(cam.s>.22) for(const o of LIFE) extra.push(o); if(cam.s>.14) for(const o of CARS) extra.push(o); if(cam.s>.12) for(const o of BOATS) extra.push(o);
   for(const o of bkVisible()) extra.push(o);
   const vis=OBJ.filter(visibleObj).concat(extra).sort((a,b)=>a.y-b.y); for(const o of vis) if(!o.rot) drawObj(o); for(const o of vis) if(o.rot) drawObj(o);
-  drawSmoke(); drawTreasures();
+  drawSmoke(); drawTreasures(); drawPilot();
   for(const b of BIRDS){ if(!b.img.complete||!b.img.naturalWidth) continue; const [sx,sy]=w2s(b.x,b.y); const w=b.w*Math.min(1,Math.max(.5,cam.s*2)), h=w*b.img.naturalHeight/b.img.naturalWidth; const fl=Math.sin(b.t*9)*.15+1; ctx.save(); ctx.translate(sx,sy); ctx.scale(-1,fl); ctx.drawImage(b.img,-w/2,-h/2,w,h); ctx.restore(); }
   drawSigns();
   if(cam.s<.16&&cloudImg.complete&&cloudImg.naturalWidth){ ctx.globalAlpha=Math.min(1,(.16-cam.s)/.06)*.6; for(const c of CLOUDS){ const [sx,sy]=w2s(c.x,c.y); const w=c.w*cam.s, h=w*cloudImg.naturalHeight/cloudImg.naturalWidth; ctx.drawImage(cloudImg,sx-w/2,sy-h/2,w,h); } ctx.globalAlpha=1; }
 }
 function frame(now){ const dt=Math.min(.05,(now-last)/1000); last=now; T+=dt;
   const k=1-Math.pow(.001,dt); cam.s*=Math.pow(tgt.s/cam.s,k); cam.cx+=(tgt.cx-cam.cx)*k; cam.cy+=(tgt.cy-cam.cy)*k;
-  step(dt); for(const o of OBJ) if(o.pulse>0) o.pulse=Math.max(0,o.pulse-dt*.7);
+  stepPilot(dt); step(dt); for(const o of OBJ) if(o.pulse>0) o.pulse=Math.max(0,o.pulse-dt*.7);
   draw(); if(Math.random()<.02) gcTiles(); requestAnimationFrame(frame); }
 
 // ---------------- vnos ----------------
@@ -611,7 +619,7 @@ function answer(it,o){ if(!game) return false; if(it===game.cur){ if(o) o.pulse=
     if(!found.has(it.id)){ found.add(it.id); try{ localStorage.setItem('ms2d-found',JSON.stringify([...found])); }catch(e){} updBag(); }
     const b=$('cBtns'); const nx=document.createElement('button'); nx.textContent='Naprej ➜'; nx.style.background='#bfe8a0'; nx.onclick=()=>{ closeCard(); nextQ(); }; b.appendChild(nx); return true; }
   play('boing'); say('To je '+it.n+'. Poskusi še enkrat!'); toast('To je '+it.n+' – poskusi še enkrat!'); return true; }
-$('bGame').onclick=()=>{ audioInit(); if(game&&game.kind==='find') stopGame(); else startGame('find'); };
+$('bGame').onclick=()=>{ audioInit(); stopPilot(); if(game&&game.kind==='find') stopGame(); else startGame('find'); };
 $('bAnimals').onclick=()=>{ audioInit(); if(game&&game.kind==='animals') stopGame(); else startGame('animals'); };
 $('qX').onclick=stopGame;
 $('quest').onclick=e=>{ if(e.target.id==='qX'||!game) return; say('Poišči: '+game.cur.n); };
@@ -778,6 +786,36 @@ function hl(i){ document.querySelectorAll('.kit').forEach((d,k)=>d.classList.tog
 $('poemX').onclick=()=>{ poemOn=false; try{$('poemAud').pause();}catch(e){} try{speechSynthesis.cancel();}catch(e){} $('poem').classList.remove('show'); };
 $('poemPlay').onclick=()=>{ poemOn=true; readPoem(Math.max(poemIdx,0),false); if(!slVoice) toast('Glas za branje deluje v brskalniku Edge'); };
 $('poemStop').onclick=()=>{ poemOn=false; try{$('poemAud').pause();}catch(e){} try{speechSynthesis.cancel();}catch(e){} };
+// ---------------- letalo ----------------
+let pilot=null; const KEYS={};
+const planeImgs=[]; for(let k=0;k<16;k++) planeImgs.push(img('letalo_'+k)); const planeSide=img('vozilo_letalo');
+function startPilot(){ stopGame(); closeCard(); const [x,y]=ll2w(14.5,46.05); pilot={x,y,ang:Math.PI/2,v:260,score:0,stars:[]};
+  const pool=ITEMS.filter(it=>it.home&&!it.kraj&&(it.c==='zanim'||it.c==='mesto'||it.c==='gora'||it.c==='voda'));
+  for(const it of pool.sort(()=>Math.random()-.5).slice(0,25)) pilot.stars.push({x:it.home[0],y:it.home[1],it,got:false});
+  tgt.s=Math.max(.3,Math.min(.45,VW/2600)); $('pad').classList.add('show'); $('pscore').classList.add('show'); $('pscore').textContent='⭐ 0'; $('bPlane').classList.add('on'); say('Poleti in poberi zvezdice!'); }
+function stopPilot(){ pilot=null; $('pad').classList.remove('show'); $('pscore').classList.remove('show'); $('bPlane').classList.remove('on'); for(const k in KEYS) KEYS[k]=false; }
+$('bPlane').onclick=()=>{ audioInit(); if(pilot) stopPilot(); else startPilot(); };
+addEventListener('keydown',e=>{ const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[e.key]; if(m&&pilot){ KEYS[m]=true; e.preventDefault(); } if(e.key==='Escape'&&pilot) stopPilot(); });
+addEventListener('keyup',e=>{ const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[e.key]; if(m) KEYS[m]=false; });
+for(const b of document.querySelectorAll('#pad button')){ const k=b.dataset.k; const on=e=>{ e.preventDefault(); KEYS[k]=true; audioInit(); }, off=e=>{ e.preventDefault(); KEYS[k]=false; };
+  b.addEventListener('pointerdown',on); b.addEventListener('pointerup',off); b.addEventListener('pointerleave',off); b.addEventListener('pointercancel',off); }
+function stepPilot(dt){ if(!pilot) return; const p=pilot; if(KEYS.L) p.ang-=2.2*dt; if(KEYS.R) p.ang+=2.2*dt; if(KEYS.U) p.v=Math.min(600,p.v+300*dt); if(KEYS.D) p.v=Math.max(120,p.v-300*dt);
+  p.x+=Math.sin(p.ang)*p.v*dt; p.y-=Math.cos(p.ang)*p.v*dt; p.x=Math.max(SL[0]-300,Math.min(SL[2]+300,p.x)); p.y=Math.max(SL[1]-300,Math.min(SL[3]+300,p.y));
+  tgt.cx=p.x; tgt.cy=p.y; cam.cx+=(p.x-cam.cx)*Math.min(1,dt*4); cam.cy+=(p.y-cam.cy)*Math.min(1,dt*4); tgt.cx=cam.cx; tgt.cy=cam.cy;
+  for(const st of p.stars){ if(st.got) continue; if(Math.hypot(st.x-p.x,st.y-p.y)<70){ st.got=true; p.score++; $('pscore').textContent='⭐ '+p.score; play('sticker'); toast(st.it.n+'!'); say(st.it.n+'.');
+      if(!found.has(st.it.id)){ found.add(st.it.id); try{ localStorage.setItem('ms2d-found',JSON.stringify([...found])); }catch(e){} updBag(); }
+      if(p.stars.every(s=>s.got)){ play('cheer'); say('Bravo! Pobral si vse zvezdice!'); toast('Bravo! Vse zvezdice! ⭐'); } } } }
+function drawPilot(){ if(!pilot) return; const p=pilot;
+  for(const st of p.stars){ if(st.got) continue; const [sx,sy]=w2s(st.x,st.y); if(sx<-40||sx>VW+40||sy<-40||sy>VH+40){ // puščica proti najbližji
+      continue; } const w=34+6*Math.sin(T*5+st.x); if(starImg.complete) ctx.drawImage(starImg,sx-w/2,sy-w/2-20,w,w); }
+  // puščica do najbližje zvezdice
+  let best=null,bd=1e18; for(const st of p.stars){ if(st.got) continue; const d=Math.hypot(st.x-p.x,st.y-p.y); if(d<bd){bd=d;best=st;} }
+  const [px,py]=w2s(p.x,p.y);
+  if(best&&bd>VW/2/cam.s*.8){ const a=Math.atan2(best.y-p.y,best.x-p.x); ctx.save(); ctx.translate(px+Math.cos(a)*90,py+Math.sin(a)*90); ctx.rotate(a); ctx.fillStyle='rgba(255,200,40,.9)'; ctx.strokeStyle='#6b4423'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(18,0); ctx.lineTo(-10,-12); ctx.lineTo(-4,0); ctx.lineTo(-10,12); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore(); }
+  const W=110; const k=((Math.round(p.ang/(Math.PI/8))%16)+16)%16; const im=planeImgs[k];
+  ctx.fillStyle='rgba(20,30,20,.25)'; ctx.beginPath(); ctx.ellipse(px+30,py+60,W*.35,W*.12,0,0,6.283); ctx.fill();
+  if(im.complete&&im.naturalWidth){ ctx.drawImage(im,px-W/2,py-W/2,W,W); }
+  else if(planeSide.complete&&planeSide.naturalWidth){ const h=W*planeSide.naturalHeight/planeSide.naturalWidth; const right=Math.sin(p.ang)>=0; ctx.save(); ctx.translate(px,py); if(right) ctx.scale(-1,1); ctx.rotate((right?-1:1)*(p.ang-(right?Math.PI/2:-Math.PI/2))); ctx.drawImage(planeSide,-W/2,-h/2,W,h); ctx.restore(); } }
 function tap(x,y){ // najprej sličice (od spredaj nazaj), nato table
   const vis=OBJ.filter(o=>o.it&&visibleObj(o)&&o.sb).sort((a,b)=>b.y-a.y);
   for(const t of TREASURES) if(t.sb&&inb(t.sb,x,y)){ openTreasure(t); return; }
