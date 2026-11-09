@@ -55,7 +55,7 @@ canvas.drag{cursor:grabbing}
 .pad{position:fixed;left:14px;bottom:14px;display:none;z-index:4;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,64px);gap:6px}
 .pad.show{display:grid}.pad button{font:900 28px Nunito;color:var(--brown);background:var(--cream);border:3px solid var(--brown);border-radius:18px;box-shadow:0 3px 0 rgba(0,0,0,.22);touch-action:none}
 .pad button[data-k=L]{grid-column:1;grid-row:2}.pad button[data-k=U]{grid-column:2;grid-row:1}.pad button[data-k=D]{grid-column:2;grid-row:2}.pad button[data-k=R]{grid-column:3;grid-row:2}
-.pscore{position:fixed;left:50%;top:12px;transform:translateX(-50%);display:none;z-index:4;background:#ffe9b0;border:4px solid var(--brown);border-radius:20px;padding:4px 16px;font:800 24px Grandstander,Nunito}
+.pscore{position:fixed;left:14px;top:92px;display:none;z-index:4;background:#ffe9b0;border:4px solid var(--brown);border-radius:20px;padding:4px 16px;font:800 24px Grandstander,Nunito}
 .pscore.show{display:block}
 .zoom{position:fixed;right:10px;bottom:calc(14px + var(--cardH));display:flex;flex-direction:column;gap:6px;z-index:3}
 .zoom button{width:46px;height:46px;font:900 26px Nunito;color:var(--brown);background:var(--cream);border:3px solid var(--brown);border-radius:14px;box-shadow:0 3px 0 rgba(0,0,0,.22);cursor:pointer}
@@ -810,28 +810,29 @@ let pilot=null; const KEYS={};
 const planeImgs=[]; for(let k=0;k<16;k++) planeImgs.push(img('letalo_'+k)); const planeSide=img('vozilo_letalo');
 function startPilot(){ stopGame(); closeCard(); const [x,y]=ll2w(14.5,46.05); pilot={x,y,ang:Math.PI/2,v:260,score:0,stars:[]};
   const pool=ITEMS.filter(it=>it.home&&!it.kraj&&(it.c==='zanim'||it.c==='mesto'||it.c==='gora'||it.c==='voda'));
-  for(const it of pool.sort(()=>Math.random()-.5).slice(0,25)) pilot.stars.push({x:it.home[0],y:it.home[1],it,got:false});
-  tgt.s=Math.max(.3,Math.min(.45,VW/2600)); $('pad').classList.add('show'); $('pscore').classList.add('show'); $('pscore').textContent='⭐ 0'; $('bPlane').classList.add('on'); say('Poleti in poberi zvezdice!'); }
-function stopPilot(){ pilot=null; $('pad').classList.remove('show'); $('pscore').classList.remove('show'); $('bPlane').classList.remove('on'); for(const k in KEYS) KEYS[k]=false; }
+  pilot.pool=pool.sort(()=>Math.random()-.5); nextTarget();
+  tgt.s=Math.max(.3,Math.min(.45,VW/2600)); $('pad').classList.add('show'); $('pscore').classList.add('show'); $('pscore').textContent='⭐ 0'; $('bPlane').classList.add('on'); }
+function nextTarget(){ const p=pilot; p.cur=p.pool.find(it=>Math.hypot(it.home[0]-p.x,it.home[1]-p.y)>600)||p.pool[0]; p.pool=p.pool.filter(x=>x!==p.cur); p.pool.push(p.cur);
+  const [kn,ki]=kindOf(p.cur); $('qKind').textContent='Poleti do'; $('qName').textContent=p.cur.n; const q=$('qPic'); q.innerHTML=''; if(ki){ const im=new Image(); im.src='s/'+ki+'.webp'; q.appendChild(im); } $('quest').classList.add('show'); say('Poleti do: '+p.cur.n+'.'); }
+function stopPilot(){ if(pilot) $('quest').classList.remove('show'); pilot=null; $('pad').classList.remove('show'); $('pscore').classList.remove('show'); $('bPlane').classList.remove('on'); for(const k in KEYS) KEYS[k]=false; }
 $('bPlane').onclick=()=>{ audioInit(); if(pilot) stopPilot(); else startPilot(); };
 addEventListener('keydown',e=>{ const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[e.key]; if(m&&pilot){ KEYS[m]=true; e.preventDefault(); } if(e.key==='Escape'&&pilot) stopPilot(); });
 addEventListener('keyup',e=>{ const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[e.key]; if(m) KEYS[m]=false; });
 for(const b of document.querySelectorAll('#pad button')){ const k=b.dataset.k; const on=e=>{ e.preventDefault(); KEYS[k]=true; audioInit(); }, off=e=>{ e.preventDefault(); KEYS[k]=false; };
   b.addEventListener('pointerdown',on); b.addEventListener('pointerup',off); b.addEventListener('pointerleave',off); b.addEventListener('pointercancel',off); }
-function stepPilot(dt){ if(!pilot) return; const p=pilot; const dx=(KEYS.R?1:0)-(KEYS.L?1:0), dy=(KEYS.D?1:0)-(KEYS.U?1:0);
+function stepPilot(dt){ if(!pilot) return; const p=pilot; if(p.wait){ cam.cx+=(p.x-cam.cx)*Math.min(1,dt*4); cam.cy+=(p.y-cam.cy)*Math.min(1,dt*4); tgt.cx=cam.cx; tgt.cy=cam.cy; return; } const dx=(KEYS.R?1:0)-(KEYS.L?1:0), dy=(KEYS.D?1:0)-(KEYS.U?1:0);
   if(dx||dy){ const ta=Math.atan2(dx,-dy); let d=ta-p.ang; d=Math.atan2(Math.sin(d),Math.cos(d)); const mx=6*dt; p.ang+=Math.max(-mx,Math.min(mx,d)); p.v=Math.min(380,p.v+400*dt); } else p.v=Math.max(220,p.v-150*dt);
   p.x+=Math.sin(p.ang)*p.v*dt; p.y-=Math.cos(p.ang)*p.v*dt; p.x=Math.max(SL[0]-300,Math.min(SL[2]+300,p.x)); p.y=Math.max(SL[1]-300,Math.min(SL[3]+300,p.y));
   tgt.cx=p.x; tgt.cy=p.y; cam.cx+=(p.x-cam.cx)*Math.min(1,dt*4); cam.cy+=(p.y-cam.cy)*Math.min(1,dt*4); tgt.cx=cam.cx; tgt.cy=cam.cy;
-  for(const st of p.stars){ if(st.got) continue; if(Math.hypot(st.x-p.x,st.y-p.y)<70){ st.got=true; p.score++; $('pscore').textContent='⭐ '+p.score; play('sticker'); toast(st.it.n+'!'); say(st.it.n+'.');
-      if(!found.has(st.it.id)){ found.add(st.it.id); try{ localStorage.setItem('ms2d-found',JSON.stringify([...found])); }catch(e){} updBag(); }
-      if(p.stars.every(s=>s.got)){ play('cheer'); say('Bravo! Pobral si vse zvezdice!'); toast('Bravo! Vse zvezdice! ⭐'); } } } }
+  const t=p.cur; if(t&&!p.wait&&Math.hypot(t.home[0]-p.x,t.home[1]-p.y)<90){ p.score++; $('pscore').textContent='⭐ '+p.score; play('cheer'); p.wait=true;
+    if(!found.has(t.id)){ found.add(t.id); try{ localStorage.setItem('ms2d-found',JSON.stringify([...found])); }catch(e){} updBag(); }
+    showCard(t,t.f[0]); say('Bravo! To je '+t.n+'. '+t.f[0]); const nx=document.createElement('button'); nx.textContent='Naprej ➜'; nx.style.background='#bfe8a0'; nx.onclick=()=>{ closeCard(); p.wait=false; nextTarget(); }; $('cBtns').appendChild(nx); } }
 function drawPilot(){ if(!pilot) return; const p=pilot;
-  for(const st of p.stars){ if(st.got) continue; const [sx,sy]=w2s(st.x,st.y); if(sx<-40||sx>VW+40||sy<-40||sy>VH+40){ // puščica proti najbližji
-      continue; } const w=34+6*Math.sin(T*5+st.x); if(starImg.complete) ctx.drawImage(starImg,sx-w/2,sy-w/2-20,w,w); }
-  // puščica do najbližje zvezdice
-  let best=null,bd=1e18; for(const st of p.stars){ if(st.got) continue; const d=Math.hypot(st.x-p.x,st.y-p.y); if(d<bd){bd=d;best=st;} }
-  const [px,py]=w2s(p.x,p.y);
-  if(best&&bd>VW/2/cam.s*.8){ const a=Math.atan2(best.y-p.y,best.x-p.x); ctx.save(); ctx.translate(px+Math.cos(a)*90,py+Math.sin(a)*90); ctx.rotate(a); ctx.fillStyle='rgba(255,200,40,.9)'; ctx.strokeStyle='#6b4423'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(18,0); ctx.lineTo(-10,-12); ctx.lineTo(-4,0); ctx.lineTo(-10,12); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore(); }
+  const t=p.cur; const [px,py]=w2s(p.x,p.y);
+  if(t){ const [sx,sy]=w2s(t.home[0],t.home[1]); const w=40+8*Math.sin(T*5); if(starImg.complete) ctx.drawImage(starImg,sx-w/2,sy-w/2-30,w,w);
+    const dist=Math.hypot(t.home[0]-p.x,t.home[1]-p.y); if(dist>140&&!p.wait){ const a=Math.atan2(t.home[1]-p.y,t.home[0]-p.x); const r=95+6*Math.sin(T*6);
+      ctx.save(); ctx.translate(px+Math.cos(a)*r,py+Math.sin(a)*r); ctx.rotate(a); ctx.fillStyle='#ffc828'; ctx.strokeStyle='#6b4423'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(30,0); ctx.lineTo(-14,-22); ctx.lineTo(-4,0); ctx.lineTo(-14,22); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+      ctx.font='900 15px Nunito'; ctx.textAlign='center'; ctx.lineWidth=4; ctx.strokeStyle='#fff8ec'; const km=Math.round(dist/P)+' km'; const lx=px+Math.cos(a)*(r+44), ly=py+Math.sin(a)*(r+44)+5; ctx.strokeText(km,lx,ly); ctx.fillStyle='#6b4423'; ctx.fillText(km,lx,ly); } }
   const W=110; const k=((Math.round(p.ang/(Math.PI/8))%16)+16)%16; const im=planeImgs[k];
   ctx.fillStyle='rgba(20,30,20,.25)'; ctx.beginPath(); ctx.ellipse(px+30,py+60,W*.35,W*.12,0,0,6.283); ctx.fill();
   if(im.complete&&im.naturalWidth){ ctx.drawImage(im,px-W/2,py-W/2,W,W); }
