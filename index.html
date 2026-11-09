@@ -612,8 +612,13 @@ let game=null;
 function pickable(kind){ return ITEMS.filter(it=>it.home&&!it.kraj&&it.c!=='drzava'&&(kind==='animals'?it.c==='zival':it.c!=='zival'&&it.c!=='vozilo'&&it.c!=='gorovje')); }
 function startGame(kind){ closeCard(); game={kind,pool:pickable(kind).sort(()=>Math.random()-.5),score:0}; $('bGame').classList.toggle('on',kind==='find'); $('bAnimals').classList.toggle('on',kind==='animals'); nextQ(); }
 function stopGame(){ game=null; $('bRegions').classList.remove('on'); $('quest').classList.remove('show'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); }
+function kindOf(it){ const n=it.n.toLowerCase();
+  if(it.c==='zival') return ['žival',null]; if(it.c==='mesto') return ['mesto','ig_tabla_mesto']; if(it.kraj) return ['kraj','ig_tabla_vas']; if(it.c==='gora') return ['goro','12_gora_1']; if(it.c==='gorovje') return ['pokrajino','12_gora_2'];
+  if(it.c==='voda') return /jezer/.test(n)?['jezero','vo_lokvanji']:/morj/.test(n)?['morje','mo_batana']:['reko','vo_brzice'];
+  if(/grad|most|cerkev|stolnic|samostan|palač|dvor|stolp|trta|kapel|svetilnik|obzidj|kip|nebotičnik|zoo|vrt|terme|kobilarn|soline|planica/.test(n)) return ['stavbo','mesto_cerkev'];
+  return ['naravno čudo','07_drevo_1']; }
 function nextQ(){ if(!game) return; if(!game.pool.length) game.pool=pickable(game.kind).sort(()=>Math.random()-.5); game.cur=game.pool.pop();
-  const it=game.cur; $('qKind').textContent=game.kind==='animals'?'Poišči žival':'Poišči'; $('qName').textContent=it.n; const p=$('qPic'); p.innerHTML=''; const src=picFor(it); if(src&&game.kind==='animals'){ const im=new Image(); im.src=src; p.appendChild(im); }
+  const it=game.cur; const [kn,ki]=kindOf(it); $('qKind').textContent='Poišči '+kn; $('qName').textContent=it.n; const p=$('qPic'); p.innerHTML=''; const src=game.kind==='animals'?picFor(it):(ki?'s/'+ki+'.webp':null); if(src){ const im=new Image(); im.src=src; p.appendChild(im); }
   $('quest').classList.add('show'); say('Poišči: '+it.n); }
 function answer(it,o){ if(!game) return false; if(it===game.cur){ if(o) o.pulse=1; play('cheer'); game.score++; showCard(it,it.f[0]); say('Bravo! '+it.n+'. '+it.f[0]);
     if(!found.has(it.id)){ found.add(it.id); try{ localStorage.setItem('ms2d-found',JSON.stringify([...found])); }catch(e){} updBag(); }
