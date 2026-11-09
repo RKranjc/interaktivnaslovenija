@@ -821,7 +821,7 @@ addEventListener('keyup',e=>{ const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',
 for(const b of document.querySelectorAll('#pad button')){ const k=b.dataset.k; const on=e=>{ e.preventDefault(); KEYS[k]=true; audioInit(); }, off=e=>{ e.preventDefault(); KEYS[k]=false; };
   b.addEventListener('pointerdown',on); b.addEventListener('pointerup',off); b.addEventListener('pointerleave',off); b.addEventListener('pointercancel',off); }
 function stepPilot(dt){ if(!pilot) return; const p=pilot; if(p.wait){ cam.cx+=(p.x-cam.cx)*Math.min(1,dt*4); cam.cy+=(p.y-cam.cy)*Math.min(1,dt*4); tgt.cx=cam.cx; tgt.cy=cam.cy; return; } const dx=(KEYS.R?1:0)-(KEYS.L?1:0), dy=(KEYS.D?1:0)-(KEYS.U?1:0);
-  if(dx||dy){ const ta=Math.atan2(dx,-dy); let d=ta-p.ang; d=Math.atan2(Math.sin(d),Math.cos(d)); const mx=6*dt; p.ang+=Math.max(-mx,Math.min(mx,d)); p.v=Math.min(380,p.v+400*dt); } else p.v=Math.max(220,p.v-150*dt);
+  if(dx||dy){ const ta=Math.atan2(dx,-dy); let d=ta-p.ang; d=Math.atan2(Math.sin(d),Math.cos(d)); const mx=3.2*dt; p.ang+=Math.max(-mx,Math.min(mx,d)); p.v=Math.min(380,p.v+400*dt); } else p.v=Math.max(220,p.v-150*dt);
   p.x+=Math.sin(p.ang)*p.v*dt; p.y-=Math.cos(p.ang)*p.v*dt; p.x=Math.max(SL[0]-300,Math.min(SL[2]+300,p.x)); p.y=Math.max(SL[1]-300,Math.min(SL[3]+300,p.y));
   tgt.cx=p.x; tgt.cy=p.y; cam.cx+=(p.x-cam.cx)*Math.min(1,dt*4); cam.cy+=(p.y-cam.cy)*Math.min(1,dt*4); tgt.cx=cam.cx; tgt.cy=cam.cy;
   const t=p.cur; if(t&&!p.wait&&Math.hypot(t.home[0]-p.x,t.home[1]-p.y)<90){ p.score++; $('pscore').textContent='⭐ '+p.score; play('cheer'); p.wait=true;
@@ -835,7 +835,7 @@ function drawPilot(){ if(!pilot) return; const p=pilot;
       ctx.font='900 15px Nunito'; ctx.textAlign='center'; ctx.lineWidth=4; ctx.strokeStyle='#fff8ec'; const km=Math.round(dist/P)+' km'; const lx=px+Math.cos(a)*(r+44), ly=py+Math.sin(a)*(r+44)+5; ctx.strokeText(km,lx,ly); ctx.fillStyle='#6b4423'; ctx.fillText(km,lx,ly); } }
   const W=110; const k=((Math.round(p.ang/(Math.PI/8))%16)+16)%16; const im=planeImgs[k];
   ctx.fillStyle='rgba(20,30,20,.25)'; ctx.beginPath(); ctx.ellipse(px+30,py+60,W*.35,W*.12,0,0,6.283); ctx.fill();
-  if(im.complete&&im.naturalWidth){ ctx.drawImage(im,px-W/2,py-W/2,W,W); }
+  if(im.complete&&im.naturalWidth){ const res=p.ang-k*Math.PI/8; const rr=Math.atan2(Math.sin(res),Math.cos(res)); ctx.save(); ctx.translate(px,py); ctx.rotate(rr); ctx.drawImage(im,-W/2,-W/2,W,W); ctx.restore(); }
   else if(planeSide.complete&&planeSide.naturalWidth){ const h=W*planeSide.naturalHeight/planeSide.naturalWidth; const right=Math.sin(p.ang)>=0; ctx.save(); ctx.translate(px,py); if(right) ctx.scale(-1,1); ctx.rotate((right?-1:1)*(p.ang-(right?Math.PI/2:-Math.PI/2))); ctx.drawImage(planeSide,-W/2,-h/2,W,h); ctx.restore(); } }
 function tap(x,y){ // najprej sličice (od spredaj nazaj), nato table
   const vis=OBJ.filter(o=>o.it&&visibleObj(o)&&o.sb).sort((a,b)=>b.y-a.y);
