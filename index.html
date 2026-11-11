@@ -695,7 +695,7 @@ function answer(it,o){ if(!game) return false; if(game.wait) return false; if(it
 $('bGame').onclick=()=>{ audioInit(); stopPilot(); if(game&&game.kind==='find') stopGame(); else startGame('find'); };
 $('bAnimals').onclick=()=>{ audioInit(); if(game&&game.kind==='animals') stopGame(); else startGame('animals'); };
 $('qX').onclick=()=>{ if(pilot) stopPilot(); stopGame(); };
-$('quest').onclick=e=>{ if(e.target.id==='qX') return; if(pilot&&pilot.cur){ say('Poleti do: '+pilot.cur.n+'.'); return; } if(!game) return;
+$('quest').onclick=e=>{ if(e.target.id==='qX') return; if(pilot&&pilot.cur){ say('Tvoj cilj: '+pilot.cur.n+'.'); return; } if(!game) return;
   if(game.kind==='regions'){ const q=game.q; if(q) say(q.text||(q.item?'V kateri regiji je '+q.item.n+'?':'Poišči regijo '+REGINFO[q.reg][0]+'.')); return; } if(game.cur) say('Poišči: '+game.cur.n); };
 const TREASURES=[
  {id:'t_zlatorog',n:'Zlatorogov zaklad',at:[13.775,46.292],k:'chest',f:['Po pripovedki je pod goro Bogatin skrit zaklad, ki ga je čuval Zlatorog. Našel si ga!']},
@@ -738,9 +738,10 @@ function drawRegion(){ drawBorders(); if(!regShow) return; const a=Math.min(1,(T
 function regionTap(x,y){ const [wx,wy]=s2w(x,y); if(wx<SL[0]||wx>SL[2]||wy<SL[1]||wy>SL[3]) return false; const r=regionAtW(wx,wy); if(!r) return false;
   const q=game.q; const n=REGINFO[r][0]; if(!q||q.hit) return true;
   if(r===q.reg){ q.hit=true; play('cheer'); game.score++; game.n++; if(!q.miss) game.ok=(game.ok||0)+1; if(q.cnt) game.done.add(r); regShow={k:r,t:T,until:T+2.5}; say(q.item?'Bravo! '+q.item.n+' je v regiji '+n+'.':'Bravo! To je '+n+'.'); toast('Bravo! '+n+' ⭐'); setTimeout(()=>{ if(game&&game.kind==='regions'&&game.q===q) nextRegion(); },1800); }
-  else { play('boing'); q.miss=true; regShow={k:r,t:T,until:T+2.2}; toast('To je '+n+'. Poskusi še enkrat!'); say('To je '+n+'. Poskusi še enkrat.'); }
+  else { play('boing'); q.miss=true; regShow={k:r,t:T,until:T+2.2}; toast('To je '+n+'. Poskusi še enkrat!'); say('To je '+n+'. Poskusi še enkrat!'); }
   return true; }
-const RQ=10;
+const RQ=10; const NUMW=['nič','eno','dve','tri','štiri','pet','šest','sedem','osem','devet','deset','enajst','dvanajst'];
+const sayOk=ok=>'Pravilno si odgovoril na '+NUMW[ok]+' od desetih vprašanj.';
 const RCHAR=[['Kje je slovensko morje s Piranom in Koprom?','obalnokraska'],['Kje je najvišja gora Triglav?','gorenjska'],['Kje gnezdi največ štorkelj?','pomurska'],['Kje je ravno kot miza in teče reka Mura?','pomurska'],
  ['Kje je glavno mesto Ljubljana?','osrednja'],['Kje je Blejsko jezero?','gorenjska'],['Kje je Postojnska jama?','primorskonotranjska'],['Kje je presihajoče Cerkniško jezero?','primorskonotranjska'],
  ['Kje je Bela krajina z brezami in toplo reko Kolpo?','jugovzhodna'],['Kje je Maribor ob reki Dravi?','podravska'],['Kje je Ptuj, najstarejše mesto?','podravska'],['Kje je Slovenj Gradec in so veliki gozdovi?','koroska'],
@@ -759,11 +760,11 @@ const RGEO=[['Kje je najvzhodnejša vas Slovenije, Hodoš?','pomurska'],['Kje je
  ['Kje je Kum, najvišji vrh Zasavja?','zasavska'],['Kje reka Sava zapusti Slovenijo?','posavska'],['Kje je Kočevski rog z medvedi?','jugovzhodna']];
 function winModal(t,p,cb){ $('wT').textContent=t; $('wP').textContent=p; $('win').classList.add('show'); $('wB').onclick=()=>{ $('win').classList.remove('show'); cb(); }; }
 function nextRegion(){ const all=Object.keys(REGINFO);
-  if(game.round===1&&game.done.size>=all.length){ play('cheer'); say('Čestitam! Našel si vse regije! Pravilno v prvo: '+(game.ok||0)+' od '+all.length+'.'); const ok1=game.ok||0; winModal('Čestitam!','Našel si vseh '+all.length+' regij! V prvo si jih zadel '+ok1+' od '+all.length+'. Zdaj pa runda 2: značilnosti regij.',()=>{ game.ok=0; game.round=2; game.n=0; game.used=new Set(); nextRegion(); }); return; }
-  if(game.round===2&&game.n>=RQ){ play('cheer'); say('Čestitam! Pravilno si odgovoril na '+(game.ok||0)+' od '+RQ+' vprašanj.'); const ok2=game.ok||0; winModal('Čestitam!','Pravilno si odgovoril na '+ok2+' od '+RQ+' vprašanj! Runda 3: v kateri regiji je …?',()=>{ game.ok=0; game.round=3; game.n=0; game.used=new Set(); nextRegion(); }); return; }
-  if(game.round===3&&game.n>=RQ){ play('cheer'); const ok=game.ok||0; say('Čestitam! Pravilno si odgovoril na '+ok+' od '+RQ+' vprašanj.'); winModal('Čestitam!','Pravilno si odgovoril na '+ok+' od '+RQ+' vprašanj! Runda 4: običaji in dobrote regij.',()=>{ game.ok=0; game.round=4; game.n=0; game.used=new Set(); nextRegion(); }); return; }
-  if(game.round===4&&game.n>=RQ){ play('cheer'); const ok=game.ok||0; say('Čestitam! Pravilno si odgovoril na '+ok+' od '+RQ+' vprašanj.'); winModal('Čestitam!','Pravilno si odgovoril na '+ok+' od '+RQ+' vprašanj! Zadnja runda 5: posebnosti Slovenije. Ta je najtežja!',()=>{ game.ok=0; game.round=5; game.n=0; game.used=new Set(); nextRegion(); }); return; }
-  if(game.round===5&&game.n>=RQ){ play('cheer'); const ok=game.ok||0; say('Čestitam! Pravilno si odgovoril na '+ok+' od '+RQ+' vprašanj. Pravi poznavalec Slovenije si!'); winModal('Bravo, pravi poznavalec Slovenije!','Pravilno si odgovoril na '+ok+' od '+RQ+' vprašanj. Rešil si vseh 5 rund! 🎉',()=>{ game.ok=0; game.round=1; game.done=new Set(); game.n=0; nextRegion(); }); return; }
+  if(game.round===1&&game.done.size>=all.length){ play('cheer'); say('Čestitam! Našel si vse regije! V prvo si jih zadel '+NUMW[game.ok||0]+' od dvanajstih.'); const ok1=game.ok||0; winModal('Čestitam!','Našel si vseh '+all.length+' regij! V prvo si jih zadel '+ok1+' od '+all.length+'. Zdaj pa runda 2: značilnosti regij.',()=>{ game.ok=0; game.round=2; game.n=0; game.used=new Set(); nextRegion(); }); return; }
+  if(game.round===2&&game.n>=RQ){ play('cheer'); say('Čestitam! '+sayOk(game.ok||0)); const ok2=game.ok||0; winModal('Čestitam!','Pravilno si odgovoril na '+ok2+' od '+RQ+' vprašanj! Runda 3: v kateri regiji je …?',()=>{ game.ok=0; game.round=3; game.n=0; game.used=new Set(); nextRegion(); }); return; }
+  if(game.round===3&&game.n>=RQ){ play('cheer'); const ok=game.ok||0; say('Čestitam! '+sayOk(ok)); winModal('Čestitam!','Pravilno si odgovoril na '+ok+' od '+RQ+' vprašanj! Runda 4: običaji in dobrote regij.',()=>{ game.ok=0; game.round=4; game.n=0; game.used=new Set(); nextRegion(); }); return; }
+  if(game.round===4&&game.n>=RQ){ play('cheer'); const ok=game.ok||0; say('Čestitam! '+sayOk(ok)); winModal('Čestitam!','Pravilno si odgovoril na '+ok+' od '+RQ+' vprašanj! Zadnja runda 5: posebnosti Slovenije. Ta je najtežja!',()=>{ game.ok=0; game.round=5; game.n=0; game.used=new Set(); nextRegion(); }); return; }
+  if(game.round===5&&game.n>=RQ){ play('cheer'); const ok=game.ok||0; say('Čestitam! '+sayOk(ok)+' Pravi poznavalec Slovenije si!'); winModal('Bravo, pravi poznavalec Slovenije!','Pravilno si odgovoril na '+ok+' od '+RQ+' vprašanj. Rešil si vseh 5 rund! 🎉',()=>{ game.ok=0; game.round=1; game.done=new Set(); game.n=0; nextRegion(); }); return; }
   $('qPic').innerHTML='';
   if(game.round===1){ const ks=all.filter(k=>!game.done.has(k)); const k=ks[Math.floor(Math.random()*ks.length)]; game.q={reg:k,cnt:true};
     $('qKind').textContent='Runda 1 · Poišči regijo · '+game.done.size+'/'+all.length+' · ✅ '+(game.ok||0); $('qName').textContent=REGINFO[k][0]; say('Poišči regijo '+REGINFO[k][0]+'.'); }
@@ -905,7 +906,7 @@ function startPilot(){ stopGame(); closeCard(); const [x,y]=ll2w(14.5,46.05); pi
   pilot.pool=pool.sort(()=>Math.random()-.5); nextTarget();
   tgt.s=Math.max(.3,Math.min(.45,VW/2600)); $('pad').classList.add('show'); $('pscore').classList.add('show'); $('pscore').textContent='⭐ 0'; $('bPlane').classList.add('on'); }
 function nextTarget(bravo){ const p=pilot; p.cur=p.pool.find(it=>Math.hypot(it.home[0]-p.x,it.home[1]-p.y)>600)||p.pool[0]; p.pool=p.pool.filter(x=>x!==p.cur); p.pool.push(p.cur);
-  const [kn,ki]=kindOf(p.cur); $('qKind').textContent='Poleti do'; $('qName').textContent=p.cur.n; const q=$('qPic'); q.innerHTML=''; if(ki){ const im=new Image(); im.src='s/'+ki+'.webp'; q.appendChild(im); } $('quest').classList.add('show'); say((bravo?'Bravo! Naslednja postaja: ':'Poleti do: ')+p.cur.n+'.'); }
+  const [kn,ki]=kindOf(p.cur); $('qKind').textContent='Poleti do'; $('qName').textContent=p.cur.n; const q=$('qPic'); q.innerHTML=''; if(ki){ const im=new Image(); im.src='s/'+ki+'.webp'; q.appendChild(im); } $('quest').classList.add('show'); say((bravo?'Bravo! Naslednja postaja: ':'Tvoj cilj: ')+p.cur.n+'.'); }
 function stopPilot(){ if(pilot) $('quest').classList.remove('show'); pilot=null; $('pad').classList.remove('show'); $('pscore').classList.remove('show'); $('bPlane').classList.remove('on'); for(const k in KEYS) KEYS[k]=false; }
 $('bPlane').onclick=()=>{ audioInit(); if(pilot) stopPilot(); else startPilot(); };
 addEventListener('keydown',e=>{ const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[e.key]; if(m&&pilot){ KEYS[m]=true; e.preventDefault(); } if(e.key==='Escape'&&pilot) stopPilot(); });

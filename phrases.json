@@ -9006,5 +9006,2065 @@
 {
 "h": "b1a5bca6",
 "t": "Pobral si vse zvezdice!"
+},
+{
+"h": "3da2ac4c",
+"t": "Poišči regijo Pomurska."
+},
+{
+"h": "302f6647",
+"t": "To je Pomurska."
+},
+{
+"h": "fc34469f",
+"t": "Poišči regijo Podravska."
+},
+{
+"h": "6cbb8d0a",
+"t": "To je Podravska."
+},
+{
+"h": "1fba7844",
+"t": "Poišči regijo Koroška."
+},
+{
+"h": "7e6cbc39",
+"t": "To je Koroška."
+},
+{
+"h": "01e23aca",
+"t": "Poišči regijo Savinjska."
+},
+{
+"h": "af13397b",
+"t": "To je Savinjska."
+},
+{
+"h": "44949dd2",
+"t": "Poišči regijo Zasavska."
+},
+{
+"h": "f8b2fd79",
+"t": "To je Zasavska."
+},
+{
+"h": "90b22d4a",
+"t": "Poišči regijo Posavska."
+},
+{
+"h": "a9c099ed",
+"t": "To je Posavska."
+},
+{
+"h": "9f9d2916",
+"t": "Poišči regijo Jugovzhodna Slovenija."
+},
+{
+"h": "b61f7e83",
+"t": "To je Jugovzhodna Slovenija."
+},
+{
+"h": "b527f522",
+"t": "Poišči regijo Osrednjeslovenska."
+},
+{
+"h": "426c5d9b",
+"t": "To je Osrednjeslovenska."
+},
+{
+"h": "21de7154",
+"t": "Poišči regijo Gorenjska."
+},
+{
+"h": "9a621111",
+"t": "To je Gorenjska."
+},
+{
+"h": "4def8faa",
+"t": "Poišči regijo Primorsko-notranjska."
+},
+{
+"h": "bcb96661",
+"t": "To je Primorsko-notranjska."
+},
+{
+"h": "101aecea",
+"t": "Poišči regijo Goriška."
+},
+{
+"h": "c0d445cb",
+"t": "To je Goriška."
+},
+{
+"h": "f77e122f",
+"t": "Poišči regijo Obalno-kraška."
+},
+{
+"h": "eeb26052",
+"t": "To je Obalno-kraška."
+},
+{
+"h": "51420708",
+"t": "Kje je slovensko morje s Piranom in Koprom?"
+},
+{
+"h": "88362301",
+"t": "Kje je najvišja gora Triglav?"
+},
+{
+"h": "4bdc7a64",
+"t": "Kje gnezdi največ štorkelj?"
+},
+{
+"h": "2e63e22c",
+"t": "Kje je ravno kot miza in teče reka Mura?"
+},
+{
+"h": "1b2267e7",
+"t": "Kje je glavno mesto Ljubljana?"
+},
+{
+"h": "6244d064",
+"t": "Kje je presihajoče Cerkniško jezero?"
+},
+{
+"h": "29af0320",
+"t": "Kje je Bela krajina z brezami in toplo reko Kolpo?"
+},
+{
+"h": "1860afc5",
+"t": "Kje je Maribor ob reki Dravi?"
+},
+{
+"h": "155cc290",
+"t": "Kje je Ptuj, najstarejše mesto?"
+},
+{
+"h": "da7d8d27",
+"t": "Kje je Slovenj Gradec in so veliki gozdovi?"
+},
+{
+"h": "a1a41f26",
+"t": "Kje je Novo mesto ob reki Krki?"
+},
+{
+"h": "1fdf434f",
+"t": "Kje je Celje s Starim gradom?"
+},
+{
+"h": "9036ce44",
+"t": "Kje teče smaragdna reka Soča?"
+},
+{
+"h": "c45af71f",
+"t": "Kje je Kras z Lipico in Škocjanskimi jamami?"
+},
+{
+"h": "e4556d56",
+"t": "Kje je Planica s skakalnicami?"
+},
+{
+"h": "8a925f09",
+"t": "Kje je Velika planina s pastirskimi kočami?"
+},
+{
+"h": "200be14e",
+"t": "Kje so Trbovlje z visokim dimnikom?"
+},
+{
+"h": "7c9cda90",
+"t": "Kje sta Krško in Brežice ob reki Savi?"
+},
+{
+"h": "b8dc8d89",
+"t": "Kje je Peca, kjer spi kralj Matjaž?"
+},
+{
+"h": "a138bf22",
+"t": "Kje na pustovanju skačejo kurenti?"
+},
+{
+"h": "9665b0b3",
+"t": "Kje pečejo prekmursko gibanico?"
+},
+{
+"h": "03fcd8ec",
+"t": "Kje kuhajo bograč?"
+},
+{
+"h": "0a5d9a8b",
+"t": "Kje sta doma kraški pršut in teran?"
+},
+{
+"h": "28274a06",
+"t": "Kje klekljajo idrijske čipke?"
+},
+{
+"h": "9cfcc9a0",
+"t": "Kje pečejo belokranjsko pogačo?"
+},
+{
+"h": "9c2f1fb8",
+"t": "Kje so Terme Čatež, kjer se kopamo v topli vodi?"
+},
+{
+"h": "2c0e20a3",
+"t": "Kje so ribniški suhorobarji, ki izdelujejo lesene žlice in sita?"
+},
+{
+"h": "cf1cab8a",
+"t": "Kje uprizarjajo Škofjeloški pasijon?"
+},
+{
+"h": "7d812b91",
+"t": "Kje rastejo grozdi na najstarejši trti na svetu?"
+},
+{
+"h": "b7371d36",
+"t": "Kje v solinah pridelujejo morsko sol?"
+},
+{
+"h": "db5cf7f0",
+"t": "Kje na pustni torek nastopajo laufarji?"
+},
+{
+"h": "b91d61bb",
+"t": "Kje pastirji na Veliki planini delajo sirčke trniče?"
+},
+{
+"h": "e88a6f49",
+"t": "Kje je doma Martin Krpan, ki je nosil sol?"
+},
+{
+"h": "ed20a247",
+"t": "Kje je rudnik premoga in mesto Velenje?"
+},
+{
+"h": "ffc99774",
+"t": "Kje je doma Prežihov Voranc, ki je napisal Solzice?"
+},
+{
+"h": "0766aed9",
+"t": "Kje so rudarji kopali premog v Trbovljah, Zagorju in Hrastniku?"
+},
+{
+"h": "e02b5924",
+"t": "Kje okoli Žalca raste hmelj za pivo?"
+},
+{
+"h": "ca9c69fc",
+"t": "Kje je najvzhodnejša vas Slovenije, Hodoš?"
+},
+{
+"h": "14308b95",
+"t": "Kje je najsevernejša točka Slovenije?"
+},
+{
+"h": "301a90d8",
+"t": "Kje je najjužnejša točka Slovenije ob reki Kolpi?"
+},
+{
+"h": "cd6859b6",
+"t": "Kje je najzahodnejša vas Slovenije, Robidišče?"
+},
+{
+"h": "9c39cbd0",
+"t": "Kje je naše največje naravno jezero, Bohinjsko jezero?"
+},
+{
+"h": "4be159c4",
+"t": "Kje je Bloška planota, kjer so začeli smučati?"
+},
+{
+"h": "c0ee4002",
+"t": "Kje je grad Žužemberk nad reko Krko?"
+},
+{
+"h": "3c09fed0",
+"t": "Kje je gora Snežnik?"
+},
+{
+"h": "93c3d5e7",
+"t": "Kje je Vipavska dolina, kjer močno piha burja?"
+},
+{
+"h": "c8d4d501",
+"t": "Kje so vinorodne Haloze?"
+},
+{
+"h": "2517f7b4",
+"t": "Kje je Ptujsko jezero, naše največje umetno jezero?"
+},
+{
+"h": "65bca0db",
+"t": "Kje se lahko s kolesom pelješ skozi rudnik v Mežici?"
+},
+{
+"h": "fe369282",
+"t": "Kje je Velenjsko jezero, ki je nastalo nad rudnikom?"
+},
+{
+"h": "01d45aae",
+"t": "Kje je reka Soča najlepše smaragdna, pri Bovcu?"
+},
+{
+"h": "bd8f1053",
+"t": "Kje je Šmarna gora nad Ljubljano?"
+},
+{
+"h": "5f872b86",
+"t": "Kje je Kum, najvišji vrh Zasavja?"
+},
+{
+"h": "b42a6727",
+"t": "Kje reka Sava zapusti Slovenijo?"
+},
+{
+"h": "9ae9e272",
+"t": "Kje je Kočevski rog z medvedi?"
+},
+{
+"h": "e541a7d9",
+"t": "Čestitam!"
+},
+{
+"h": "a7a5e6d3",
+"t": "Našel si vse regije!"
+},
+{
+"h": "ef6bc9e4",
+"t": "V prvo si jih zadel nič od dvanajstih."
+},
+{
+"h": "b33e5734",
+"t": "V prvo si jih zadel eno od dvanajstih."
+},
+{
+"h": "1ff803b3",
+"t": "V prvo si jih zadel dve od dvanajstih."
+},
+{
+"h": "5d8dbad3",
+"t": "V prvo si jih zadel tri od dvanajstih."
+},
+{
+"h": "e94c7d93",
+"t": "V prvo si jih zadel štiri od dvanajstih."
+},
+{
+"h": "19f67363",
+"t": "V prvo si jih zadel pet od dvanajstih."
+},
+{
+"h": "3aa20ce5",
+"t": "V prvo si jih zadel šest od dvanajstih."
+},
+{
+"h": "ab32a4fe",
+"t": "V prvo si jih zadel sedem od dvanajstih."
+},
+{
+"h": "49065c92",
+"t": "V prvo si jih zadel osem od dvanajstih."
+},
+{
+"h": "c377c68e",
+"t": "V prvo si jih zadel devet od dvanajstih."
+},
+{
+"h": "2da67af7",
+"t": "V prvo si jih zadel deset od dvanajstih."
+},
+{
+"h": "95d8550b",
+"t": "V prvo si jih zadel enajst od dvanajstih."
+},
+{
+"h": "07c4d8d9",
+"t": "V prvo si jih zadel dvanajst od dvanajstih."
+},
+{
+"h": "328c6882",
+"t": "Pravilno si odgovoril na nič od desetih vprašanj."
+},
+{
+"h": "31c24b98",
+"t": "Pravi poznavalec Slovenije si!"
+},
+{
+"h": "dd4ca8ca",
+"t": "Pravilno si odgovoril na eno od desetih vprašanj."
+},
+{
+"h": "37ad0f19",
+"t": "Pravilno si odgovoril na dve od desetih vprašanj."
+},
+{
+"h": "b72959a1",
+"t": "Pravilno si odgovoril na tri od desetih vprašanj."
+},
+{
+"h": "be813df9",
+"t": "Pravilno si odgovoril na štiri od desetih vprašanj."
+},
+{
+"h": "51a22b69",
+"t": "Pravilno si odgovoril na pet od desetih vprašanj."
+},
+{
+"h": "6408bdad",
+"t": "Pravilno si odgovoril na šest od desetih vprašanj."
+},
+{
+"h": "5c81ee2c",
+"t": "Pravilno si odgovoril na sedem od desetih vprašanj."
+},
+{
+"h": "bf714aa6",
+"t": "Pravilno si odgovoril na osem od desetih vprašanj."
+},
+{
+"h": "31e94ebc",
+"t": "Pravilno si odgovoril na devet od desetih vprašanj."
+},
+{
+"h": "e934a671",
+"t": "Pravilno si odgovoril na deset od desetih vprašanj."
+},
+{
+"h": "6164061c",
+"t": "V kateri regiji je Ljubljana?"
+},
+{
+"h": "74d7f2db",
+"t": "Ljubljana je v regiji Osrednjeslovenska."
+},
+{
+"h": "98e55df7",
+"t": "V kateri regiji je Maribor?"
+},
+{
+"h": "291b0e71",
+"t": "Maribor je v regiji Podravska."
+},
+{
+"h": "73eaa32a",
+"t": "V kateri regiji je Celje?"
+},
+{
+"h": "96abdb0d",
+"t": "Celje je v regiji Savinjska."
+},
+{
+"h": "0c9af59d",
+"t": "V kateri regiji je Kranj?"
+},
+{
+"h": "d725ff0c",
+"t": "Kranj je v regiji Gorenjska."
+},
+{
+"h": "cdfc435a",
+"t": "V kateri regiji je Koper?"
+},
+{
+"h": "0610c324",
+"t": "Koper je v regiji Obalno-kraška."
+},
+{
+"h": "f2673035",
+"t": "V kateri regiji je Piran?"
+},
+{
+"h": "347cf89f",
+"t": "Piran je v regiji Obalno-kraška."
+},
+{
+"h": "9c7885a3",
+"t": "V kateri regiji je Novo mesto?"
+},
+{
+"h": "3748db9e",
+"t": "Novo mesto je v regiji Jugovzhodna Slovenija."
+},
+{
+"h": "3a34ea5e",
+"t": "V kateri regiji je Murska Sobota?"
+},
+{
+"h": "dde15fb5",
+"t": "Murska Sobota je v regiji Pomurska."
+},
+{
+"h": "9b6b242a",
+"t": "V kateri regiji je Nova Gorica?"
+},
+{
+"h": "bc60833d",
+"t": "Nova Gorica je v regiji Goriška."
+},
+{
+"h": "ed69cdec",
+"t": "V kateri regiji je Ptuj?"
+},
+{
+"h": "09020070",
+"t": "Ptuj je v regiji Podravska."
+},
+{
+"h": "752df61f",
+"t": "V kateri regiji je Škofja Loka?"
+},
+{
+"h": "4ca5b9fe",
+"t": "Škofja Loka je v regiji Gorenjska."
+},
+{
+"h": "c2624fea",
+"t": "V kateri regiji je Tolmin?"
+},
+{
+"h": "000466ab",
+"t": "Tolmin je v regiji Goriška."
+},
+{
+"h": "96d07caa",
+"t": "V kateri regiji je Idrija?"
+},
+{
+"h": "e5876973",
+"t": "Idrija je v regiji Goriška."
+},
+{
+"h": "8d9d15a5",
+"t": "V kateri regiji je Jesenice?"
+},
+{
+"h": "b3b0420a",
+"t": "Jesenice je v regiji Gorenjska."
+},
+{
+"h": "eb72ae18",
+"t": "V kateri regiji je Radovljica?"
+},
+{
+"h": "448fbde3",
+"t": "Radovljica je v regiji Gorenjska."
+},
+{
+"h": "f9125810",
+"t": "V kateri regiji je Kamnik?"
+},
+{
+"h": "24b85609",
+"t": "Kamnik je v regiji Osrednjeslovenska."
+},
+{
+"h": "16d3edc7",
+"t": "V kateri regiji je Domžale?"
+},
+{
+"h": "f6af2ae8",
+"t": "Domžale je v regiji Osrednjeslovenska."
+},
+{
+"h": "97c1424e",
+"t": "V kateri regiji je Vrhnika?"
+},
+{
+"h": "b1fd5afd",
+"t": "Vrhnika je v regiji Osrednjeslovenska."
+},
+{
+"h": "adaf3071",
+"t": "V kateri regiji je Ajdovščina?"
+},
+{
+"h": "39663850",
+"t": "Ajdovščina je v regiji Goriška."
+},
+{
+"h": "abb3324d",
+"t": "V kateri regiji je Sežana?"
+},
+{
+"h": "23b1ee29",
+"t": "Sežana je v regiji Obalno-kraška."
+},
+{
+"h": "99c3d004",
+"t": "V kateri regiji je Izola?"
+},
+{
+"h": "dd48b17e",
+"t": "Izola je v regiji Obalno-kraška."
+},
+{
+"h": "2366ff50",
+"t": "V kateri regiji je Kočevje?"
+},
+{
+"h": "a2a14f9f",
+"t": "Kočevje je v regiji Jugovzhodna Slovenija."
+},
+{
+"h": "16ad5f5d",
+"t": "V kateri regiji je Ribnica?"
+},
+{
+"h": "662c1ec6",
+"t": "Ribnica je v regiji Jugovzhodna Slovenija."
+},
+{
+"h": "95c0bc06",
+"t": "V kateri regiji je Črnomelj?"
+},
+{
+"h": "6c2b492b",
+"t": "Črnomelj je v regiji Jugovzhodna Slovenija."
+},
+{
+"h": "e88affd2",
+"t": "V kateri regiji je Metlika?"
+},
+{
+"h": "3a69d441",
+"t": "Metlika je v regiji Jugovzhodna Slovenija."
+},
+{
+"h": "72fd994f",
+"t": "V kateri regiji je Krško?"
+},
+{
+"h": "2f914f8c",
+"t": "Krško je v regiji Posavska."
+},
+{
+"h": "81b97b3f",
+"t": "V kateri regiji je Brežice?"
+},
+{
+"h": "167e6ba8",
+"t": "Brežice je v regiji Posavska."
+},
+{
+"h": "10e097cc",
+"t": "V kateri regiji je Sevnica?"
+},
+{
+"h": "229e9495",
+"t": "Sevnica je v regiji Posavska."
+},
+{
+"h": "bffc97db",
+"t": "V kateri regiji je Trbovlje?"
+},
+{
+"h": "453e4cf6",
+"t": "Trbovlje je v regiji Zasavska."
+},
+{
+"h": "46ed9c86",
+"t": "V kateri regiji je Velenje?"
+},
+{
+"h": "22c5fbfd",
+"t": "Velenje je v regiji Savinjska."
+},
+{
+"h": "9af69340",
+"t": "V kateri regiji je Slovenj Gradec?"
+},
+{
+"h": "27d1bd13",
+"t": "Slovenj Gradec je v regiji Koroška."
+},
+{
+"h": "b7c29ead",
+"t": "V kateri regiji je Ravne na Koroškem?"
+},
+{
+"h": "f96a73ec",
+"t": "Ravne na Koroškem je v regiji Koroška."
+},
+{
+"h": "2e07fe27",
+"t": "V kateri regiji je Žalec?"
+},
+{
+"h": "1b0cf558",
+"t": "Žalec je v regiji Savinjska."
+},
+{
+"h": "08ed19a7",
+"t": "V kateri regiji je Rogaška Slatina?"
+},
+{
+"h": "025b7da0",
+"t": "Rogaška Slatina je v regiji Savinjska."
+},
+{
+"h": "d612fa52",
+"t": "V kateri regiji je Slovenska Bistrica?"
+},
+{
+"h": "968211f6",
+"t": "Slovenska Bistrica je v regiji Podravska."
+},
+{
+"h": "5866505a",
+"t": "V kateri regiji je Ormož?"
+},
+{
+"h": "6a89861c",
+"t": "Ormož je v regiji Podravska."
+},
+{
+"h": "69c46af5",
+"t": "V kateri regiji je Ljutomer?"
+},
+{
+"h": "f3e54226",
+"t": "Ljutomer je v regiji Pomurska."
+},
+{
+"h": "7a06c934",
+"t": "V kateri regiji je Gornja Radgona?"
+},
+{
+"h": "b67e2df1",
+"t": "Gornja Radgona je v regiji Pomurska."
+},
+{
+"h": "949d14d2",
+"t": "V kateri regiji je Lendava?"
+},
+{
+"h": "1dbb57c5",
+"t": "Lendava je v regiji Pomurska."
+},
+{
+"h": "6427a0a8",
+"t": "V kateri regiji je Bovec?"
+},
+{
+"h": "f61c0433",
+"t": "Bovec je v regiji Goriška."
+},
+{
+"h": "135c73e9",
+"t": "V kateri regiji je Kranjska Gora?"
+},
+{
+"h": "6d6a0a58",
+"t": "Kranjska Gora je v regiji Gorenjska."
+},
+{
+"h": "e87ad2d3",
+"t": "V kateri regiji je Kobarid?"
+},
+{
+"h": "154aade4",
+"t": "Kobarid je v regiji Goriška."
+},
+{
+"h": "2553ef08",
+"t": "V kateri regiji je Logatec?"
+},
+{
+"h": "bb69b40f",
+"t": "Logatec je v regiji Osrednjeslovenska."
+},
+{
+"h": "ea6bf8f8",
+"t": "V kateri regiji je Grosuplje?"
+},
+{
+"h": "d1947c77",
+"t": "Grosuplje je v regiji Osrednjeslovenska."
+},
+{
+"h": "54e75349",
+"t": "V kateri regiji je Laško?"
+},
+{
+"h": "5e2c053a",
+"t": "Laško je v regiji Savinjska."
+},
+{
+"h": "f68ce1d3",
+"t": "V kateri regiji je Ilirska Bistrica?"
+},
+{
+"h": "7ee4677e",
+"t": "Ilirska Bistrica je v regiji Primorsko-notranjska."
+},
+{
+"h": "775b9ff3",
+"t": "V kateri regiji je Postojna?"
+},
+{
+"h": "6314d956",
+"t": "Postojna je v regiji Primorsko-notranjska."
+},
+{
+"h": "f4ebfbd0",
+"t": "V kateri regiji je Blejsko jezero?"
+},
+{
+"h": "85461deb",
+"t": "Blejsko jezero je v regiji Gorenjska."
+},
+{
+"h": "2dad9fbb",
+"t": "V kateri regiji je Bohinjsko jezero?"
+},
+{
+"h": "46171718",
+"t": "Bohinjsko jezero je v regiji Gorenjska."
+},
+{
+"h": "e480f4ab",
+"t": "V kateri regiji je Cerkniško jezero?"
+},
+{
+"h": "619c543e",
+"t": "Cerkniško jezero je v regiji Primorsko-notranjska."
+},
+{
+"h": "c5adfa5d",
+"t": "V kateri regiji je Jezero Jasna?"
+},
+{
+"h": "3e8655b2",
+"t": "Jezero Jasna je v regiji Gorenjska."
+},
+{
+"h": "43ebce61",
+"t": "V kateri regiji je Velenjsko jezero?"
+},
+{
+"h": "c7295c1c",
+"t": "Velenjsko jezero je v regiji Savinjska."
+},
+{
+"h": "0aa56cee",
+"t": "V kateri regiji je Šmartinsko jezero?"
+},
+{
+"h": "4dae8b19",
+"t": "Šmartinsko jezero je v regiji Savinjska."
+},
+{
+"h": "44156424",
+"t": "V kateri regiji je Krnsko jezero?"
+},
+{
+"h": "edf26b83",
+"t": "Krnsko jezero je v regiji Goriška."
+},
+{
+"h": "41a77e9e",
+"t": "V kateri regiji je Ptujsko jezero?"
+},
+{
+"h": "6fda4502",
+"t": "Ptujsko jezero je v regiji Podravska."
+},
+{
+"h": "e1bc0d06",
+"t": "V kateri regiji je Divje jezero?"
+},
+{
+"h": "74c4d2d7",
+"t": "Divje jezero je v regiji Goriška."
+},
+{
+"h": "4add7db4",
+"t": "V kateri regiji je Planšarsko jezero?"
+},
+{
+"h": "da42b265",
+"t": "Planšarsko jezero je v regiji Gorenjska."
+},
+{
+"h": "8471a39c",
+"t": "V kateri regiji je Pohorje?"
+},
+{
+"h": "e18d5ab6",
+"t": "Pohorje je v regiji Podravska."
+},
+{
+"h": "38ad04f1",
+"t": "V kateri regiji je Snežnik?"
+},
+{
+"h": "1d4d713a",
+"t": "Snežnik je v regiji Primorsko-notranjska."
+},
+{
+"h": "9d295526",
+"t": "V kateri regiji je Kanin?"
+},
+{
+"h": "26b2d611",
+"t": "Kanin je v regiji Goriška."
+},
+{
+"h": "e1ae2976",
+"t": "V kateri regiji je Krn?"
+},
+{
+"h": "f630d6fd",
+"t": "Krn je v regiji Goriška."
+},
+{
+"h": "ed808601",
+"t": "V kateri regiji je Stol?"
+},
+{
+"h": "e39e208e",
+"t": "Stol je v regiji Gorenjska."
+},
+{
+"h": "584dbf6f",
+"t": "V kateri regiji je Storžič?"
+},
+{
+"h": "86501826",
+"t": "Storžič je v regiji Gorenjska."
+},
+{
+"h": "0e1ace08",
+"t": "V kateri regiji je Peca?"
+},
+{
+"h": "dda72d67",
+"t": "Peca je v regiji Koroška."
+},
+{
+"h": "dcb19c05",
+"t": "V kateri regiji je Trdinov vrh?"
+},
+{
+"h": "f2a590e2",
+"t": "Trdinov vrh je v regiji Jugovzhodna Slovenija."
+},
+{
+"h": "b8b60337",
+"t": "V kateri regiji je Slavnik?"
+},
+{
+"h": "ca876581",
+"t": "Slavnik je v regiji Obalno-kraška."
+},
+{
+"h": "00a322bd",
+"t": "V kateri regiji je Tromostovje?"
+},
+{
+"h": "47ac7746",
+"t": "Tromostovje je v regiji Osrednjeslovenska."
+},
+{
+"h": "c50d4b17",
+"t": "V kateri regiji je Zmajski most?"
+},
+{
+"h": "e03b292a",
+"t": "Zmajski most je v regiji Osrednjeslovenska."
+},
+{
+"h": "d4f3b04b",
+"t": "V kateri regiji je Ljubljanska stolnica?"
+},
+{
+"h": "ad54a74e",
+"t": "Ljubljanska stolnica je v regiji Osrednjeslovenska."
+},
+{
+"h": "5af6e2e3",
+"t": "V kateri regiji je Nebotičnik?"
+},
+{
+"h": "f6f15f3a",
+"t": "Nebotičnik je v regiji Osrednjeslovenska."
+},
+{
+"h": "edbcaf35",
+"t": "V kateri regiji je Šmarna gora?"
+},
+{
+"h": "da388fca",
+"t": "Šmarna gora je v regiji Osrednjeslovenska."
+},
+{
+"h": "0c4f67f5",
+"t": "V kateri regiji je Stara trta?"
+},
+{
+"h": "0f6c4a71",
+"t": "Stara trta je v regiji Podravska."
+},
+{
+"h": "20556a55",
+"t": "V kateri regiji je Vodni stolp?"
+},
+{
+"h": "90418e03",
+"t": "Vodni stolp je v regiji Podravska."
+},
+{
+"h": "02b6aaf3",
+"t": "V kateri regiji je Stari most?"
+},
+{
+"h": "60dc99af",
+"t": "Stari most je v regiji Podravska."
+},
+{
+"h": "d74ece5f",
+"t": "V kateri regiji je Knežji dvorec?"
+},
+{
+"h": "074e3280",
+"t": "Knežji dvorec je v regiji Savinjska."
+},
+{
+"h": "cc4001bf",
+"t": "V kateri regiji je Prešernov kip?"
+},
+{
+"h": "9f6dd3ee",
+"t": "Prešernov kip je v regiji Gorenjska."
+},
+{
+"h": "e6a735df",
+"t": "V kateri regiji je Piransko obzidje?"
+},
+{
+"h": "771af9a7",
+"t": "Piransko obzidje je v regiji Obalno-kraška."
+},
+{
+"h": "93637211",
+"t": "V kateri regiji je Soboški grad?"
+},
+{
+"h": "dddecdea",
+"t": "Soboški grad je v regiji Pomurska."
+},
+{
+"h": "1bb02bbb",
+"t": "V kateri regiji je Kostanjevica?"
+},
+{
+"h": "ffcdbe8e",
+"t": "Kostanjevica je v regiji Goriška."
+},
+{
+"h": "5f506eed",
+"t": "V kateri regiji je Mestni stolp?"
+},
+{
+"h": "fd92c605",
+"t": "Mestni stolp je v regiji Podravska."
+},
+{
+"h": "d4264cd6",
+"t": "V kateri regiji je Kapiteljska cerkev?"
+},
+{
+"h": "09eae04f",
+"t": "Kapiteljska cerkev je v regiji Jugovzhodna Slovenija."
+},
+{
+"h": "2b38e33d",
+"t": "V kateri regiji je Slap Kozjak?"
+},
+{
+"h": "e01aac12",
+"t": "Slap Kozjak je v regiji Goriška."
+},
+{
+"h": "02c371d9",
+"t": "V kateri regiji je Samostan Stična?"
+},
+{
+"h": "bc3ddebe",
+"t": "Samostan Stična je v regiji Osrednjeslovenska."
+},
+{
+"h": "ef8ca3fe",
+"t": "V kateri regiji je Kobilarna Lipica?"
+},
+{
+"h": "d80b1c76",
+"t": "Kobilarna Lipica je v regiji Obalno-kraška."
+},
+{
+"h": "a761ab20",
+"t": "V kateri regiji je Vintgar?"
+},
+{
+"h": "74f8ca5d",
+"t": "Vintgar je v regiji Gorenjska."
+},
+{
+"h": "59cce420",
+"t": "V kateri regiji je Slap Peričnik?"
+},
+{
+"h": "04616759",
+"t": "Slap Peričnik je v regiji Gorenjska."
+},
+{
+"h": "60011b9d",
+"t": "V kateri regiji je Zelenci?"
+},
+{
+"h": "38ac7474",
+"t": "Zelenci je v regiji Gorenjska."
+},
+{
+"h": "f4adb536",
+"t": "V kateri regiji je Most v Kanalu?"
+},
+{
+"h": "aab55ef1",
+"t": "Most v Kanalu je v regiji Goriška."
+},
+{
+"h": "f824b3e9",
+"t": "V kateri regiji je Solkanski most?"
+},
+{
+"h": "ae17fd24",
+"t": "Solkanski most je v regiji Goriška."
+},
+{
+"h": "c5ccb758",
+"t": "V kateri regiji je Rakov Škocjan?"
+},
+{
+"h": "42d5b045",
+"t": "Rakov Škocjan je v regiji Primorsko-notranjska."
+},
+{
+"h": "d4c7fb53",
+"t": "V kateri regiji je Živalski vrt?"
+},
+{
+"h": "b482e556",
+"t": "Živalski vrt je v regiji Osrednjeslovenska."
+},
+{
+"h": "9e5123f0",
+"t": "V kateri regiji je Terme Čatež?"
+},
+{
+"h": "932f3931",
+"t": "Terme Čatež je v regiji Posavska."
+},
+{
+"h": "dcb1d389",
+"t": "V kateri regiji je Olimje?"
+},
+{
+"h": "4290d500",
+"t": "Olimje je v regiji Savinjska."
+},
+{
+"h": "f272e6bc",
+"t": "V kateri regiji je Postojnska jama?"
+},
+{
+"h": "a926a091",
+"t": "Postojnska jama je v regiji Primorsko-notranjska."
+},
+{
+"h": "fb7d2409",
+"t": "V kateri regiji je Škocjanske jame?"
+},
+{
+"h": "6b3396db",
+"t": "Škocjanske jame je v regiji Obalno-kraška."
+},
+{
+"h": "0d2b7e35",
+"t": "V kateri regiji je Soline?"
+},
+{
+"h": "42229f35",
+"t": "Soline je v regiji Obalno-kraška."
+},
+{
+"h": "842d5f6f",
+"t": "V kateri regiji je Planica?"
+},
+{
+"h": "10b028e2",
+"t": "Planica je v regiji Gorenjska."
+},
+{
+"h": "0150769e",
+"t": "V kateri regiji je Logarska dolina?"
+},
+{
+"h": "565a1c5d",
+"t": "Logarska dolina je v regiji Savinjska."
+},
+{
+"h": "28bbdbc9",
+"t": "Tvoj cilj: Ljubljana."
+},
+{
+"h": "fcf7b1dc",
+"t": "Naslednja postaja: Ljubljana."
+},
+{
+"h": "d612e816",
+"t": "Tvoj cilj: Maribor."
+},
+{
+"h": "5a559aab",
+"t": "Naslednja postaja: Maribor."
+},
+{
+"h": "0c3c0587",
+"t": "Tvoj cilj: Celje."
+},
+{
+"h": "5eac6a62",
+"t": "Naslednja postaja: Celje."
+},
+{
+"h": "7ba9a9e4",
+"t": "Tvoj cilj: Kranj."
+},
+{
+"h": "49a9c369",
+"t": "Naslednja postaja: Kranj."
+},
+{
+"h": "8fb24603",
+"t": "Tvoj cilj: Koper."
+},
+{
+"h": "d18a7dea",
+"t": "Naslednja postaja: Koper."
+},
+{
+"h": "015a5b74",
+"t": "Tvoj cilj: Piran."
+},
+{
+"h": "ab59cc01",
+"t": "Naslednja postaja: Piran."
+},
+{
+"h": "12074e46",
+"t": "Tvoj cilj: Novo mesto."
+},
+{
+"h": "23cb284d",
+"t": "Naslednja postaja: Novo mesto."
+},
+{
+"h": "b6141a17",
+"t": "Tvoj cilj: Murska Sobota."
+},
+{
+"h": "27de7ee6",
+"t": "Naslednja postaja: Murska Sobota."
+},
+{
+"h": "ad6825c3",
+"t": "Tvoj cilj: Nova Gorica."
+},
+{
+"h": "c3d9060e",
+"t": "Naslednja postaja: Nova Gorica."
+},
+{
+"h": "f0874179",
+"t": "Tvoj cilj: Ptuj."
+},
+{
+"h": "2746ed22",
+"t": "Naslednja postaja: Ptuj."
+},
+{
+"h": "a5f3ef35",
+"t": "Tvoj cilj: Blejsko jezero."
+},
+{
+"h": "7dd7540e",
+"t": "Naslednja postaja: Blejsko jezero."
+},
+{
+"h": "85c0c2a2",
+"t": "Tvoj cilj: Bohinjsko jezero."
+},
+{
+"h": "a4df74fd",
+"t": "Naslednja postaja: Bohinjsko jezero."
+},
+{
+"h": "fc0743a6",
+"t": "Tvoj cilj: Cerkniško jezero."
+},
+{
+"h": "b74615f1",
+"t": "Naslednja postaja: Cerkniško jezero."
+},
+{
+"h": "c8dbf6cc",
+"t": "Tvoj cilj: Jezero Jasna."
+},
+{
+"h": "f35598a7",
+"t": "Naslednja postaja: Jezero Jasna."
+},
+{
+"h": "3ba7b72c",
+"t": "Tvoj cilj: Velenjsko jezero."
+},
+{
+"h": "ed525333",
+"t": "Naslednja postaja: Velenjsko jezero."
+},
+{
+"h": "8a40c427",
+"t": "Tvoj cilj: Šmartinsko jezero."
+},
+{
+"h": "4f9529fa",
+"t": "Naslednja postaja: Šmartinsko jezero."
+},
+{
+"h": "935d3bed",
+"t": "Tvoj cilj: Triglavska jezera."
+},
+{
+"h": "1a1402d0",
+"t": "Naslednja postaja: Triglavska jezera."
+},
+{
+"h": "baf3ebf9",
+"t": "Tvoj cilj: Krnsko jezero."
+},
+{
+"h": "635da1a4",
+"t": "Naslednja postaja: Krnsko jezero."
+},
+{
+"h": "1c3eae87",
+"t": "Tvoj cilj: Ptujsko jezero."
+},
+{
+"h": "a5e473a8",
+"t": "Naslednja postaja: Ptujsko jezero."
+},
+{
+"h": "531e1eef",
+"t": "Tvoj cilj: Divje jezero."
+},
+{
+"h": "f0dc312c",
+"t": "Naslednja postaja: Divje jezero."
+},
+{
+"h": "e8f80618",
+"t": "Tvoj cilj: Črno jezero."
+},
+{
+"h": "fdc8544d",
+"t": "Naslednja postaja: Črno jezero."
+},
+{
+"h": "9d955e4d",
+"t": "Tvoj cilj: Zbiljsko jezero."
+},
+{
+"h": "342f28d0",
+"t": "Naslednja postaja: Zbiljsko jezero."
+},
+{
+"h": "2e2304cd",
+"t": "Tvoj cilj: Planšarsko jezero."
+},
+{
+"h": "d224af1c",
+"t": "Naslednja postaja: Planšarsko jezero."
+},
+{
+"h": "a2bb8bc8",
+"t": "Tvoj cilj: Savinja."
+},
+{
+"h": "ec7d0819",
+"t": "Naslednja postaja: Savinja."
+},
+{
+"h": "3a820ee5",
+"t": "Tvoj cilj: Ljubljanica."
+},
+{
+"h": "072c2e28",
+"t": "Naslednja postaja: Ljubljanica."
+},
+{
+"h": "14325765",
+"t": "Tvoj cilj: Vipava."
+},
+{
+"h": "a4870836",
+"t": "Naslednja postaja: Vipava."
+},
+{
+"h": "579c03c6",
+"t": "Tvoj cilj: Idrijca."
+},
+{
+"h": "b25e5c6f",
+"t": "Naslednja postaja: Idrijca."
+},
+{
+"h": "110082b3",
+"t": "Tvoj cilj: Sava."
+},
+{
+"h": "96f57d48",
+"t": "Naslednja postaja: Sava."
+},
+{
+"h": "819a9fe4",
+"t": "Tvoj cilj: Soča."
+},
+{
+"h": "39ac5e4b",
+"t": "Naslednja postaja: Soča."
+},
+{
+"h": "d74eb1d8",
+"t": "Tvoj cilj: Drava."
+},
+{
+"h": "4c5aad15",
+"t": "Naslednja postaja: Drava."
+},
+{
+"h": "fde575dd",
+"t": "Tvoj cilj: Mura."
+},
+{
+"h": "7c6cfb02",
+"t": "Naslednja postaja: Mura."
+},
+{
+"h": "8a166aeb",
+"t": "Tvoj cilj: Krka."
+},
+{
+"h": "4ab5f2a0",
+"t": "Naslednja postaja: Krka."
+},
+{
+"h": "91b7ed33",
+"t": "Tvoj cilj: Kolpa."
+},
+{
+"h": "8227db06",
+"t": "Naslednja postaja: Kolpa."
+},
+{
+"h": "e50f7745",
+"t": "Tvoj cilj: Morje."
+},
+{
+"h": "ea7d4efc",
+"t": "Naslednja postaja: Morje."
+},
+{
+"h": "61782947",
+"t": "Tvoj cilj: Triglav."
+},
+{
+"h": "87f475da",
+"t": "Naslednja postaja: Triglav."
+},
+{
+"h": "af40a5bd",
+"t": "Tvoj cilj: Grintovec."
+},
+{
+"h": "cde4a39c",
+"t": "Naslednja postaja: Grintovec."
+},
+{
+"h": "559f4ca7",
+"t": "Tvoj cilj: Velika planina."
+},
+{
+"h": "fa0e7194",
+"t": "Naslednja postaja: Velika planina."
+},
+{
+"h": "7b4fd031",
+"t": "Tvoj cilj: Pohorje."
+},
+{
+"h": "43606c30",
+"t": "Naslednja postaja: Pohorje."
+},
+{
+"h": "df4f424c",
+"t": "Tvoj cilj: Snežnik."
+},
+{
+"h": "45a56755",
+"t": "Naslednja postaja: Snežnik."
+},
+{
+"h": "bca4fc65",
+"t": "Tvoj cilj: Nanos."
+},
+{
+"h": "95379b2c",
+"t": "Naslednja postaja: Nanos."
+},
+{
+"h": "6170f077",
+"t": "Tvoj cilj: Škrlatica."
+},
+{
+"h": "83d8b952",
+"t": "Naslednja postaja: Škrlatica."
+},
+{
+"h": "463c5cb6",
+"t": "Tvoj cilj: Mangart."
+},
+{
+"h": "1064fb5b",
+"t": "Naslednja postaja: Mangart."
+},
+{
+"h": "163b17e2",
+"t": "Tvoj cilj: Jalovec."
+},
+{
+"h": "73cabf4f",
+"t": "Naslednja postaja: Jalovec."
+},
+{
+"h": "28366a4f",
+"t": "Tvoj cilj: Kanin."
+},
+{
+"h": "ccaafc2a",
+"t": "Naslednja postaja: Kanin."
+},
+{
+"h": "f525c757",
+"t": "Tvoj cilj: Krn."
+},
+{
+"h": "432445ce",
+"t": "Naslednja postaja: Krn."
+},
+{
+"h": "91c195f4",
+"t": "Tvoj cilj: Črna prst."
+},
+{
+"h": "5f8fa1c9",
+"t": "Naslednja postaja: Črna prst."
+},
+{
+"h": "02b19314",
+"t": "Tvoj cilj: Stol."
+},
+{
+"h": "2220ac9f",
+"t": "Naslednja postaja: Stol."
+},
+{
+"h": "f604f92e",
+"t": "Tvoj cilj: Storžič."
+},
+{
+"h": "6caf2bc3",
+"t": "Naslednja postaja: Storžič."
+},
+{
+"h": "04ce2089",
+"t": "Tvoj cilj: Ojstrica."
+},
+{
+"h": "06920932",
+"t": "Naslednja postaja: Ojstrica."
+},
+{
+"h": "0eb79343",
+"t": "Tvoj cilj: Raduha."
+},
+{
+"h": "cf599bac",
+"t": "Naslednja postaja: Raduha."
+},
+{
+"h": "3ee18505",
+"t": "Tvoj cilj: Peca."
+},
+{
+"h": "4df6a072",
+"t": "Naslednja postaja: Peca."
+},
+{
+"h": "f987c37a",
+"t": "Tvoj cilj: Uršlja gora."
+},
+{
+"h": "718d9ea3",
+"t": "Naslednja postaja: Uršlja gora."
+},
+{
+"h": "2fbd5a45",
+"t": "Tvoj cilj: Rogla."
+},
+{
+"h": "129d8560",
+"t": "Naslednja postaja: Rogla."
+},
+{
+"h": "4f3eff0d",
+"t": "Tvoj cilj: Kum."
+},
+{
+"h": "a480fb9c",
+"t": "Naslednja postaja: Kum."
+},
+{
+"h": "843af6b4",
+"t": "Tvoj cilj: Trdinov vrh."
+},
+{
+"h": "a22d19d5",
+"t": "Naslednja postaja: Trdinov vrh."
+},
+{
+"h": "977fbf46",
+"t": "Tvoj cilj: Slavnik."
+},
+{
+"h": "9a274d73",
+"t": "Naslednja postaja: Slavnik."
+},
+{
+"h": "0d5da3b0",
+"t": "Tvoj cilj: Tromostovje."
+},
+{
+"h": "24f5b2a1",
+"t": "Naslednja postaja: Tromostovje."
+},
+{
+"h": "6ed4ac0a",
+"t": "Tvoj cilj: Zmajski most."
+},
+{
+"h": "d0c73ccd",
+"t": "Naslednja postaja: Zmajski most."
+},
+{
+"h": "4eea9a86",
+"t": "Tvoj cilj: Ljubljanska stolnica."
+},
+{
+"h": "552248e9",
+"t": "Naslednja postaja: Ljubljanska stolnica."
+},
+{
+"h": "e8a4d772",
+"t": "Tvoj cilj: Nebotičnik."
+},
+{
+"h": "030cfc69",
+"t": "Naslednja postaja: Nebotičnik."
+},
+{
+"h": "7d5e38b8",
+"t": "Tvoj cilj: Šmarna gora."
+},
+{
+"h": "d345506d",
+"t": "Naslednja postaja: Šmarna gora."
+},
+{
+"h": "a0855bf4",
+"t": "Tvoj cilj: Stara trta."
+},
+{
+"h": "76540fe3",
+"t": "Naslednja postaja: Stara trta."
+},
+{
+"h": "0b0243d8",
+"t": "Tvoj cilj: Vodni stolp."
+},
+{
+"h": "2743a4f1",
+"t": "Naslednja postaja: Vodni stolp."
+},
+{
+"h": "bab74816",
+"t": "Tvoj cilj: Stari most."
+},
+{
+"h": "272ac6ed",
+"t": "Naslednja postaja: Stari most."
+},
+{
+"h": "d42f5afe",
+"t": "Tvoj cilj: Knežji dvorec."
+},
+{
+"h": "e4d61943",
+"t": "Naslednja postaja: Knežji dvorec."
+},
+{
+"h": "8f6e879e",
+"t": "Tvoj cilj: Prešernov kip."
+},
+{
+"h": "de386373",
+"t": "Naslednja postaja: Prešernov kip."
+},
+{
+"h": "334851fd",
+"t": "Tvoj cilj: Pretorska palača."
+},
+{
+"h": "e7215546",
+"t": "Naslednja postaja: Pretorska palača."
+},
+{
+"h": "d2b58b4c",
+"t": "Tvoj cilj: Piranski svetilnik."
+},
+{
+"h": "5fd890ef",
+"t": "Naslednja postaja: Piranski svetilnik."
+},
+{
+"h": "07d7fc0e",
+"t": "Tvoj cilj: Piransko obzidje."
+},
+{
+"h": "e6fc74d1",
+"t": "Naslednja postaja: Piransko obzidje."
+},
+{
+"h": "f480e6b8",
+"t": "Tvoj cilj: Soboški grad."
+},
+{
+"h": "3f6ad30f",
+"t": "Naslednja postaja: Soboški grad."
+},
+{
+"h": "0b5e7942",
+"t": "Tvoj cilj: Kostanjevica."
+},
+{
+"h": "c7074825",
+"t": "Naslednja postaja: Kostanjevica."
+},
+{
+"h": "ce2c08b8",
+"t": "Tvoj cilj: Mestni stolp."
+},
+{
+"h": "d075e44b",
+"t": "Naslednja postaja: Mestni stolp."
+},
+{
+"h": "b26fe36f",
+"t": "Tvoj cilj: Kapiteljska cerkev."
+},
+{
+"h": "572ca8ec",
+"t": "Naslednja postaja: Kapiteljska cerkev."
+},
+{
+"h": "ef5ade5a",
+"t": "Tvoj cilj: Ruska kapelica."
+},
+{
+"h": "5749b211",
+"t": "Naslednja postaja: Ruska kapelica."
+},
+{
+"h": "dd8b9dbc",
+"t": "Tvoj cilj: Slap Kozjak."
+},
+{
+"h": "02469f89",
+"t": "Naslednja postaja: Slap Kozjak."
+},
+{
+"h": "5d579538",
+"t": "Tvoj cilj: Samostan Stična."
+},
+{
+"h": "f397358d",
+"t": "Naslednja postaja: Samostan Stična."
+},
+{
+"h": "86c93297",
+"t": "Tvoj cilj: Kobilarna Lipica."
+},
+{
+"h": "8482e864",
+"t": "Naslednja postaja: Kobilarna Lipica."
+},
+{
+"h": "09cabdbd",
+"t": "Tvoj cilj: Vintgar."
+},
+{
+"h": "3edac748",
+"t": "Naslednja postaja: Vintgar."
+},
+{
+"h": "82be0dfd",
+"t": "Tvoj cilj: Slap Peričnik."
+},
+{
+"h": "b9575ff4",
+"t": "Naslednja postaja: Slap Peričnik."
+},
+{
+"h": "69716870",
+"t": "Tvoj cilj: Zelenci."
+},
+{
+"h": "6afb3a55",
+"t": "Naslednja postaja: Zelenci."
+},
+{
+"h": "b0d382c7",
+"t": "Tvoj cilj: Most v Kanalu."
+},
+{
+"h": "f07dfd72",
+"t": "Naslednja postaja: Most v Kanalu."
+},
+{
+"h": "68a8afc4",
+"t": "Tvoj cilj: Solkanski most."
+},
+{
+"h": "a5a48ff3",
+"t": "Naslednja postaja: Solkanski most."
+},
+{
+"h": "3c1df171",
+"t": "Tvoj cilj: Rakov Škocjan."
+},
+{
+"h": "bc9d62ac",
+"t": "Naslednja postaja: Rakov Škocjan."
+},
+{
+"h": "bc7b5a1a",
+"t": "Tvoj cilj: Živalski vrt."
+},
+{
+"h": "4613c4f5",
+"t": "Naslednja postaja: Živalski vrt."
+},
+{
+"h": "af117f75",
+"t": "Tvoj cilj: Terme Čatež."
+},
+{
+"h": "d90609b0",
+"t": "Naslednja postaja: Terme Čatež."
+},
+{
+"h": "99425704",
+"t": "Tvoj cilj: Olimje."
+},
+{
+"h": "2f144317",
+"t": "Naslednja postaja: Olimje."
+},
+{
+"h": "50d05296",
+"t": "Tvoj cilj: Bogenšperk."
+},
+{
+"h": "a08770fd",
+"t": "Naslednja postaja: Bogenšperk."
+},
+{
+"h": "94287ca9",
+"t": "Tvoj cilj: Postojnska jama."
+},
+{
+"h": "14a8bb14",
+"t": "Naslednja postaja: Postojnska jama."
+},
+{
+"h": "ca0299be",
+"t": "Tvoj cilj: Predjamski grad."
+},
+{
+"h": "c93a2f03",
+"t": "Naslednja postaja: Predjamski grad."
+},
+{
+"h": "29e2d108",
+"t": "Tvoj cilj: Škocjanske jame."
+},
+{
+"h": "f09f1875",
+"t": "Naslednja postaja: Škocjanske jame."
+},
+{
+"h": "99e8bb7c",
+"t": "Tvoj cilj: Soline."
+},
+{
+"h": "d34d1cd7",
+"t": "Naslednja postaja: Soline."
+},
+{
+"h": "e5e0a4ce",
+"t": "Tvoj cilj: Planica."
+},
+{
+"h": "b1907bdf",
+"t": "Naslednja postaja: Planica."
+},
+{
+"h": "218a728f",
+"t": "Tvoj cilj: Logarska dolina."
+},
+{
+"h": "9c5ffb7e",
+"t": "Naslednja postaja: Logarska dolina."
+},
+{
+"h": "58073b19",
+"t": "V bližini so Šmartinsko jezero, Žalec, Laško."
+},
+{
+"h": "6d5dbf9b",
+"t": "V bližini so Trdinov vrh, Krka."
+},
+{
+"h": "7f071d61",
+"t": "V bližini so Gornja Radgona, Ljutomer."
+},
+{
+"h": "363457cc",
+"t": "V bližini so Vipava, Idrija, Predjamski grad."
+},
+{
+"h": "755e6885",
+"t": "V bližini so Koper, Soline, Piran."
+},
+{
+"h": "9d01ec15",
+"t": "V bližini so Mura."
+},
+{
+"h": "10ededdc",
+"t": "V bližini so Vrhnika, Predjamski grad, Rakov Škocjan."
+},
+{
+"h": "53999098",
+"t": "V bližini so Postojnska jama, Rakov Škocjan, Cerkniško jezero."
+},
+{
+"h": "1c442cde",
+"t": "V bližini so Ljutomer, Lendava, Ormož."
+},
+{
+"h": "d1b89b96",
+"t": "V bližini so Novo mesto, Samostan Stična."
+},
+{
+"h": "cb5c30c8",
+"t": "V bližini so Gornja Radgona, Murska Sobota, Ljutomer."
+},
+{
+"h": "d46063b5",
+"t": "V bližini so Novo mesto, Metlika."
+},
+{
+"h": "4b10e6e3",
+"t": "V bližini so Škocjanske jame, Kobilarna Lipica."
+},
+{
+"h": "7958d7fa",
+"t": "V bližini so Murska Sobota, Gornja Radgona, Ljutomer."
+},
+{
+"h": "d31e10e5",
+"t": "V bližini so Novo mesto, Trdinov vrh, Krka."
+},
+{
+"h": "1589505a",
+"t": "V bližini so Sežana, Škocjanske jame, Slavnik."
+},
+{
+"h": "1ddea863",
+"t": "V bližini so Postojna, Rakov Škocjan, Predjamski grad."
+},
+{
+"h": "d9a1ea70",
+"t": "V bližini so Nanos, Postojnska jama, Postojna."
+},
+{
+"h": "600d6849",
+"t": "V bližini so Ilirska Bistrica, Postojna, Postojnska jama."
+},
+{
+"h": "c6ef0a2c",
+"t": "V bližini so Trdinov vrh, Krško, Brežice."
+},
+{
+"h": "bfbe421e",
+"t": "V bližini so Murska Sobota, Ljutomer, Mura."
+},
+{
+"h": "51f6d93d",
+"t": "Zlatorog."
+},
+{
+"h": "6914ec13",
+"t": "Zlatorog je bel gams z zlatimi rogovi iz slovenske pripovedke."
+},
+{
+"h": "28b28f70",
+"t": "Živel je pod Triglavom in čuval zaklad pod goro Bogatin."
+},
+{
+"h": "a3bcacee",
+"t": "Ko je lovec Zlatoroga ranil, so iz njegove krvi zrasle triglavske rože."
+},
+{
+"h": "205f9e26",
+"t": "Poišči: Zlatorog"
+},
+{
+"h": "8b881c33",
+"t": "To je Zlatorog."
 }
 ]

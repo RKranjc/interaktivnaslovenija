@@ -1,4 +1,5 @@
 name: Glas Maya1 (vsi stavki)
+# zagon 2026-11-11: regije NUTS 3, letalo, Zlatorog
 on:
   workflow_dispatch: {}
   push: { branches: [main], paths: ['.github/workflows/maya-vse.yml'] }
@@ -24,3 +25,22 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"; git config user.email "41898281+github-actions[bot]@users.noreply.github.com"
           python tools/maya_bake.py
+  indeks:
+    needs: zapeci
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main }
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898281+github-actions[bot]@users.noreply.github.com"
+          for k in 1 2 3 4 5; do
+            git pull -q --rebase origin main
+            python3 -c "import os,json;json.dump(sorted(f[:-4] for f in os.listdir('audio') if f.endswith('.mp3')),open('audio/index.json','w'))"
+            git add audio/index.json
+            git diff --cached --quiet && exit 0
+            git commit -q -m "Glas Maya1: seznam posnetkov"
+            git push -q origin HEAD:main && exit 0
+            sleep 10
+          done
+          exit 1
