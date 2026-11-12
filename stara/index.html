@@ -191,6 +191,7 @@
 </div>
 <div class="tools">
   <button class="tb" id="bHome"><span class="ic">🏠</span><span class="tx">Domov</span></button>
+  <button class="tb on" id="bStyle"><span class="ic">🖌️</span><span class="tx">Slikanica</span></button>
   <button class="tb" id="bDay"><span class="ic">🌙</span><span class="tx">Noč</span></button>
   <button class="tb" id="bWeather"><span class="ic">☀️</span><span class="tx">Vreme</span></button>
   <button class="tb" id="bSeason"><span class="ic">🌻</span><span class="tx">Poletje</span></button>
@@ -3150,8 +3151,8 @@ function applyWeather(){ setBtn('bWeather',['☀️','🌧️','❄️'][weather
 $('bSeason').onclick=()=>{ audioInit(); season=(season+1)%4; setBtn('bSeason',['🌻','🍂','⛄','🌸'][season],['Poletje','Jesen','Zima','Pomlad'][season]); if(!weatherOpts().includes(weather)){ weather=weather===1&&season===2?2:weather===2?1:0; if(!weatherOpts().includes(weather)) weather=0; } applyWeather(); play('pop'); };
 $('bWeather').onclick=()=>{ audioInit(); const o=weatherOpts(); weather=o[(o.indexOf(weather)+1)%o.length]; applyWeather(); play(weather===1?'river':weather===2?'sticker':'pop'); };
 $('bLabels').onclick=()=>{ labels=!labels; $('bLabels').classList.toggle('on',labels); };
-if($('bStyle')) $('bStyle').onclick=()=>{ audioInit(); play('pop');
-  if(WC){ setWC(false); toast('🎲 Igračni zemljevid'); return; }
+if($('bStyle')) $('bStyle').onclick=()=>{ audioInit(); play('pop'); try{ localStorage.setItem('ms3d_wcoff',WC?'1':'0'); }catch(e){}
+  if(WC){ setWC(false); toast('Navaden 3D zemljevid'); return; }
   const ov=$('wcLoad'); ov.classList.add('show');
   setTimeout(()=>{ try{ wcEnsure(); if(!wc.fb) throw new Error('fbo'); setWC(true); toast('🖌️ Slikanica – naslikan zemljevid'); }
     catch(e){ console.warn(e); WC=false; document.body.classList.remove('wc'); toast('Ta naprava žal ne zmore Slikanice 🙁'); }
@@ -3487,7 +3488,8 @@ const INAPP=/FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|Line\/|MicroMessenger|Sn
     window.__ready=true;
     setTimeout(()=>{ toast('Klikni na živali, reke, gore in kraje!'); },1500);
     // Slikanica je privzeti videz; navadni 3D ostane le kot rezerva za naprave, ki je ne zmorejo
-    if(!LITE && !WCBAD && !/[?&]navadno/.test(location.search)) setTimeout(()=>{ wc.trying=true; setTimeout(()=>{ wc.trying=false; },8000); try{ wcEnsure(); if(!wc.fb) throw new Error('fbo'); setWC(true); }catch(e){ console.warn('slikanica',e); WC=false; document.body.classList.remove('wc'); } },1200);
+    let WCOFF=false; try{ WCOFF=localStorage.getItem('ms3d_wcoff')==='1'; }catch(e){} if(WCOFF&&$('bStyle')) $('bStyle').classList.remove('on');
+    if(!LITE && !WCBAD && !WCOFF && !/[?&]navadno/.test(location.search)) setTimeout(()=>{ wc.trying=true; setTimeout(()=>{ wc.trying=false; },8000); try{ wcEnsure(); if(!wc.fb) throw new Error('fbo'); setWC(true); }catch(e){ console.warn('slikanica',e); WC=false; document.body.classList.remove('wc'); } },1200);
   }catch(e){ console.error(e); const lost=gl.isContextLost&&gl.isContextLost();
     if(!LITE){ try{ sessionStorage.setItem('ms3d_lite','1'); location.reload(); return; }catch(_){} }
     fail(lost||e.message==null||e.message==='null' ? 'Tej napravi je zmanjkalo pomnilnika za 3D zemljevid. Odpri povezavo v Safariju ali Chromu (v Messengerju: ⋯ → Odpri v brskalniku) in zapri druge zavihke.' : 'Ups, nekaj je šlo narobe pri risanju karte: '+e.message); }
