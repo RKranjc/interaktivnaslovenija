@@ -191,7 +191,6 @@
 </div>
 <div class="tools">
   <button class="tb" id="bHome"><span class="ic">🏠</span><span class="tx">Domov</span></button>
-  <button class="tb on" id="bStyle"><span class="ic">🖌️</span><span class="tx">Slikanica</span></button>
   <button class="tb" id="bDay"><span class="ic">🌙</span><span class="tx">Noč</span></button>
   <button class="tb" id="bWeather"><span class="ic">☀️</span><span class="tx">Vreme</span></button>
   <button class="tb" id="bSeason"><span class="ic">🌻</span><span class="tx">Poletje</span></button>
@@ -205,6 +204,7 @@
   <button class="tb game" id="bAnimals"><span class="ic">🐾</span><span class="tx">Živali</span></button>
   <button class="tb game" id="bPost"><span class="ic">📦</span><span class="tx">Poštar</span></button>
   <button class="tb game" id="bPilot"><span class="ic">✈️</span><span class="tx">Letalo</span></button>
+  <button class="tb" id="b2D" onclick="location.href='../'"><span class="ic">🗺️</span><span class="tx">2D zemljevid</span></button>
 </div>
 <div class="card" id="card"><button class="x" id="cardX">✖</button><div class="emo" id="cEmo"></div><h2 id="cName"></h2><p id="cText"></p><div class="more" id="cMore"></div><div class="btns" id="cBtns"></div></div>
 <div class="phelp" id="pHelp"><b>Kako letiš:</b> <span>◀ ▶ obračaj</span> <span>▲ ▼ gor in dol</span> <span>Sledi puščici do ⭐</span></div><div class="parrow" id="pArrow"><div>➤</div></div><div class="pctl" id="pctl"><button data-k="l">◀</button><div><button data-k="u">▲</button><button data-k="d">▼</button></div><button data-k="r">▶</button><button class="pexit" id="pExit">Pristani</button></div>
@@ -3489,7 +3489,7 @@ const INAPP=/FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|Line\/|MicroMessenger|Sn
     setTimeout(()=>{ toast('Klikni na živali, reke, gore in kraje!'); },1500);
     // Slikanica je privzeti videz; navadni 3D ostane le kot rezerva za naprave, ki je ne zmorejo
     let WCOFF=false; try{ WCOFF=localStorage.getItem('ms3d_wcoff')==='1'; }catch(e){} if(WCOFF&&$('bStyle')) $('bStyle').classList.remove('on');
-    if(!LITE && !WCBAD && !WCOFF && !/[?&]navadno/.test(location.search)) setTimeout(()=>{ wc.trying=true; setTimeout(()=>{ wc.trying=false; },8000); try{ wcEnsure(); if(!wc.fb) throw new Error('fbo'); setWC(true); }catch(e){ console.warn('slikanica',e); WC=false; document.body.classList.remove('wc'); } },1200);
+    if(false) setTimeout(()=>{ wc.trying=true; setTimeout(()=>{ wc.trying=false; },8000); try{ wcEnsure(); if(!wc.fb) throw new Error('fbo'); setWC(true); }catch(e){ console.warn('slikanica',e); WC=false; document.body.classList.remove('wc'); } },1200);
   }catch(e){ console.error(e); const lost=gl.isContextLost&&gl.isContextLost();
     if(!LITE){ try{ sessionStorage.setItem('ms3d_lite','1'); location.reload(); return; }catch(_){} }
     fail(lost||e.message==null||e.message==='null' ? 'Tej napravi je zmanjkalo pomnilnika za 3D zemljevid. Odpri povezavo v Safariju ali Chromu (v Messengerju: ⋯ → Odpri v brskalniku) in zapri druge zavihke.' : 'Ups, nekaj je šlo narobe pri risanju karte: '+e.message); }
