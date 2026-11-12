@@ -542,7 +542,7 @@ function buildTerrain(){
       c=mix(vec3(.86,.80,.62),c,smoothstep(1.,25.,hm));
       // water (rivers, lakes)
       float w=smoothstep(.35,.6,ov.g);
-      vec3 wc=mix(vec3(.18,.55,.85),vec3(.35,.75,.95),vnoise(vP.xz*3.+uTime*.6));
+      vec3 wc=mix(vec3(.18,.55,.85),vec3(.35,.75,.95),mix(.5,vnoise(vP.xz*3.+uTime*.6),1.-smoothstep(18.,45.,distance(uCam,vP))));
       c=mix(c,wc,w);
       // motorway
       float rd=smoothstep(.3,.7,texture(uRd,vUV).r)*uRoadPaint; c=mix(c,vec3(.42,.42,.44),rd*.95); float rcore=smoothstep(.85,.98,texture(uRd,vUV).r)*uRoadPaint; c=mix(c,vec3(.95,.85,.4),rcore*.6);
@@ -1485,7 +1485,7 @@ function initFauna(){ const rnd=mulberry(33);
   const labs={}; for(const k in FKIND) labs[k]=labelCell(FKIND[k].n); for(const a of FAUNA) a.lab=labs[a.kind];
 }
 let faunaVisible=[];
-function updFauna(dt){ faunaVisible=[]; if(cam.D>80) return; const R=cam.D*1.4+8;
+function updFauna(dt){ faunaVisible=[]; if(cam.D>38) return; const R=cam.D*1.4+8;
   for(const a of FAUNA){ if(Math.abs(a.home[0]-cam.X)>R||Math.abs(a.home[1]-cam.Z)>R) continue;
     const go=a.kind==='butterfly'?1:clamp(Math.sin(T*.3+a.phase)*1.8+.4,0,1); const sp=a.kind==='duck'?.05:a.kind==='butterfly'?.25:a.kind==='squirrel'?.18:.09; a.u+=dt*sp*go;
     const r=a.kind==='duck'?.25:a.kind==='squirrel'?.25:.7; const t=a.u+a.phase;
@@ -3253,9 +3253,9 @@ float lum(vec3 c){ return dot(c,vec3(.299,.587,.114)); }
 vec3 sat(vec3 c,float s){ return mix(vec3(lum(c)),c,s); }
 void main(){
   vec2 px=gl_FragCoord.xy, tx=1./uRes; float sc=max(uRes.y/900.,.6); vec2 uv=vUV;
-  vec2 wob=(vec2(fbm(px/(16.*sc)),fbm(px/(16.*sc)+9.3))-.5)*.6*sc*tx;
+  vec2 wob=vec2(0.);
   // Kuwahara (4 kvadranti) – ploskve kot s čopičem
-  vec3 best=vec3(0.); float bv=1e9; float r=1.7*sc;
+  vec3 best=vec3(0.); float bw=0.; float r=1.7*sc;
   for(int k=0;k<4;k++){ vec2 sg=vec2(k==1||k==3?-1.:1., k>=2?-1.:1.); vec3 m=vec3(0.), m2=vec3(0.);
 #ifdef LQ
     for(int j=0;j<2;j++){ vec2 off=vec2(float(j),1.-float(j))*r+vec2(.5*r); vec3 t=texture(uC,uv+wob+sg*off*tx).rgb; m+=t; m2+=t*t; }
@@ -3264,7 +3264,8 @@ void main(){
     for(int j=0;j<4;j++){ vec2 off=vec2(j==1||j==3?1.:0., j>=2?1.:0.)*r+vec2(.5*r); vec3 t=texture(uC,uv+wob+sg*off*tx).rgb; m+=t; m2+=t*t; }
     m*=.25; m2*=.25;
 #endif
-    vec3 va=m2-m*m; float vs=va.r+va.g+va.b; if(vs<bv){ bv=vs; best=m; } }
+    vec3 va=max(m2-m*m,0.); float vs=va.r+va.g+va.b; float w=1./((vs+.002)*(vs+.002)); best+=m*w; bw+=w; }
+  best/=bw;
   vec3 c0=texture(uC,uv+wob).rgb; vec3 c=mix(c0,best,.42);
 #ifdef LQ
   vec3 b=(texture(uC,uv+wob+vec2(3.,1.)*sc*tx).rgb+texture(uC,uv+wob-vec2(3.,1.)*sc*tx).rgb+texture(uC,uv+wob+vec2(-1.,3.)*sc*tx).rgb+texture(uC,uv+wob+vec2(1.,-3.)*sc*tx).rgb)*.25;
@@ -3281,7 +3282,7 @@ void main(){
   float ink=max(dEdge,lEdge*.75)*(.85+.3*vn(px/(5.*sc)))*(1.-smoothstep(uFocus*2.2,uFocus*4.5,L0));
   float lap=abs(lum(cl)+lum(cr)+lum(cu)+lum(cd)-4.*lum(c));
   // živa paleta
-  c=pow(max(c,0.),vec3(.9)); { float l=max(lum(c),.001); float lq=(floor(l*5.+.5))/5.; float lb=mix(l,lq,.45); c*=lb/l; } c=sat(c,1.55);
+  c=pow(max(c,0.),vec3(.9)); { float l=max(lum(c),.001); float lx=l*5.+.5; float lq=(floor(lx)+smoothstep(.25,.75,fract(lx))-.5)/5.; float lb=mix(l,lq,.45); c*=lb/l; } c=sat(c,1.55);
   float g=clamp(c.g-max(c.r,c.b),0.,1.); c.r+=g*.16; c.b-=g*.05;
   float bl=clamp(c.b-max(c.r,c.g),0.,1.); c.g+=bl*.25;
   c*=vec3(1.05,1.,.93); c=clamp(c+.02,0.,1.);
