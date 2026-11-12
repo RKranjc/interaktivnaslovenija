@@ -81,6 +81,8 @@
   .quest.show{transform:translate(-50%,0)}
   #qHelp{border:0;border-radius:16px;font:inherit;font-weight:800;font-size:17px;padding:8px 14px;cursor:pointer;background:#fff4d6;box-shadow:0 3px 0 #0002;white-space:nowrap}
   #qHelp.on{background:#ffd54a}
+  #misSub{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;max-width:min(640px,88vw);background:#fffdf5;border-radius:18px;padding:10px 16px;font-weight:800;font-size:18px;line-height:1.3;box-shadow:0 4px 0 #0003;display:none;text-align:center;z-index:40;pointer-events:none}
+  #misSub.show{display:block}
   .quest .q{font-size:70px;line-height:1.1}
   .quest .qk{font-size:16px;font-weight:800;color:#ff9f43;text-transform:uppercase;letter-spacing:1px}
   .quest .qn{font-family:'Grandstander',sans-serif;font-size:34px;font-weight:700;line-height:1.05}
@@ -215,11 +217,13 @@
   <button class="tb game" id="bPost"><span class="ic">📦</span><span class="tx">Poštar</span></button>
   <button class="tb game" id="bPilot"><span class="ic">✈️</span><span class="tx">Letalo</span></button>
   <button class="tb game" id="bRegions"><span class="ic">🗺️</span><span class="tx">Regije</span></button>
+  <button class="tb game" id="bKekec"><span class="ic">🧒</span><span class="tx">Misija Kekec</span></button>
   <button class="tb" id="b2D" onclick="location.href='../'"><span class="ic">🖼️</span><span class="tx">2D zemljevid</span></button>
 </div>
 <div class="card" id="card"><button class="x" id="cardX">✖</button><div class="emo" id="cEmo"></div><h2 id="cName"></h2><p id="cText"></p><div class="more" id="cMore"></div><div class="btns" id="cBtns"></div></div>
 <div class="phelp" id="pHelp"><b>Kako letiš:</b> <span>◀ ▶ obračaj</span> <span>▲ ▼ gor in dol</span> <span>Sledi puščici do ⭐</span></div><div class="parrow" id="pArrow"><div>➤</div></div><div class="pctl" id="pctl"><button data-k="l">◀</button><div><button data-k="u">▲</button><button data-k="d">▼</button></div><button data-k="r">▶</button><button class="pexit" id="pExit">Pristani</button></div>
 <div class="quest" id="quest"><div class="q" id="qEmo"></div><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div><div class="stars" id="qStars"></div></div><button id="qHelp" onclick="gameHelp()">💡 Pomoč</button></div>
+<div id="misSub"></div>
 <div class="book" id="regWin"><div class="in" style="text-align:center;width:min(520px,92vw)"><div style="font-size:70px">🏆</div><h2 id="rwT"></h2><p id="rwP" style="font-size:20px;line-height:1.4"></p><button class="tb" id="rwB" style="margin:10px auto 0;font-size:22px">Naprej ▶</button></div></div>
 <button class="ride" id="rideBtn">🚪 Izstopi</button>
 <button class="ride view" id="viewBtn">Pogled od zunaj</button>
@@ -1206,7 +1210,7 @@ function kinematics(dt){
 function drawModels(E){
   IB={sphere:[],cyl:[],cone:[],box:[],tcyl:[]};
   for(const it of ITEMS){ if(!it.model) continue; if(rideFP&&follow===it&&fpTrans>=1&&it.id==='balon') continue; drawModel(it); }
-  drawLandmarks(); drawTraffic(lastDt); drawFauna(); drawTreasures(); drawPostVan(); drawPilot(); drawRainbow();
+  drawLandmarks(); drawTraffic(lastDt); drawFauna(); drawTreasures(); drawPostVan(); drawPilot(); drawMission(); drawRainbow();
   const P=prims.P; setCommon(P,E,T);
   for(const k of ['sphere','cyl','cone','box','tcyl']){ const arr=IB[k]; if(!arr.length) continue; const pr=prims[k]; const n=arr.length/20;
     gl.bindBuffer(gl.ARRAY_BUFFER,pr.ib); const data=new Float32Array(arr); if(data.byteLength>4*20*4000){ gl.bufferData(gl.ARRAY_BUFFER,data,gl.DYNAMIC_DRAW); } else gl.bufferSubData(gl.ARRAY_BUFFER,0,data);
@@ -1606,7 +1610,7 @@ function postVan(F,rot){ const Y=[.98,.8,.12,.6]; put('box',fr(F,[0,.66,-.2]),[.
   for(const sx of [1,-1]){ const E=fr(F,[sx*.465,.72,-.2]); put('box',E,[.02,.4,.62],[.98,.98,.98]); put('box',fr(E,[sx*.006,.06,-.15],[.55,0,0]),[.022,.05,.36],[.85,.15,.15]); put('box',fr(E,[sx*.006,.06,.15],[-.55,0,0]),[.022,.05,.36],[.85,.15,.15]); }
   for(const sx of [1,-1]) put('sphere',fr(F,[sx*.3,.45,1.02]),[.08,.06,.03],[1,.97,.75,1]);
   wheels(F,[[.46,.21,.55],[-.46,.21,.55],[.46,.21,-.6],[-.46,.21,-.6]],.21,.15,rot); }
-function startPost(){ regStop(); stopPilot(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); stopRide();
+function startPost(){ misStop(); regStop(); stopPilot(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); stopRide();
   const [x,z]=ll(14.51,46.05); postal={van:{pos:[x,groundY(x,z),z],yaw:0,rot:0},score:0,tries:0,target:null,driving:null,area:null,recent:[]}; $('bPost').classList.add('on'); nextLetter(); }
 function stopPost(){ if(!postal) return; clearTimeout(postal.timer); postal=null; follow=null; northUp(); $('bPost').classList.remove('on'); $('quest').classList.remove('show'); }
 function nextLetter(){ const pool=ITEMS.filter(i=>i.lm&&i.c==='mesto'&&!postal.recent.includes(i.id)); const t=pool[Math.floor(Math.random()*pool.length)]; postal.target=t; postal.tries=0; postal.area=null;
@@ -2503,7 +2507,7 @@ function showMore(it){ const box=$('cMore'); if(!box) return; box.innerHTML='';
 
 // ---------------- Pilot ----------------
 let pilot=null; const pkeys={l:0,r:0,u:0,d:0};
-function startPilot(){ regStop(); stopPost(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); stopRide();
+function startPilot(){ misStop(); regStop(); stopPost(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); stopRide();
   const [x,z]=ll(14.46,46.22); const rnd=Math.random;
   const pool=ITEMS.filter(i=>i.lm&&!i.kraj&&!i.det&&i.c!=='drzava'); const pick=[]; while(pick.length<12&&pool.length){ pick.push(pool.splice(Math.floor(rnd()*pool.length),1)[0]); }
   pilot={pos:[x,groundY(x,z)+7,z],yaw:Math.PI*.6,roll:0,speed:3.2,alt:7,base:0,score:0,stars:pick.map(it=>{ const q=ll(...it.lm.at); return {it,x:q[0],z:q[1],y:groundY(q[0],q[1])+6,got:false}; })};
@@ -3072,7 +3076,7 @@ function pickTerrain(px,py){ const P=hitTerrain(px,py); if(!P) return null; cons
   if(best) return best;
   if(cam.D>60){ let br=null,brd=14; for(const it of ITEMS){ if(!it.range||it.country||!it.home) continue; const d=Math.hypot(it.home[0]-x,it.home[1]-z); if(d<brd){brd=d;br=it;} } if(br) return br; }
   return null; }
-function click(x,y){ if(regG){ audioInit(); regTap(x,y); return; } let it=pick(x,y); if(!it) it=pickTerrain(x,y); if(!it) return; audioInit(); if(pilot){ play(it.snd); showCard(it,nextFact(it)); return; }
+function click(x,y){ if(mis){ audioInit(); misTap(x,y); return; } if(regG){ audioInit(); regTap(x,y); return; } let it=pick(x,y); if(!it) it=pickTerrain(x,y); if(!it) return; audioInit(); if(pilot){ play(it.snd); showCard(it,nextFact(it)); return; }
   if(it.fauna||it.treasure){ play(it.snd); const fact=nextFact(it); showCard(it,fact);
     if(it.treasure && !found.has(it.id)){ found.add(it.id); saveFound(); setTimeout(()=>play('cheer'),400); burst(); updateBag(); }
     if(it.k==='mushroom'){ it.flee=performance.now()/1000; play('squeak'); setTimeout(()=>play('squeak'),200); }
@@ -3204,9 +3208,9 @@ $('bPass').onclick=()=>{ const g=$('passGrid'); g.innerHTML=''; const towns=ITEM
   $('passCount').textContent=`${stamps.size} / ${towns.length}`; $('pass').classList.add('show'); audioInit(); play('pop'); };
 $('passX').onclick=()=>$('pass').classList.remove('show');
 $('pass').onclick=e=>{ if(e.target===$('pass')) $('pass').classList.remove('show'); };
-function startGame(animals){ audioInit(); regStop(); stopPost(); stopPilot(); stopRide(); const was=game&&!!game.animalsOnly===!!animals; if(game){ clearTimeout(game.timer); game=null; $('quest').classList.remove('show'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); game=null; if(was) return; }
+function startGame(animals){ audioInit(); misStop(); regStop(); stopPost(); stopPilot(); stopRide(); const was=game&&!!game.animalsOnly===!!animals; if(game){ clearTimeout(game.timer); game=null; $('quest').classList.remove('show'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); game=null; if(was) return; }
   game={score:0,target:null,tries:0,recent:[],animalsOnly:!!animals}; $(animals?'bAnimals':'bGame').classList.add('on'); closeCard(); stopRide(); setHome(); nextQ(); }
-$('bAnimals').onclick=()=>startGame(true); $('bRegions').onclick=regStart;
+$('bAnimals').onclick=()=>startGame(true); $('bRegions').onclick=regStart; $('bKekec').onclick=misStart;
 $('bGame').onclick=()=>startGame(false);
 const _unusedGame=()=>{ audioInit(); stopPost(); if(game){ clearTimeout(game.timer); game=null; $('quest').classList.remove('show'); $('bGame').classList.remove('on'); return; }
   game={score:0,target:null,tries:0,recent:[]}; $('bGame').classList.add('on'); closeCard(); stopRide(); setHome(); nextQ(); };
@@ -3216,7 +3220,7 @@ function nextQ(){ const pool=ITEMS.filter(i=>!i.labelOnly && !i.kraj && (!game.a
   $('quest').classList.add('show'); say((t.plural?'Kje so ':'Kje je ')+t.n+'?');
   const R=t.mv&&t.mv.k!=='path'?Math.max(8,(t.mv.r||0)+5):7; const a=Math.random()*6.283, off=Math.random()*R*.45; const p=t.mv&&t.mv.k==='path'?t.pos:[t.home[0],0,t.home[1]];
   game.area={x:p[0]+Math.cos(a)*off,z:p[2]+Math.sin(a)*off,r:R,a:0}; game.help=false; $('qHelp').style.display=''; $('qHelp').classList.remove('on'); setHome(); }
-function gameHelp(){ audioInit(); if(!game||game.waiting||!game.area||game.help) return; play('pop'); game.help=true; game.area.a=0; $('qHelp').classList.add('on'); flyTo(game.area.x,game.area.z,game.area.r*7,null); cam.pitch=.85; toast('💡 Poglej v krog!'); }
+function gameHelp(){ audioInit(); if(mis){ misHelp(); return; } if(!game||game.waiting||!game.area||game.help) return; play('pop'); game.help=true; game.area.a=0; $('qHelp').classList.add('on'); flyTo(game.area.x,game.area.z,game.area.r*7,null); cam.pitch=.85; toast('💡 Poglej v krog!'); }
 function gameAdvance(){ if(!game||!game.waiting) return; game.waiting=false; clearTimeout(game.timer); stopSay(); closeCard(); setHome(); nextQ(); }
 function gameClick(it){ if(game.waiting) return; const t=game.target; if(!t) return;
   if(it===t){ game.score++; play('cheer'); it.pulse=1; collect(it); burst(); game.target=null; flyTo(it.pos[0],it.pos[2],it.mv?30:55,it.pos[1]);
@@ -3252,11 +3256,11 @@ const sayOk=ok=>'Pravilno si odgovoril na '+NUMW[ok]+' od desetih vprašanj.';
 function regInit(){ if(REGP) return; REGP={}; REGC={};
   for(const k in REGD.p) REGP[k]=REGD.p[k].map(r=>r.map(([lo,la])=>{ const [x,z]=ll(lo,la); return [x,groundY(x,z)+.2,z]; }));
   for(const k in REGD.l){ const [x,z]=ll(REGD.l[k][0],REGD.l[k][1]); REGC[k]=[x,groundY(x,z)+.6,z]; }
-  regCv=document.createElement('canvas'); regCv.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none'; cv.after(regCv); regCx=regCv.getContext('2d'); }
+  ovInit(); }
 function regAt(x,z){ if(!REGP) return null; for(const k in REGP) for(const r of REGP[k]){ let ins=false; for(let i=0,j=r.length-1;i<r.length;j=i++){ const a=r[i], b=r[j]; if((a[2]>z)!==(b[2]>z) && x<(b[0]-a[0])*(z-a[2])/(b[2]-a[2])+a[0]) ins=!ins; } if(ins) return k; } return null; }
 function regClear(it){ const x=it.home[0], z=it.home[1]; const r=regAt(x,z); if(!r) return false; for(let k=0;k<8;k++){ const a=k*Math.PI/4, r2=regAt(x+Math.cos(a)*3.5,z+Math.sin(a)*3.5); if(r2&&r2!==r) return false; } return true; }
 function regDraw(){ if(!regCv) return; const dpr=Math.min(window.devicePixelRatio||1,2); const w=Math.round(W*dpr), h=Math.round(H*dpr); if(regCv.width!==w||regCv.height!==h){ regCv.width=w; regCv.height=h; }
-  const c=regCx; c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H); if(!regG||!VP) return;
+  const c=regCx; c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H); if(!VP) return; if(mis) misOverlay(c); if(!regG) return;
   const path=k=>{ c.beginPath(); for(const r of REGP[k]){ let st=true; for(const p of r){ const q=M4.xf(VP,p[0],p[1],p[2]); if(q[3]<=0) continue; const x=(q[0]*.5+.5)*W, y=(-q[1]*.5+.5)*H; if(st){ c.moveTo(x,y); st=false; } else c.lineTo(x,y); } c.closePath(); } };
   c.lineJoin='round'; c.lineCap='round';
   for(const k in REGP){ path(k); c.setLineDash([]); c.strokeStyle='rgba(60,35,10,.6)'; c.lineWidth=5; c.stroke(); c.strokeStyle='#fff'; c.lineWidth=2.2; c.setLineDash([8,6]); c.stroke(); } c.setLineDash([]);
@@ -3264,7 +3268,7 @@ function regDraw(){ if(!regCv) return; const dpr=Math.min(window.devicePixelRati
     const p=REGC[regShow], q=M4.xf(VP,p[0],p[1],p[2]); if(q[3]>0){ const x=(q[0]*.5+.5)*W, y=(-q[1]*.5+.5)*H; c.font='800 '+Math.round(Math.max(18,Math.min(34,W/34)))+'px Grandstander,Nunito,sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.lineWidth=7; c.strokeStyle='#fff'; c.strokeText(REGINFO[regShow][0],x,y); c.fillStyle='#5a3a1a'; c.fillText(REGINFO[regShow][0],x,y); } } }
 function regModal(t,p,cb){ $('rwT').textContent=t; $('rwP').textContent=p; $('regWin').classList.add('show'); $('rwB').onclick=()=>{ $('regWin').classList.remove('show'); if(regG) cb(); }; }
 function regStop(){ if(!regG) return; regG=null; regShow=null; $('quest').classList.remove('show'); $('bRegions').classList.remove('on'); $('regWin').classList.remove('show'); }
-function regStart(){ audioInit(); if(regG){ regStop(); return; } stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); regInit();
+function regStart(){ audioInit(); if(regG){ regStop(); return; } misStop(); stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); regInit();
   let pool=ITEMS.filter(it=>it.home&&!it.labelOnly&&!it.kraj&&(it.c==='mesto'||it.c==='gora'||it.c==='zanim')&&regClear(it)); if(AUD){ const rec=pool.filter(it=>AUD.has(h32('V kateri regiji je '+it.n+'?'))); if(rec.length>=20) pool=rec; }
   regG={round:1,n:0,ok:0,done:new Set(),used:new Set(),pool}; $('bRegions').classList.add('on'); $('qEmo').textContent='🗺️'; regNext(); }
 function regQ(kind,name,txt){ $('qHelp').style.display='none'; $('qKind').textContent=kind; $('qName').textContent=name; $('qStars').textContent=txt; $('quest').classList.add('show'); }
@@ -3283,6 +3287,84 @@ function regTap(px,py){ const g=regG; if(!g||!g.q||g.q.hit) return; const P=hitT
   regShow=r; if(r===q.reg){ q.hit=true; play('cheer'); g.n++; if(!q.miss) g.ok++; if(q.cnt) g.done.add(r); regShowT=performance.now()+2500; say(q.item?'Bravo! '+q.item.n+' je v regiji '+n+'.':'Bravo! To je '+n+'.'); toast('⭐ Bravo! '+n);
     setTimeout(()=>{ if(regG===g&&g.q===q) regNext(); },q.item||q.text?2600:1800); }
   else { q.miss=true; play('boing'); regShowT=performance.now()+2200; say('To je '+n+'. Poskusi še enkrat!'); toast('To je '+n+' – poskusi še enkrat!'); } }
+
+// ---------------- MISIJA: KEKEC ----------------
+var mis=null;
+const MIS_LL={hutB:[13.91,46.395],owl:[14.01,46.385],st:[[13.935,46.37],[13.905,46.35],[13.94,46.335]],hutP:[13.99,46.33],mojca:[13.975,46.368]};
+const MIS_T={
+ intro:[['','Joj! Hudobni Bedanec je ujel Kekca in ga zaprl pri svoji koči pod Triglavom.'],['','Bedanec se ne boji ničesar. Boji se samo sove!'],['','Pomagaj Kekcu. Poišči sovo v gozdu.']],
+ owl:[['','Bravo! Našel si sovo.'],['','Zdaj hitro k Bedancu. Poišči Bedančevo kočo v gorah.']],
+ hut:[['Bedanec','Joj, sova! Na pomoč! Bežim!'],['','Bedanec je zbežal. Kekec je prost!'],['Kekec','Hvala, prijatelj! Zdaj morava rešiti Mojco. Mojca je pri teti Pehti.'],['','Pokaži Kekcu pot. Tapni zastavico.']],
+ st:[[['','Kekec gre čez brv nad potokom.']],[['','Kekec gre mimo šumečega slapa.']],[['','Kekec gre čez planino, kjer se pasejo ovce.']],[['','Tu je Pehtina koča.']]],
+ pehta:[['Pehta','Kekec, ti si pogumen fant. Tu imaš kapljice za Mojčine oči.'],['','Tapni stekleničko s kapljicami.']],
+ lost:[['','Oh ne! Mojca ne vidi in je zatavala v gozd.'],['','Zdaj si ti Mojca. Vidiš samo čisto malo okoli sebe.'],['','Poslušaj Kekca in pojdi proti njegovemu glasu. Tapni tja, kamor želiš iti.']],
+ call:['Mojca, tukaj sem!','Mojca, sem pojdi!','Mojca, slišiš moj glas?'],
+ near:[['','Čisto blizu si!']],
+ end:[['Kekec','Našel sem te, Mojca! Tu so kapljice za tvoje oči.'],['Mojca','Kekec, vidim! Vidim gore in sonce!'],['','Bravo! Rešil si Kekca in Mojco. Pravi junak si!']]};
+function ovInit(){ if(regCv) return; regCv=document.createElement('canvas'); regCv.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none'; cv.after(regCv); regCx=regCv.getContext('2d'); }
+function misW(l){ const [x,z]=ll(l[0],l[1]); return [x,z]; }
+function misStop(){ if(!mis) return; mis=null; stopSay(); $('quest').classList.remove('show'); $('bKekec').classList.remove('on'); $('misSub').classList.remove('show'); $('regWin').classList.remove('show'); setHome(); }
+function misStart(){ audioInit(); if(mis){ misStop(); return; } regStop(); stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); ovInit();
+  const B=misW(MIS_LL.hutB), P=misW(MIS_LL.hutP);
+  mis={step:0,t:0,dark:0,peek:0,callT:0,nextCall:3,hoot:2,help:false,area:null,target:null,busy:true,B,P,O:misW(MIS_LL.owl),ST:MIS_LL.st.map(misW).concat([[P[0]+1.1,P[1]+.9]]),sti:0,bottle:false,
+    kekec:{p:[B[0]+1.0,B[1]+.5],yaw:.6,vis:true,sit:true,ph:0}, bedanec:{p:[B[0]+1.9,B[1]+1.0],yaw:-2,vis:true,ph:0}, pehta:{p:[P[0]+.2,P[1]+1.2],yaw:.5,vis:true,ph:0}, mojca:{p:[P[0]-.8,P[1]+1.1],yaw:-.3,vis:true,ph:0}, owl:{p:null,fly:null}};
+  mis.owl.p=[mis.O[0],groundY(mis.O[0],mis.O[1])+.75,mis.O[1]];
+  $('bKekec').classList.add('on'); misStep(0); }
+function misQ(emo,task){ $('qEmo').textContent=emo; $('qKind').textContent='Misija: Kekec · '+[1,1,2,3,4,5,6][mis.step]+'/6'; $('qName').textContent=task; $('qStars').textContent=''; $('quest').classList.add('show'); $('qHelp').style.display=(mis.step>=1&&mis.step<=5&&mis.step!==4)?'':'none'; $('qHelp').classList.remove('on'); }
+function misSay(who,txt,cb,vol){ const g=mis; if(!g) return; const tok={}; g.tok=tok; const sub=$('misSub'); sub.textContent=(who?who+': ':'')+txt; sub.classList.add('show');
+  const done=()=>{ if(tok.d) return; tok.d=true; if(mis!==g||g.tok!==tok) return; sub.classList.remove('show'); if(cb) cb(); };
+  const S=splitS(txt); setTimeout(done,2500+txt.length*120);
+  if(sfxOn&&AUD&&S.length&&S.every(x=>AUD.has(h32(x)))){ stopSay(); const q={}; sayQ=q; let i=0; const next=()=>{ if(sayQ!==q) return; if(i>=S.length){ setTimeout(done,300); return; } const a=new Audio('../audio/'+h32(S[i++])+'.mp3'); a.volume=vol==null?1:vol; q.a=a; a.onended=()=>setTimeout(next,90); a.onerror=()=>next(); const p=a.play(); if(p&&p.catch) p.catch(()=>{}); }; next(); }
+  else { say(txt); setTimeout(done,900+txt.length*(sfxOn?75:50)); } }
+function misSeq(L,cb,i){ i=i||0; const g=mis; if(!g) return; if(i>=L.length){ if(cb) cb(); return; } misSay(L[i][0],L[i][1],()=>{ if(mis===g) misSeq(L,cb,i+1); }); }
+function misArea(x,z,r){ const a=Math.random()*6.283, off=Math.random()*r*.5; mis.area={x:x+Math.cos(a)*off,z:z+Math.sin(a)*off,r,a:0}; mis.help=false; }
+function misStep(n){ const g=mis; if(!g) return; g.step=n; g.t=0; g.target=null; g.help=false; g.area=null;
+  if(n===0){ g.busy=true; misQ('🧒','Bedanec je ujel Kekca!'); flyTo(g.B[0],g.B[1],15); cam.pitch=.85; misSeq(MIS_T.intro,()=>misStep(1)); }
+  else if(n===1){ g.busy=false; misQ('🦉','Poišči sovo v gozdu'); flyTo((g.B[0]+g.O[0])/2,(g.B[1]+g.O[1])/2,34); g.target={k:'owl',p:g.owl.p,r:46}; misArea(g.O[0],g.O[1],2.6); }
+  else if(n===2){ g.busy=false; misQ('🏚️','Poišči Bedančevo kočo'); flyTo((g.B[0]+g.O[0])/2,(g.B[1]+g.O[1])/2,34); g.target={k:'hutB',p:[g.B[0],groundY(g.B[0],g.B[1])+.5,g.B[1]],r:54}; misArea(g.B[0],g.B[1],2.6); }
+  else if(n===3){ g.busy=false; g.sti=0; misQ('🚩','Pokaži Kekcu pot: tapni zastavico'); misFlag(); }
+  else if(n===4){ g.busy=true; misQ('🧪','Pehta ima kapljice'); flyTo(g.P[0],g.P[1],13); misSeq(MIS_T.pehta,()=>{ g.bottle=true; g.busy=false; g.target={k:'bottle',p:[g.pehta.p[0]+.3,groundY(g.pehta.p[0],g.pehta.p[1])+2.6,g.pehta.p[1]+.3],r:60}; misQ('🧪','Tapni stekleničko'); }); }
+  else if(n===5){ g.busy=true; const M=misW(MIS_LL.mojca); g.mojca.p=[M[0],M[1]]; g.mojca.vis=true; g.mojca.walkTo=null; g.kekec.p=[g.P[0]+1.1,g.P[1]+.9]; g.darkOn=true; misQ('👧','Si Mojca: sledi Kekčevemu glasu'); flyTo(M[0],M[1],13); misSeq(MIS_T.lost.slice(1),()=>{ g.busy=false; g.nextCall=.5; }); }
+  else if(n===6){ g.busy=true; g.darkOn=false; g.mojca.walkTo=null; play('cheer'); burst(); misQ('🎉','Mojca spet vidi!'); misSeq(MIS_T.end,()=>{ burst(); regModal('Bravo, junak!','Rešil si Kekca in Mojco! 🎉',()=>{}); $('rwB').onclick=()=>{ $('regWin').classList.remove('show'); misStop(); }; }); } }
+function misFlag(){ const g=mis, s=g.ST[g.sti]; g.target={k:'flag',p:[s[0],groundY(s[0],s[1])+.8,s[1]],r:56}; flyTo((s[0]+g.kekec.p[0])/2,(s[1]+g.kekec.p[1])/2,17); g.area={x:s[0],z:s[1],r:1.2,a:0}; g.help=true; }
+function misHelp(){ const g=mis; if(!g||g.busy) return; play('pop'); $('qHelp').classList.add('on');
+  if(g.step===1||g.step===2){ g.help=true; if(g.area){ g.area.a=0; flyTo(g.area.x,g.area.z,g.area.r*7); } toast('💡 Poglej v krog!'); }
+  else if(g.step===3&&g.target){ flyTo(g.target.p[0],g.target.p[2],13); }
+  else if(g.step===5){ g.peek=3; toast('💡 Za hip vidiš, kje je Kekec!'); } }
+function misScr(p){ const q=M4.xf(VP,p[0],p[1],p[2]); if(q[3]<=0) return null; return [(q[0]*.5+.5)*W,(-q[1]*.5+.5)*H]; }
+function misTap(x,y){ const g=mis; if(!g||g.busy) return;
+  if(g.step===5){ const P=hitTerrain(x,y); if(!P) return; const m=g.mojca; let dx=P[0]-m.p[0], dz=P[2]-m.p[1]; const d=Math.hypot(dx,dz); if(d<.05) return; const k=Math.min(d,3)/d; m.walkTo=[m.p[0]+dx*k,m.p[1]+dz*k]; play('pop'); return; }
+  const t=g.target; if(!t) return; const q=misScr(t.p); if(!q||Math.hypot(q[0]-x,q[1]-y)>t.r){ if(g.step===1||g.step===2){ play('boing'); toast(g.step===1?'Tu ni sove – išči naprej!':'To ni Bedančeva koča – išči naprej!'); } return; }
+  g.target=null; g.help=false; g.area=null; play('cheer');
+  if(t.k==='owl'){ g.busy=true; toast('🦉 Našel si sovo!'); misSeq(MIS_T.owl,()=>misStep(2)); }
+  else if(t.k==='hutB'){ g.busy=true; const o=g.owl; o.fly={a:o.p.slice(),b:[g.B[0]+.2,groundY(g.B[0],g.B[1])+1.9,g.B[1]],t:0,d:3.2,cb:()=>{ flyTo(g.B[0],g.B[1],15); play('owl'); g.bedanec.run=true; g.kekec.sit=false; misSeq(MIS_T.hut,()=>misStep(3)); }}; cam.dist=18; }
+  else if(t.k==='flag'){ g.busy=true; g.kekec.walkTo=g.ST[g.sti].slice(); g.kekec.onArr=()=>{ const i=g.sti; misSeq(MIS_T.st[i],()=>{ if(i>=g.ST.length-1) misStep(4); else { g.sti=i+1; g.busy=false; misFlag(); } }); }; }
+  else if(t.k==='bottle'){ g.busy=true; g.bottle=false; play('pop'); toast('🧪 Kekec ima kapljice!'); g.mojca.vis=false; misSay('',MIS_T.lost[0][1],()=>misStep(5)); } }
+function misWalk(a,dt,spd){ if(!a.walkTo) return false; const dx=a.walkTo[0]-a.p[0], dz=a.walkTo[1]-a.p[1], d=Math.hypot(dx,dz); if(d<.08){ a.walkTo=null; a.walking=false; return true; } const st=Math.min(d,spd*dt); a.p[0]+=dx/d*st; a.p[1]+=dz/d*st; a.yaw=Math.atan2(dx,dz); a.ph+=dt*9; a.walking=true; return false; }
+function misTick(dt){ const g=mis; if(!g) return; g.t+=dt; const k=g.kekec, m=g.mojca, b=g.bedanec, o=g.owl;
+  if(g.step<=2&&!o.fly){ g.hoot-=dt; if(g.hoot<=0){ g.hoot=g.step===1?4.5:9; if(!g.busy||g.step===0) play('owl'); } }
+  if(o.fly){ const f=o.fly; f.t=Math.min(1,f.t+dt/f.d); const e=f.t*f.t*(3-2*f.t); o.p=[lerp(f.a[0],f.b[0],e),lerp(f.a[1],f.b[1],e)+Math.sin(e*Math.PI)*3,lerp(f.a[2],f.b[2],e)]; if(f.t<1){ cam.tx=o.p[0]; cam.tz=o.p[2]; } else if(f.cb){ const c=f.cb; f.cb=null; c(); } }
+  if(b.run){ b.p[0]+=dt*2.6; b.p[1]+=dt*1.2; b.yaw=1.1; b.ph+=dt*14; b.runT=(b.runT||0)+dt; if(b.runT>4) b.vis=false; } else if(b.vis){ b.yaw=-2+Math.sin(g.t*.8)*.9; }
+  if(k.walkTo){ if(misWalk(k,dt,2.4)&&k.onArr){ const f=k.onArr; k.onArr=null; f(); } cam.tx=k.p[0]; cam.tz=k.p[1]; cam.ty=groundY(k.p[0],k.p[1]); }
+  g.dark=clamp(g.dark+(g.darkOn?dt*.7:-dt*.5),0,1); if(g.peek>0) g.peek-=dt; if(g.callT>0) g.callT-=dt;
+  if(g.step===5){ misWalk(m,dt,1.7); cam.tx=m.p[0]; cam.tz=m.p[1]; cam.ty=groundY(m.p[0],m.p[1]); cam.dist=13; const d=Math.hypot(k.p[0]-m.p[0],k.p[1]-m.p[1]); k.yaw=Math.atan2(m.p[0]-k.p[0],m.p[1]-k.p[1]);
+    if(!g.busy){ if(d<1.3){ misStep(6); return; } g.nextCall-=dt; if(g.nextCall<=0){ g.nextCall=5.5; g.callT=2.2; const c=MIS_T.call[(g.calls=(g.calls||0)+1)%MIS_T.call.length]; const vol=clamp(1.15-d/6,.18,1); if(d<2.6&&!g.nearSaid){ g.nearSaid=true; misSay('',MIS_T.near[0][1],null,1); } else misSay('Kekec',c,null,vol); } } } }
+function hutK(F,wood,roof){ put('box',fr(F,[0,.3,0]),[1.0,.6,.8],wood); for(const sx of [1,-1]) put('box',fr(F,[sx*.28,.78,0],[0,0,-sx*.7]),[.78,.07,.95],roof); put('box',fr(F,[0,.72,0]),[.5,.3,.78],wood); put('box',fr(F,[.15,.22,.41]),[.22,.42,.03],[.25,.16,.1]); put('box',fr(F,[-.25,.38,.41]),[.2,.18,.03],[.95,.85,.5,1]); put('box',fr(F,[-.25,1.02,-.15]),[.14,.3,.14],[.45,.42,.4]); }
+function drawMission(){ const g=mis; if(!g) return; const S=clamp(.75+cam.D*.022,1,1.7); const at=(x,z,yaw,s,dy)=>M4.mul(M4.mul(mT(x,groundY(x,z)+(dy||0),z),mRy(yaw||0)),mS(S*(s||1),S*(s||1),S*(s||1)));
+  hutK(at(g.B[0],g.B[1],.5,1.5),[.36,.26,.18],[.2,.17,.15]); hutK(at(g.P[0],g.P[1],-.4,1.4),[.62,.45,.28],[.5,.2,.15]);
+  const k=g.kekec; if(k.vis){ const F=at(k.p[0],k.p[1],k.yaw,1.15); person(F,{kid:1,shirt:[.95,.93,.86,.2],pants:[.42,.3,.2],hat:'straw',hair:HAIRC[1],walk:k.walking,sit:k.sit,armL:k.sit?.2:null,armR:k.sit?.2:(g.step===5?-2.6+Math.sin(T*6)*.4:null)},k.ph); }
+  const b=g.bedanec; if(b.vis){ const F=at(b.p[0],b.p[1],b.yaw,1.5); const P=person(F,{shirt:[.3,.24,.2,.2],coat:[.24,.2,.17],pants:[.16,.14,.13],hair:HAIRC[2],hat:'beanie',hatC:[.2,.18,.16],walk:1,armL:b.run?-2.8:null,armR:b.run?-2.8:null},b.run?b.ph:T*3); put('sphere',fr(P,[0,.8,.1]),[.13,.13,.09],[.1,.08,.07]); }
+  const p=g.pehta; if(p.vis&&g.step>=3){ const F=at(p.p[0],p.p[1],p.yaw,1.25); const P=person(F,{shirt:[.3,.42,.3,.2],coat:[.26,.36,.28],pants:[.3,.25,.3],hair:[.8,.8,.8],scarf:[.7,.25,.2],armR:g.bottle?-1.3:null},0); put('sphere',fr(P,[0,.96,-.02]),[.17,.14,.16],[.55,.2,.25]); }
+  const m=g.mojca; if(m.vis&&g.step>=3){ const F=at(m.p[0],m.p[1],m.yaw,1.15); const P=person(F,{kid:1,shirt:[.85,.2,.25,.2],pants:[.85,.2,.25],hair:HAIRC[1],walk:m.walking},m.ph); put('cone',fr(P,[0,.3,0]),[.2,.34,.18],[.85,.2,.25]); for(const sx of [1,-1]) put('sphere',fr(P,[sx*.15,.8,-.05]),[.05,.11,.05],HAIRC[1]); }
+  const o=g.owl; if(g.step<=2||o.fly){ if(!o.fly) put('cyl',M4.mul(mT(o.p[0],o.p[1]-.75,o.p[2]),mS(S,S,S)),[.12,.72/S,.12],[.4,.28,.18]); const F=M4.mul(M4.mul(mT(o.p[0],o.p[1]+(o.fly?0:Math.abs(Math.sin(T*2))*.06),o.p[2]),mRy(T*.3)),mS(S*1.5,S*1.5,S*1.5)); owlModel(F,T); }
+  if(g.step===3&&g.target&&g.target.k==='flag'){ const s=g.ST[g.sti]; const F=at(s[0],s[1],T*.8,1.3); flag(F,1.1,[.9,.15,.15,.4]); put('sphere',fr(F,[0,1.3+Math.sin(T*4)*.08,0]),[.13,.13,.13],[1,.85,.2,1]); }
+  if(g.bottle&&g.target){ const t=g.target.p; const F=M4.mul(M4.mul(mT(t[0],t[1]+Math.sin(T*3)*.1,t[2]),mRy(T*1.5)),mS(S*3.2,S*3.2,S*3.2)); put('sphere',fr(F,[0,.34,0]),[.05,.05,.05],[1,.9,.3,1]); put('cyl',fr(F,[0,-.12,0]),[.09,.22,.09],[.3,.65,.95,1]); put('cyl',fr(F,[0,.1,0]),[.04,.08,.04],[.3,.65,.95,1]); put('sphere',fr(F,[0,.2,0]),[.05,.04,.05],[.5,.33,.2]); } }
+function misOverlay(c){ const g=mis; if(!g||g.dark<=0.01) return; const m=g.mojca, k=g.kekec; const ms=misScr([m.p[0],groundY(m.p[0],m.p[1])+.6,m.p[1]]); if(!ms) return; const r=Math.min(W,H)*.24; const al=g.dark*(g.peek>0?.35:.97);
+  const gr=c.createRadialGradient(ms[0],ms[1],r*.55,ms[0],ms[1],r); gr.addColorStop(0,'rgba(6,8,22,0)'); gr.addColorStop(1,'rgba(6,8,22,'+al.toFixed(3)+')'); c.fillStyle=gr; c.fillRect(0,0,W,H);
+  if(g.step!==5) return; c.beginPath(); c.arc(ms[0],ms[1],22,0,7); c.strokeStyle='rgba(255,255,255,.9)'; c.lineWidth=3; c.stroke(); c.font='24px sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillText('👧',ms[0],ms[1]-40-Math.abs(Math.sin(T*3))*5);
+  const ks=misScr([k.p[0],groundY(k.p[0],k.p[1])+.6,k.p[1]]); let ang; if(ks) ang=Math.atan2(ks[1]-ms[1],ks[0]-ms[0]); else return;
+  const loud=g.callT>0?1:.35; c.lineCap='round'; for(let i=0;i<3;i++){ const ph=(T*1.4+i/3)%1; const rr=r*(.62+.3*ph); c.beginPath(); c.arc(ms[0],ms[1],rr,ang-.3,ang+.3); c.strokeStyle='rgba(255,213,74,'+(loud*(1-ph)).toFixed(2)+')'; c.lineWidth=6; c.stroke(); }
+  if(g.callT>0){ c.font='800 26px Nunito,sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillStyle='rgba(255,213,74,.95)'; c.fillText('♪',ms[0]+Math.cos(ang)*r*.5,ms[1]+Math.sin(ang)*r*.5); } }
 function confetti(){ const c=$('confetti'), e=['🎉','⭐','🎈','🐻','🏔️','🐝','💚','🍇']; for(let i=0;i<70;i++){ const s=document.createElement('span'); s.textContent=e[i%e.length]; s.style.left=Math.random()*100+'vw'; s.style.animationDuration=(2.2+Math.random()*2.5)+'s'; s.style.animationDelay=Math.random()+'s'; c.appendChild(s); setTimeout(()=>s.remove(),5500);} }
 function burst(){ const c=$('confetti'); for(let i=0;i<22;i++){ const s=document.createElement('span'); s.textContent=['⭐','✨','🌟'][i%3]; s.style.left=(35+Math.random()*30)+'vw'; s.style.animationDuration=(1.6+Math.random()*1.4)+'s'; c.appendChild(s); setTimeout(()=>s.remove(),3500);} }
 let helpHidden=false; function hideHelpSoon(){ if(helpHidden) return; helpHidden=true; setTimeout(()=>$('help').style.opacity=0,4000); }
@@ -3410,7 +3492,7 @@ function frame(now){ try{ frameInner(now); }catch(e){ console.error(e); requestA
 function frameInner(now){
   const dt=Math.min(.05,(now-last)/1000); last=now; T+=dt; lastDt=dt;
   dayT=lerp(dayT,day,1-Math.pow(.3,dt)); for(let i=0;i<4;i++) seasonT[i]=lerp(seasonT[i],season===i?1:0,1-Math.pow(.25,dt)); rainbow=Math.max(0,rainbow-dt/30); for(let i=0;i<3;i++) weatherT[i]=lerp(weatherT[i],weather===i?1:0,1-Math.pow(.25,dt));
-  updateCam(dt); const E=envState(); lastEnv=E; regDraw();
+  if(mis) misTick(dt); updateCam(dt); const E=envState(); lastEnv=E; regDraw();
   updFauna(dt); updSeasonal(dt); updPost(dt); updPilot(dt); checkStamps(dt);
   for(const it of ITEMS){ updateItem(it,T,dt); } if(window.__sc){ const s=window.__sc; s.pos=[Math.sin(T*.25)*3,40+(s.__y||0),Math.cos(T*.25)*3]; } kinematics(dt);
   if(WC){ try{ wcEnsure(); }catch(e){ setWC(false); } if(WC&&wc.fb) gl.bindFramebuffer(gl.FRAMEBUFFER,wc.ms||wc.fb); }
@@ -3420,7 +3502,7 @@ function frameInner(now){
   gl.bindVertexArray(sky.vao); gl.drawArrays(gl.TRIANGLES,0,3);
   gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK); gl.disable(gl.BLEND);
   // terrain
-  setCommon(terrain.P,E,T); gl.uniform2f(terrain.P.u.uB,BX,BZ); gl.uniform1f(terrain.P.u.uEX,EX); flashT=Math.max(0,flashT-lastDt/2.5); gl.uniform2f(terrain.P.u.uFlash,flashId,flashT); gl.uniform1f(terrain.P.u.uRoadPaint,STYLE.road?0:1); gl.uniform1f(terrain.P.u.uLineW,clamp(cam.D*.0032,.22,1.1)); { const A=(game&&game.help&&game.area)||(postal&&postal.area); if(A){ A.a=Math.min(1,(A.a||0)+lastDt*1.5); gl.uniform4f(terrain.P.u.uArea,A.x,A.z,A.r,A.a);} else gl.uniform4f(terrain.P.u.uArea,0,0,1,0); } gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,overlayTex); gl.uniform1i(terrain.P.u.uOv,0); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,roadTex); gl.uniform1i(terrain.P.u.uRd,1); gl.activeTexture(gl.TEXTURE0);
+  setCommon(terrain.P,E,T); gl.uniform2f(terrain.P.u.uB,BX,BZ); gl.uniform1f(terrain.P.u.uEX,EX); flashT=Math.max(0,flashT-lastDt/2.5); gl.uniform2f(terrain.P.u.uFlash,flashId,flashT); gl.uniform1f(terrain.P.u.uRoadPaint,STYLE.road?0:1); gl.uniform1f(terrain.P.u.uLineW,clamp(cam.D*.0032,.22,1.1)); { const A=(game&&game.help&&game.area)||(postal&&postal.area)||(mis&&mis.help&&mis.area); if(A){ A.a=Math.min(1,(A.a||0)+lastDt*1.5); gl.uniform4f(terrain.P.u.uArea,A.x,A.z,A.r,A.a);} else gl.uniform4f(terrain.P.u.uArea,0,0,1,0); } gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,overlayTex); gl.uniform1i(terrain.P.u.uOv,0); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,roadTex); gl.uniform1i(terrain.P.u.uRd,1); gl.activeTexture(gl.TEXTURE0);
   gl.disable(gl.CULL_FACE);
   gl.bindVertexArray(terrain.vao); gl.drawElements(gl.TRIANGLES,terrain.count,gl.UNSIGNED_INT,0);
 
