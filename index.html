@@ -35,7 +35,7 @@ canvas.drag{cursor:grabbing}
 .loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#cfe6ea;z-index:9;font:800 24px Grandstander,Nunito,sans-serif;transition:opacity .6s}
 .loading .bee{font-size:56px;animation:b 1s infinite alternate}@keyframes b{to{transform:translateY(-12px)}}
 .quest{position:fixed;left:50%;top:12px;transform:translate(-50%,-140px);transition:transform .35s;z-index:4;background:#ffe9b0;border:4px solid var(--brown);border-radius:22px;padding:6px 14px 6px 8px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
-.quest.show{transform:translate(-50%,0)}.quest img{height:54px}.quest .qk{font-weight:900;font-size:13px}.quest .qn{font:800 22px Grandstander,Nunito,sans-serif;max-width:62vw}.quest button{border:none;background:none;font:900 22px Nunito;color:var(--brown);cursor:pointer}.quest #qHelp.off{opacity:.35;filter:grayscale(1)}
+.quest.show{transform:translate(-50%,0)}.quest img{height:54px}.quest .qk{font-weight:900;font-size:13px}.quest .qn{font:800 22px Grandstander,Nunito,sans-serif;max-width:62vw}.quest button{border:none;background:none;font:900 22px Nunito;color:var(--brown);cursor:pointer}.quest #qHelp{background:#fff;border:3px solid var(--brown);border-radius:14px;padding:2px 8px;box-shadow:0 3px 0 rgba(0,0,0,.2)}.quest #qHelp:not(.off){background:#ffd54a}
 @media (max-width:700px){.quest{top:auto;bottom:calc(12px + var(--cardH))}.quest.show{transform:translate(-50%,0)}.quest:not(.show){transform:translate(-50%,200px)}}
   .book{position:fixed;inset:0;background:#0006;z-index:9;display:none;place-items:center}
   .book.show{display:grid}
@@ -78,7 +78,7 @@ canvas.drag{cursor:grabbing}
  <button class="tb" id="bAnimals"><span class="ic">🐾</span><span class="tx">Živali</span></button>
  <button class="tb" id="b3D" onclick="location.href='stara/'"><span class="ic">🧊</span><span class="tx">3D zemljevid</span></button>
 </div>
-<div class="quest" id="quest"><span id="qPic"></span><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div></div><button id="qHelp" title="Pomoč">💡</button><button id="qX">✕</button></div>
+<div class="quest" id="quest"><span id="qPic"></span><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div></div><button id="qHelp" class="off" title="Pomoč: pokaži krog">💡</button><button id="qX">✕</button></div>
 <div class="zoom"><button id="zIn">+</button><button id="zOut">−</button></div>
 <div class="card" id="card"><button class="x" id="cardX">✕</button><div class="pic" id="cPic"></div><div style="flex:1;min-width:0"><h2 id="cName"></h2><p id="cText"></p><div class="btns" id="cBtns"></div><div class="more" id="cMore"></div></div></div>
 <div class="toast" id="toast"></div>
@@ -610,7 +610,7 @@ function loadBK(){ if(BKload) return; BKload=true; fetch('spr.bin').then(r=>r.ar
 function bkVisible(){ if(cam.s<1.0){ return []; } loadBK(); if(!BK) return []; const [x0,y0]=s2w(-80,-40), [x1,y1]=s2w(VW+80,VH+200); const out=[];
   for(let gy=Math.floor(y0/BKC);gy<=Math.floor(y1/BKC);gy++) for(let gx=Math.floor(x0/BKC);gx<=Math.floor(x1/BKC);gx++){ const a=BK.get(gx+','+gy); if(a) for(const o of a){ if(!o.img) o.img=img(o.name.replace('.png','')); out.push(o); } } return out; }
 function drawObj(o){ o.sb=null; if(!o.img.complete||!o.img.naturalWidth) return; const s=cam.s; const far=Math.max(0,Math.min(1,(s-.08)/.2));
-  if(o.kind==='lm'&&o.it&&o.it.c!=='mesto'&&far<.05&&!(hintOn&&game&&game.cur===o.it)) { o.sb=null; return; }
+  if(o.kind==='lm'&&o.it&&o.it.c!=='mesto'&&far<.05&&!(game&&game.help&&game.cur===o.it)) { o.sb=null; return; }
   let w=o.w*s; if(o.kind==='farm'||o.kind==='car'||o.kind==='boat'){ w=o.w*s; } const minw=(o.kind==='farm'||o.kind==='car'||o.kind==='boat'||o.kind==='bk')?0:o.kind==='lm'?(o.it&&o.it.c==='mesto'?20:14)+14*far:o.kind==='dec'?0:16+10*far; w=Math.max(w,minw);
   let h=w*o.img.naturalHeight/o.img.naturalWidth; if(o.kind!=='bk'){ const maxh=(o.kind==='lm'?30:24)+300*s; if(h>maxh){ w*=maxh/h; h=maxh; } } const [sx,sy]=w2s(o.x,o.y); if(sx<-w||sx>VW+w||sy<-10||sy-h>VH+10) return;
   let bob=0; if(o.kind==='veh'&&(o.it.id==='balon'||o.it.id==='letalo')) bob=-h*.6-Math.sin(T*1.5)*3; if(o.rot) bob=h*.5;
@@ -686,14 +686,12 @@ function kindOf(it){ const n=it.n.toLowerCase();
   if(/ gora$/.test(n)) return ['goro','12_gora_1'];
   if(/bogenšperk|olimje|kostanjevica|grad|most|cerkev|stolnic|samostan|palač|dvor|stolp|trta|kapel|svetilnik|obzidj|kip|nebotičnik|zoo|vrt|terme|kobilarn|soline|planica/.test(n)) return ['stavbo','mesto_cerkev'];
   return ['naravno čudo','07_drevo_1']; }
-let hintOn=true; try{ hintOn=localStorage.getItem('ms2_hint')!=='0'; }catch(e){}
-function setHint(on){ hintOn=on; try{ localStorage.setItem('ms2_hint',on?'1':'0'); }catch(e){} const b=$('qHelp'); b.classList.toggle('off',!on); b.title=on?'Pomoč je vklopljena':'Pomoč je izklopljena'; }
-$('qHelp').onclick=e=>{ e.stopPropagation(); audioInit(); play('pop'); setHint(!hintOn); toast(hintOn?'💡 Pomoč vklopljena: krog pokaže, kje približno iskati':'Pomoč izklopljena'); };
-$('qHelp').classList.toggle('off',!hintOn); let hintBtn=null;
-function drawHint(){ const sh=!!(game&&(game.kind==='find'||game.kind==='animals')); if(sh!==hintBtn){ hintBtn=sh; $('qHelp').style.display=sh?'':'none'; } if(!hintOn||!game||game.wait||!game.area||(game.kind!=='find'&&game.kind!=='animals')) return; const A=game.area; A.a=Math.min(1,A.a+.03); const [x,y]=w2s(A.x,A.y); const r=A.r*cam.s; const pu=.5+.5*Math.sin(T*4);
+$('qHelp').onclick=e=>{ e.stopPropagation(); audioInit(); if(!game||game.wait) return; play('pop'); game.help=!game.help; $('qHelp').classList.toggle('off',!game.help); if(game.help){ if(game.area) game.area.a=0; toast('💡 Poglej v krog!'); } };
+let hintBtn=null;
+function drawHint(){ const sh=!!(game&&(game.kind==='find'||game.kind==='animals')); if(sh!==hintBtn){ hintBtn=sh; $('qHelp').style.display=sh?'':'none'; } if(!game||!game.help||game.wait||!game.area||(game.kind!=='find'&&game.kind!=='animals')) return; const A=game.area; A.a=Math.min(1,A.a+.03); const [x,y]=w2s(A.x,A.y); const r=A.r*cam.s; const pu=.5+.5*Math.sin(T*4);
   ctx.save(); ctx.beginPath(); ctx.rect(0,0,VW,VH); ctx.arc(x,y,r,0,7,true); ctx.fillStyle=`rgba(40,30,10,${.22*A.a})`; ctx.fill('evenodd');
   ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.lineWidth=6; ctx.strokeStyle=`rgba(255,255,255,${.9*A.a})`; ctx.stroke(); ctx.lineWidth=3.5; ctx.strokeStyle=`rgba(255,${190+40*pu|0},40,${A.a})`; ctx.stroke(); ctx.restore(); }
-function nextQ(){ if(!game) return; game.wait=false; if(!game.pool.length) game.pool=pickable(game.kind).sort(()=>Math.random()-.5); game.cur=game.pool.pop();
+function nextQ(){ if(!game) return; game.wait=false; if(!game.pool.length) game.pool=pickable(game.kind).sort(()=>Math.random()-.5); game.cur=game.pool.pop(); game.help=false; $('qHelp').classList.add('off');
   { const h=game.cur.home, R=(game.kind==='animals'?22:16)*P, a=Math.random()*6.283, off=Math.random()*R*.5; game.area=h?{x:h[0]+Math.cos(a)*off,y:h[1]+Math.sin(a)*off,r:R,a:0}:null; }
   const it=game.cur; const [kn,ki]=kindOf(it); $('qKind').textContent='Poišči '+kn; $('qName').textContent=it.n; const p=$('qPic'); p.innerHTML=''; const src=game.kind==='animals'?picFor(it):(ki?'s/'+ki+'.webp':null); if(src){ const im=new Image(); im.src=src; p.appendChild(im); }
   $('quest').classList.add('show'); say('Poišči: '+it.n); }

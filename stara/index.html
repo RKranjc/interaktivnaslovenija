@@ -79,6 +79,8 @@
   .card .x{position:absolute;right:14px;top:12px;border:0;background:#f1f1f1;border-radius:50%;width:42px;height:42px;font-size:22px;cursor:pointer}
   .quest{position:fixed;left:50%;top:16px;transform:translate(-50%,-150%);background:#fff;border-radius:28px;padding:6px 22px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 0 #0002;z-index:6;transition:transform .35s}
   .quest.show{transform:translate(-50%,0)}
+  #qHelp{border:0;border-radius:16px;font:inherit;font-weight:800;font-size:17px;padding:8px 14px;cursor:pointer;background:#fff4d6;box-shadow:0 3px 0 #0002;white-space:nowrap}
+  #qHelp.on{background:#ffd54a}
   .quest .q{font-size:70px;line-height:1.1}
   .quest .qk{font-size:16px;font-weight:800;color:#ff9f43;text-transform:uppercase;letter-spacing:1px}
   .quest .qn{font-family:'Grandstander',sans-serif;font-size:34px;font-weight:700;line-height:1.05}
@@ -181,6 +183,14 @@
   .card .btns{margin-top:8px!important;gap:6px!important}
   .card .btns button{font-size:14px!important;padding:4px 10px!important}
   .card .x{width:32px!important;height:32px!important;font-size:16px!important;right:10px!important;top:10px!important}
+  .card{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;padding:10px 12px 12px!important;width:min(300px,calc(100vw - 120px))}
+  .card .emo{margin:0!important;line-height:0!important;grid-column:1}
+  .card .emo img{width:46px!important;height:46px!important;display:block}
+  .card h2{grid-column:2;padding-right:34px;font-size:22px!important}
+  .card p,.card .more,.card .btns{grid-column:1/-1}
+  .card p{margin-top:6px!important;font-size:15.5px!important;line-height:1.3!important}
+  .card .btns{flex-wrap:wrap}
+  .card .x{width:28px!important;height:28px!important;font-size:14px!important;right:8px!important;top:8px!important}
 </style>
 </head>
 <body>
@@ -209,7 +219,7 @@
 </div>
 <div class="card" id="card"><button class="x" id="cardX">✖</button><div class="emo" id="cEmo"></div><h2 id="cName"></h2><p id="cText"></p><div class="more" id="cMore"></div><div class="btns" id="cBtns"></div></div>
 <div class="phelp" id="pHelp"><b>Kako letiš:</b> <span>◀ ▶ obračaj</span> <span>▲ ▼ gor in dol</span> <span>Sledi puščici do ⭐</span></div><div class="parrow" id="pArrow"><div>➤</div></div><div class="pctl" id="pctl"><button data-k="l">◀</button><div><button data-k="u">▲</button><button data-k="d">▼</button></div><button data-k="r">▶</button><button class="pexit" id="pExit">Pristani</button></div>
-<div class="quest" id="quest"><div class="q" id="qEmo"></div><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div><div class="stars" id="qStars"></div></div></div>
+<div class="quest" id="quest"><div class="q" id="qEmo"></div><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div><div class="stars" id="qStars"></div></div><button id="qHelp" onclick="gameHelp()">💡 Pomoč</button></div>
 <div class="book" id="regWin"><div class="in" style="text-align:center;width:min(520px,92vw)"><div style="font-size:70px">🏆</div><h2 id="rwT"></h2><p id="rwP" style="font-size:20px;line-height:1.4"></p><button class="tb" id="rwB" style="margin:10px auto 0;font-size:22px">Naprej ▶</button></div></div>
 <button class="ride" id="rideBtn">🚪 Izstopi</button>
 <button class="ride view" id="viewBtn">Pogled od zunaj</button>
@@ -1601,7 +1611,7 @@ function startPost(){ regStop(); stopPilot(); if(game){ clearTimeout(game.timer)
 function stopPost(){ if(!postal) return; clearTimeout(postal.timer); postal=null; follow=null; northUp(); $('bPost').classList.remove('on'); $('quest').classList.remove('show'); }
 function nextLetter(){ const pool=ITEMS.filter(i=>i.lm&&i.c==='mesto'&&!postal.recent.includes(i.id)); const t=pool[Math.floor(Math.random()*pool.length)]; postal.target=t; postal.tries=0; postal.area=null;
   postal.recent.push(t.id); if(postal.recent.length>8) postal.recent.shift();
-  $('qEmo').innerHTML=''; $('qKind').textContent='Pismo za'; $('qName').textContent=t.n; const im=document.createElement('img'); im.src=t.icon.toDataURL(); im.style.width='78px'; im.style.height='78px'; $('qEmo').appendChild(im);
+  $('qEmo').innerHTML=''; $('qHelp').style.display='none'; $('qKind').textContent='Pismo za'; $('qName').textContent=t.n; const im=document.createElement('img'); im.src=t.icon.toDataURL(); im.style.width='78px'; im.style.height='78px'; $('qEmo').appendChild(im);
   $('qStars').textContent='Dostavljeno: '+postal.score; $('quest').classList.add('show'); closeCard();
   follow=null; const v=postal.van.pos; flyTo((v[0]+0)*.3,(v[2]+0)*.3,215); cam.pitch=.9; say('Pismo za '+t.n+'! Kam ga odpeljemo?'); play('pop'); }
 function postClick(it){ if(!postal||postal.driving||!postal.target) return; if(!it.lm&&!it.labelOnly) return;
@@ -2498,7 +2508,7 @@ function startPilot(){ regStop(); stopPost(); if(game){ clearTimeout(game.timer)
   const pool=ITEMS.filter(i=>i.lm&&!i.kraj&&!i.det&&i.c!=='drzava'); const pick=[]; while(pick.length<12&&pool.length){ pick.push(pool.splice(Math.floor(rnd()*pool.length),1)[0]); }
   pilot={pos:[x,groundY(x,z)+7,z],yaw:Math.PI*.6,roll:0,speed:3.2,alt:7,base:0,score:0,stars:pick.map(it=>{ const q=ll(...it.lm.at); return {it,x:q[0],z:q[1],y:groundY(q[0],q[1])+6,got:false}; })};
   follow={pos:pilot.pos}; cam.dist=24; cam.pitch=.38; $('bPilot').classList.add('on'); $('pctl').classList.add('show'); $('pHelp').classList.add('show'); $('pArrow').classList.add('show');
-  $('qEmo').innerHTML=''; $('qKind').textContent='Pilot'; $('qName').textContent='Poberi zvezdice'; $('qStars').textContent='Zvezdice: 0 / '+pilot.stars.length; $('quest').classList.add('show');
+  $('qEmo').innerHTML=''; $('qHelp').style.display='none'; $('qKind').textContent='Pilot'; $('qName').textContent='Poberi zvezdice'; $('qStars').textContent='Zvezdice: 0 / '+pilot.stars.length; $('quest').classList.add('show');
   say('Poleti in poberi zvezdice! S puščicami levo in desno obračaš, gor in dol pa letiš višje ali nižje.'); play('plane'); }
 function stopPilot(){ if(!pilot) return; pilot=null; follow=null; closeCard(); $('bPilot').classList.remove('on'); $('pctl').classList.remove('show'); $('pHelp').classList.remove('show'); $('pArrow').classList.remove('show'); $('quest').classList.remove('show'); setHome(); }
 function updPilot(dt){ if(!pilot) return; const P=pilot; const turn=(pkeys.l?1:0)-(pkeys.r?1:0);
@@ -3205,14 +3215,15 @@ function nextQ(){ const pool=ITEMS.filter(i=>!i.labelOnly && !i.kraj && (!game.a
   $('qKind').textContent=game.animalsOnly?'Najdi žival':'Poišči'; $('qName').textContent=t.n; $('qStars').textContent='Najdeno: '+game.score;
   $('quest').classList.add('show'); say((t.plural?'Kje so ':'Kje je ')+t.n+'?');
   const R=t.mv&&t.mv.k!=='path'?Math.max(8,(t.mv.r||0)+5):7; const a=Math.random()*6.283, off=Math.random()*R*.45; const p=t.mv&&t.mv.k==='path'?t.pos:[t.home[0],0,t.home[1]];
-  game.area={x:p[0]+Math.cos(a)*off,z:p[2]+Math.sin(a)*off,r:R,a:0}; flyTo(game.area.x,game.area.z,R*7,null); cam.pitch=.85; }
+  game.area={x:p[0]+Math.cos(a)*off,z:p[2]+Math.sin(a)*off,r:R,a:0}; game.help=false; $('qHelp').style.display=''; $('qHelp').classList.remove('on'); setHome(); }
+function gameHelp(){ audioInit(); if(!game||game.waiting||!game.area||game.help) return; play('pop'); game.help=true; game.area.a=0; $('qHelp').classList.add('on'); flyTo(game.area.x,game.area.z,game.area.r*7,null); cam.pitch=.85; toast('💡 Poglej v krog!'); }
 function gameAdvance(){ if(!game||!game.waiting) return; game.waiting=false; clearTimeout(game.timer); stopSay(); closeCard(); setHome(); nextQ(); }
 function gameClick(it){ if(game.waiting) return; const t=game.target; if(!t) return;
   if(it===t){ game.score++; play('cheer'); it.pulse=1; collect(it); burst(); game.target=null; flyTo(it.pos[0],it.pos[2],it.mv?30:55,it.pos[1]);
     game.area=null; game.waiting=true; game.paused=false; const fact=nextFact(it); showCard(it,fact); $('qStars').textContent='Najdeno: '+game.score;
     const msg='Bravo! To je '+it.n+'. '+fact; const wait=slVoice? Math.max(5000, msg.length*75+1500) : 5500;
     setTimeout(()=>say(msg),700); game.timer=setTimeout(gameAdvance,Math.max(wait,9000)); }
-  else { game.tries++; play('boing'); it.wig=1; if(game.tries>=2){ t.pulse=3; game.area={x:t.pos[0],z:t.pos[2],r:3,a:game.area?game.area.a:1}; } }
+  else { game.tries++; play('boing'); it.wig=1; if(game.tries>=2&&game.help){ t.pulse=3; game.area={x:t.pos[0],z:t.pos[2],r:3,a:game.area?game.area.a:1}; } }
 }
 
 // ---------------- REGIJE (NUTS 3) ----------------
@@ -3256,7 +3267,7 @@ function regStop(){ if(!regG) return; regG=null; regShow=null; $('quest').classL
 function regStart(){ audioInit(); if(regG){ regStop(); return; } stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); regInit();
   let pool=ITEMS.filter(it=>it.home&&!it.labelOnly&&!it.kraj&&(it.c==='mesto'||it.c==='gora'||it.c==='zanim')&&regClear(it)); if(AUD){ const rec=pool.filter(it=>AUD.has(h32('V kateri regiji je '+it.n+'?'))); if(rec.length>=20) pool=rec; }
   regG={round:1,n:0,ok:0,done:new Set(),used:new Set(),pool}; $('bRegions').classList.add('on'); $('qEmo').textContent='🗺️'; regNext(); }
-function regQ(kind,name,txt){ $('qKind').textContent=kind; $('qName').textContent=name; $('qStars').textContent=txt; $('quest').classList.add('show'); }
+function regQ(kind,name,txt){ $('qHelp').style.display='none'; $('qKind').textContent=kind; $('qName').textContent=name; $('qStars').textContent=txt; $('quest').classList.add('show'); }
 function regNext(){ const g=regG; if(!g) return; const all=Object.keys(REGP); setHome(); regShow=null;
   if(g.round===1&&g.done.size>=all.length){ play('cheer'); burst(); say('Čestitam! Našel si vse regije! V prvo si jih zadel '+NUMW[g.ok]+' od dvanajstih.'); const ok=g.ok;
     regModal('Čestitam!','Našel si vseh '+all.length+' regij! V prvo si jih zadel '+ok+' od '+all.length+'. Zdaj pa runda 2: značilnosti regij.',()=>{ g.round=2; g.n=0; g.ok=0; g.used=new Set(); regNext(); }); return; }
@@ -3409,7 +3420,7 @@ function frameInner(now){
   gl.bindVertexArray(sky.vao); gl.drawArrays(gl.TRIANGLES,0,3);
   gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK); gl.disable(gl.BLEND);
   // terrain
-  setCommon(terrain.P,E,T); gl.uniform2f(terrain.P.u.uB,BX,BZ); gl.uniform1f(terrain.P.u.uEX,EX); flashT=Math.max(0,flashT-lastDt/2.5); gl.uniform2f(terrain.P.u.uFlash,flashId,flashT); gl.uniform1f(terrain.P.u.uRoadPaint,STYLE.road?0:1); gl.uniform1f(terrain.P.u.uLineW,clamp(cam.D*.0032,.22,1.1)); { const A=(game&&game.area)||(postal&&postal.area); if(A){ A.a=Math.min(1,(A.a||0)+lastDt*1.5); gl.uniform4f(terrain.P.u.uArea,A.x,A.z,A.r,A.a);} else gl.uniform4f(terrain.P.u.uArea,0,0,1,0); } gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,overlayTex); gl.uniform1i(terrain.P.u.uOv,0); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,roadTex); gl.uniform1i(terrain.P.u.uRd,1); gl.activeTexture(gl.TEXTURE0);
+  setCommon(terrain.P,E,T); gl.uniform2f(terrain.P.u.uB,BX,BZ); gl.uniform1f(terrain.P.u.uEX,EX); flashT=Math.max(0,flashT-lastDt/2.5); gl.uniform2f(terrain.P.u.uFlash,flashId,flashT); gl.uniform1f(terrain.P.u.uRoadPaint,STYLE.road?0:1); gl.uniform1f(terrain.P.u.uLineW,clamp(cam.D*.0032,.22,1.1)); { const A=(game&&game.help&&game.area)||(postal&&postal.area); if(A){ A.a=Math.min(1,(A.a||0)+lastDt*1.5); gl.uniform4f(terrain.P.u.uArea,A.x,A.z,A.r,A.a);} else gl.uniform4f(terrain.P.u.uArea,0,0,1,0); } gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,overlayTex); gl.uniform1i(terrain.P.u.uOv,0); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,roadTex); gl.uniform1i(terrain.P.u.uRd,1); gl.activeTexture(gl.TEXTURE0);
   gl.disable(gl.CULL_FACE);
   gl.bindVertexArray(terrain.vao); gl.drawElements(gl.TRIANGLES,terrain.count,gl.UNSIGNED_INT,0);
 
