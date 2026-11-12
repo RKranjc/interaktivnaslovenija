@@ -194,6 +194,10 @@
   .card .btns{flex-wrap:wrap}
   .card .x{width:28px!important;height:28px!important;font-size:14px!important;right:8px!important;top:8px!important}
 </style>
+<script>
+// samodejna osvežitev, če je brskalnik naložil staro shranjeno različico strani
+(function(){ try{ fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(function(r){ var lm=r.headers.get('last-modified'); if(!lm) return; var srv=Date.parse(lm), cur=Date.parse(document.lastModified); if(!(srv>cur+5000)) return; var k='fresh:'+location.pathname; if(sessionStorage.getItem(k)===lm) return; sessionStorage.setItem(k,lm); location.replace(location.pathname+'?v='+srv); }).catch(function(){}); }catch(e){} })();
+</script>
 </head>
 <body>
 <canvas id="gl"></canvas>

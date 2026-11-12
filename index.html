@@ -64,7 +64,11 @@ canvas.drag{cursor:grabbing}
 .wbox button{font:900 20px Nunito;color:var(--brown);background:#bfe8a0;border:4px solid var(--brown);border-radius:18px;padding:8px 22px;cursor:pointer}
 .zoom{position:fixed;right:10px;bottom:calc(14px + var(--cardH));display:flex;flex-direction:column;gap:6px;z-index:3}
 .zoom button{width:46px;height:46px;font:900 26px Nunito;color:var(--brown);background:var(--cream);border:3px solid var(--brown);border-radius:14px;box-shadow:0 3px 0 rgba(0,0,0,.22);cursor:pointer}
-</style></head><body>
+</style><script>
+// samodejna osvežitev, če je brskalnik naložil staro shranjeno različico strani
+(function(){ try{ fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(function(r){ var lm=r.headers.get('last-modified'); if(!lm) return; var srv=Date.parse(lm), cur=Date.parse(document.lastModified); if(!(srv>cur+5000)) return; var k='fresh:'+location.pathname; if(sessionStorage.getItem(k)===lm) return; sessionStorage.setItem(k,lm); location.replace(location.pathname+'?v='+srv); }).catch(function(){}); }catch(e){} })();
+</script>
+</head><body>
 <canvas id="cv"></canvas>
 <div class="title">Moja Slovenija</div>
 <div class="bag"><span id="bagT">Zbrano</span><div class="bar"><i id="bagF"></i></div><span id="bagN">0</span></div>
