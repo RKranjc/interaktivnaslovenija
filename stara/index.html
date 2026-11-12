@@ -198,6 +198,28 @@
 // samodejna osvežitev, če je brskalnik naložil staro shranjeno različico strani
 (function(){ try{ fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(function(r){ var lm=r.headers.get('last-modified'); if(!lm) return; var srv=Date.parse(lm), cur=Date.parse(document.lastModified); if(!(srv>cur+5000)) return; var k='fresh:'+location.pathname; if(sessionStorage.getItem(k)===lm) return; sessionStorage.setItem(k,lm); location.replace(location.pathname+'?v='+srv); }).catch(function(){}); }catch(e){} })();
 </script>
+
+<style>
+/* manj besedila: brez naslova, kompaktna naloga, meni samo z ikonami (besedilo ob prehodu z miško) */
+.title{display:none!important}
+.quest{top:10px!important;padding:4px 10px!important;gap:8px!important;border-radius:16px!important;max-width:min(520px,calc(100vw - 330px))!important}
+.quest .q{font-size:28px!important;line-height:1!important}
+.quest .q img,.quest .q svg,.quest img{width:32px!important;height:32px!important}
+.quest .qk{font-size:10px!important;letter-spacing:.5px!important}
+.quest .qn{font-size:16px!important;line-height:1.12!important}
+.quest .stars{font-size:11px!important}
+#qHelp{font-size:13px!important;padding:5px 9px!important;border-radius:12px!important}
+#misSub{font-size:16px!important;padding:7px 14px!important}
+@media (max-width:760px){.quest{top:40px!important;max-width:94vw!important}}
+.tools .tb .tx,.tools .tsep{display:none!important}
+.tools .tb{width:44px!important;height:42px!important;min-width:0!important;padding:0!important;justify-content:center!important;flex-direction:row!important}
+.tools{align-items:flex-end;overflow-x:hidden}
+.hint{display:none!important}
+@media (hover:hover) and (min-width:761px){
+  .tools:hover .tb .tx{display:inline!important}
+  .tools:hover .tb{width:128px!important;justify-content:flex-start!important;padding:0 10px!important;gap:8px!important;font-size:14px!important}
+}
+</style>
 </head>
 <body>
 <canvas id="gl"></canvas>
@@ -2516,8 +2538,9 @@ function startPilot(){ misStop(); regStop(); stopPost(); if(game){ clearTimeout(
   const pool=ITEMS.filter(i=>i.lm&&!i.kraj&&!i.det&&i.c!=='drzava'); const pick=[]; while(pick.length<12&&pool.length){ pick.push(pool.splice(Math.floor(rnd()*pool.length),1)[0]); }
   pilot={pos:[x,groundY(x,z)+7,z],yaw:Math.PI*.6,roll:0,speed:3.2,alt:7,base:0,score:0,stars:pick.map(it=>{ const q=ll(...it.lm.at); return {it,x:q[0],z:q[1],y:groundY(q[0],q[1])+6,got:false}; })};
   follow={pos:pilot.pos}; cam.dist=24; cam.pitch=.38; $('bPilot').classList.add('on'); $('pctl').classList.add('show'); $('pHelp').classList.add('show'); $('pArrow').classList.add('show');
-  $('qEmo').innerHTML=''; $('qHelp').style.display='none'; $('qKind').textContent='Pilot'; $('qName').textContent='Poberi zvezdice'; $('qStars').textContent='Zvezdice: 0 / '+pilot.stars.length; $('quest').classList.add('show');
-  say('Poleti in poberi zvezdice! S puščicami levo in desno obračaš, gor in dol pa letiš višje ali nižje.'); play('plane'); }
+  $('qEmo').innerHTML=''; $('qHelp').style.display='none'; $('qStars').textContent=''; $('quest').classList.add('show'); { const P=pilot; setTimeout(()=>{ if(pilot===P) $('pHelp').classList.remove('show'); },15000); }
+  pilotNext('Poleti in poberi zvezdice! S puščicami levo in desno obračaš, gor in dol pa letiš višje ali nižje. Tvoj cilj: '); play('plane'); }
+function pilotNext(pre){ const P=pilot; if(!P) return; let best=null,bd=1e9; for(const st of P.stars){ if(st.got) continue; const d=Math.hypot(st.x-P.pos[0],st.z-P.pos[2]); if(d<bd){ bd=d; best=st; } } P.cur=best; $('qKind').textContent='Pilot · ⭐ '+P.score+'/'+P.stars.length; if(best){ $('qName').textContent='Poleti do: '+best.it.n; say(pre+best.it.n+'.'); } }
 function stopPilot(){ if(!pilot) return; pilot=null; follow=null; closeCard(); $('bPilot').classList.remove('on'); $('pctl').classList.remove('show'); $('pHelp').classList.remove('show'); $('pArrow').classList.remove('show'); $('quest').classList.remove('show'); setHome(); }
 function updPilot(dt){ if(!pilot) return; const P=pilot; const turn=(pkeys.l?1:0)-(pkeys.r?1:0);
   P.yaw+=turn*1.0*dt; P.roll=lerp(P.roll,-turn*.45,1-Math.pow(.02,dt)); P.alt=clamp((P.alt||5.5)+((pkeys.u?1:0)-(pkeys.d?1:0))*dt*4,2,22); P.pitchV=lerp(P.pitchV||0,((pkeys.u?1:0)-(pkeys.d?1:0))*.3,1-Math.pow(.02,dt));
@@ -2525,10 +2548,10 @@ function updPilot(dt){ if(!pilot) return; const P=pilot; const turn=(pkeys.l?1:0
   if(Math.abs(x)>BX*.97||Math.abs(z)>BZ*.97){ P.yaw+=Math.PI*dt*1.5; x=clamp(x,-BX*.97,BX*.97); z=clamp(z,-BZ*.97,BZ*.97); }
   let gmax=0; for(const k of [0,3,6,9]) gmax=Math.max(gmax,groundY(x+Math.sin(P.yaw)*k,z+Math.cos(P.yaw)*k));
   const y=lerp(P.pos[1],Math.max(gmax+2,(P.base==null?(P.base=P.pos[1]-5.5):P.base)+P.alt),1-Math.pow(.3,dt)); P.pos=[x,y,z]; follow.pos=P.pos;
-  const want=P.yaw+Math.PI; let dy=((want-cam.yaw+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI; cam.yaw+=dy*(1-Math.pow(.15,dt)); cam.pitch=.38; { let best=null,bd=1e9; for(const st of P.stars){ if(st.got) continue; const d=Math.hypot(st.x-x,st.z-z); if(d<bd){bd=d;best=st;} } const A=$('pArrow');
+  const want=P.yaw+Math.PI; let dy=((want-cam.yaw+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI; cam.yaw+=dy*(1-Math.pow(.15,dt)); cam.pitch=.38; { const best=(P.cur&&!P.cur.got)?P.cur:null; const A=$('pArrow');
     if(best){ A.style.display=''; const rel=Math.atan2(best.x-x,best.z-z)-P.yaw; const r=Math.atan2(Math.sin(rel),Math.cos(rel)); A.firstChild.style.transform='rotate('+(-r*180/Math.PI-90)+'deg)'; } else A.style.display='none'; }
   for(const s of P.stars){ if(s.got) continue; if(Math.hypot(s.x-x,s.z-z)<3.2 && Math.abs(s.y-y)<5){ s.got=true; P.score++; if(P.score>=1) $('pHelp').classList.remove('show'); play('sticker'); burst(); collect(s.it);
-      $('qStars').textContent='Zvezdice: '+P.score+' / '+P.stars.length; const f=nextFact(s.it); showCard(s.it,f); setTimeout(()=>say(s.it.n+'! '+f),300);
+      $('qKind').textContent='Pilot · ⭐ '+P.score+'/'+P.stars.length; const f=nextFact(s.it); showCard(s.it,f); if(P.score<P.stars.length&&(!P.cur||P.cur.got)) pilotNext('Bravo! Naslednja postaja: '); else if(P.score>=P.stars.length){ $('qName').textContent='Vse zvezdice so pobrane!'; }
       if(P.score===P.stars.length){ confetti(); play('cheer'); setTimeout(()=>say('Bravo, pilot! Pobral si vse zvezdice!'),2500); } } } }
 function drawPilot(){ if(!pilot) return; const P=pilot; const F=M4.mul(M4.mul(M4.mul(M4.mul(mT(P.pos[0],P.pos[1],P.pos[2]),mRy(P.yaw)),mRx(-(P.pitchV||0))),mRz(P.roll)),mS(.42,.42,.42)); plane(F);
   for(const s of P.stars){ if(s.got) continue; const dd=Math.hypot(s.x-P.pos[0],s.z-P.pos[2]); const ks=1.1+clamp((dd-15)*.025,0,2.2); const S=M4.mul(M4.mul(mT(s.x,s.y+Math.sin(T*2+s.x)*.3,s.z),mRy(T*1.5)),mS(ks,ks,ks)); const G=[1,.82,.15,1];
@@ -3201,7 +3224,7 @@ window.addEventListener('keyup',e=>{ const m={ArrowLeft:'l',ArrowRight:'r',Arrow
 let stamps=new Set(); try{ JSON.parse(localStorage.getItem('slo3d-stamps')||'[]').forEach(x=>stamps.add(x)); }catch(e){}
 const SCOL=['#d9483b','#2f6fd6','#1f9a5a','#8e44ad','#d97a10'];
 let stampT=0, toastT=null;
-function toast(msg){ const e=$('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove('show'),2600); }
+function toast(msg){ const e=$('toast'); { const q=$('quest'); let t=14; if(q&&q.classList.contains('show')){ const r=q.getBoundingClientRect(); if(r.top<innerHeight/2) t=Math.max(14,r.bottom+10); } e.style.setProperty('top',t+'px','important'); } e.textContent=msg; e.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove('show'),2600); }
 function updPass(){ $('passBadge').textContent=stamps.size; }
 function checkStamps(dt){ stampT+=dt; if(stampT<.5) return; stampT=0; if(cam.D>45) return;
   for(const it of ITEMS){ if(!(it.c==='mesto'||it.kraj)||it.country||stamps.has(it.id)) continue; const p=it.home; if(!p) continue;

@@ -11,14 +11,15 @@ html,body{margin:0;height:100%;overflow:hidden;background:#cfe6ea;font-family:Nu
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:grab}
 canvas.drag{cursor:grabbing}
 .title{position:fixed;left:14px;top:10px;font:800 26px Grandstander,Nunito,sans-serif;color:#fff;text-shadow:0 2px 0 #6b4423,0 0 6px rgba(0,0,0,.35);pointer-events:none;z-index:3}
-.bag{position:fixed;left:14px;top:50px;display:flex;align-items:center;gap:8px;background:var(--cream);border:3px solid var(--brown);border-radius:18px;padding:4px 12px;font-weight:900;z-index:3;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.bag{position:fixed;left:12px;top:10px;display:flex;align-items:center;gap:8px;background:var(--cream);border:3px solid var(--brown);border-radius:18px;padding:4px 12px;font-weight:900;z-index:3;box-shadow:0 3px 0 rgba(0,0,0,.2)}
 .bag .bar{width:90px;height:10px;border-radius:6px;background:#e9dcc4;overflow:hidden}.bag .bar i{display:block;height:100%;background:#f2b33d;width:0}
 .menu{position:fixed;right:10px;top:10px;display:flex;flex-direction:column;gap:7px;z-index:3}
 .tb{font:900 15px Nunito,sans-serif;color:var(--brown);background:var(--cream);border:3px solid var(--brown);border-radius:16px;padding:6px 12px;min-width:118px;text-align:left;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.22);display:flex;align-items:center;gap:8px}
 .tb:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.22)}
 .tb.on{background:#ffe08a}
 .tb .ic{font-size:18px}
-@media (max-width:700px){.tb{min-width:0;padding:6px 9px}.tb .tx{display:none}.title{font-size:20px}}
+.menu{align-items:flex-end}.tb{min-width:0;padding:6px 9px}.tb .tx{display:none}
+@media (hover:hover){.menu:hover .tb{min-width:128px}.menu:hover .tb .tx{display:inline}}
 .card{position:fixed;left:50%;bottom:-420px;transform:translateX(-50%);width:min(430px,94vw);background:var(--cream);border:3px solid var(--brown);border-radius:20px;padding:9px 12px 10px 10px;display:flex;gap:10px;align-items:flex-start;z-index:5;transition:bottom .35s cubic-bezier(.2,1.3,.4,1);box-shadow:0 6px 0 rgba(0,0,0,.25),0 10px 30px rgba(0,0,0,.25)}
 .card.show{bottom:max(12px,env(safe-area-inset-bottom))}
 .card .pic{width:72px;height:72px;flex:none;display:flex;align-items:center;justify-content:center}
@@ -34,8 +35,8 @@ canvas.drag{cursor:grabbing}
 .toast.show{transform:translate(-50%,0);opacity:1}
 .loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#cfe6ea;z-index:9;font:800 24px Grandstander,Nunito,sans-serif;transition:opacity .6s}
 .loading .bee{font-size:56px;animation:b 1s infinite alternate}@keyframes b{to{transform:translateY(-12px)}}
-.quest{position:fixed;left:50%;top:12px;transform:translate(-50%,-140px);transition:transform .35s;z-index:4;background:#ffe9b0;border:4px solid var(--brown);border-radius:22px;padding:6px 14px 6px 8px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
-.quest.show{transform:translate(-50%,0)}.quest img{height:54px}.quest .qk{font-weight:900;font-size:13px}.quest .qn{font:800 22px Grandstander,Nunito,sans-serif;max-width:62vw}.quest button{border:none;background:none;font:900 22px Nunito;color:var(--brown);cursor:pointer}.quest #qHelp{background:#fff;border:3px solid var(--brown);border-radius:14px;padding:2px 8px;box-shadow:0 3px 0 rgba(0,0,0,.2)}.quest #qHelp:not(.off){background:#ffd54a}
+.quest{position:fixed;left:50%;top:12px;transform:translate(-50%,-140px);transition:transform .35s;z-index:4;background:#ffe9b0;border:3px solid var(--brown);border-radius:16px;padding:4px 10px 4px 8px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.quest.show{transform:translate(-50%,0)}.quest img{height:36px}.quest .qk{font-weight:900;font-size:11px}.quest .qn{font:800 17px Grandstander,Nunito,sans-serif;max-width:56vw;line-height:1.15}.quest button{border:none;background:none;font:900 17px Nunito;color:var(--brown);cursor:pointer}.quest #qHelp{background:#fff;border:3px solid var(--brown);border-radius:14px;padding:2px 8px;box-shadow:0 3px 0 rgba(0,0,0,.2)}.quest #qHelp:not(.off){background:#ffd54a}
 @media (max-width:700px){.quest{top:auto;bottom:calc(12px + var(--cardH))}.quest.show{transform:translate(-50%,0)}.quest:not(.show){transform:translate(-50%,200px)}}
   .book{position:fixed;inset:0;background:#0006;z-index:9;display:none;place-items:center}
   .book.show{display:grid}
@@ -70,7 +71,6 @@ canvas.drag{cursor:grabbing}
 </script>
 </head><body>
 <canvas id="cv"></canvas>
-<div class="title">Moja Slovenija</div>
 <div class="bag"><span id="bagT">Zbrano</span><div class="bar"><i id="bagF"></i></div><span id="bagN">0</span></div>
 <div class="menu">
  <button class="tb" id="bHome"><span class="ic">🏠</span><span class="tx">Domov</span></button>
@@ -977,7 +977,7 @@ function more(it){ const box=$('cMore'); box.innerHTML=''; const extra=[...(MORE
   say(it.n+'. '+(MORE[it.id]||[]).join(' ')+(nb.length?' V bližini so '+nb.join(', ')+'.':'')); }
 function closeCard(){ $('card').classList.remove('show'); document.documentElement.style.setProperty('--cardH','0px'); }
 $('cardX').onclick=()=>{ closeCard(); advance(); };
-let toastT; function toast(m){ const e=$('toast'); e.textContent=m; e.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove('show'),2600); }
+let toastT; function toast(m){ const e=$('toast'); { const q=$('quest'); let t=14; if(q&&q.classList.contains('show')){ const r=q.getBoundingClientRect(); if(r.top<innerHeight/2) t=Math.max(14,r.bottom+10); } e.style.setProperty('top',t+'px','important'); } e.textContent=m; e.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove('show'),2600); }
 $('bHome').onclick=()=>{ home(); closeCard(); play('pop'); };
 $('bLabels').onclick=()=>{ labels=!labels; $('bLabels').classList.toggle('on',labels); };
 $('bSound').onclick=()=>{ audioInit(); sfxOn=!sfxOn; musicOn=sfxOn; try{ musicGain.gain.setTargetAtTime(musicOn?1:0,AC.currentTime,.2); }catch(_){} $('bSound').querySelector('.ic').textContent=sfxOn?'🔊':'🔇'; if(!sfxOn) stopSay(); };
