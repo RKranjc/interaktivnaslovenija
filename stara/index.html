@@ -83,6 +83,8 @@
   #qHelp.on{background:#ffd54a}
   #misSub{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;max-width:min(640px,88vw);background:#fffdf5;border-radius:18px;padding:10px 16px;font-weight:800;font-size:18px;line-height:1.3;box-shadow:0 4px 0 #0003;display:none;text-align:center;z-index:40;pointer-events:none}
   #misSub.show{display:block}
+  .bw{border:0;border-radius:18px;background:#fff4d6;font:inherit;font-weight:800;font-size:22px;padding:12px 22px;cursor:pointer;box-shadow:0 4px 0 #0002;line-height:1.3}
+  .bw:active{transform:translateY(3px);box-shadow:0 1px 0 #0002}
   .quest .q{font-size:70px;line-height:1.1}
   .quest .qk{font-size:16px;font-weight:800;color:#ff9f43;text-transform:uppercase;letter-spacing:1px}
   .quest .qn{font-family:'Grandstander',sans-serif;font-size:34px;font-weight:700;line-height:1.05}
@@ -214,7 +216,7 @@
 .tools .tb .tx,.tools .tsep{display:none!important}
 .tools .tb{width:44px!important;height:42px!important;min-width:0!important;padding:0!important;justify-content:center!important;flex-direction:row!important}
 .tools{align-items:flex-end;overflow-x:hidden}
-.hint{display:none!important}
+#help{display:none!important}
 @media (hover:hover) and (min-width:761px){
   .tools:hover .tb .tx{display:inline!important}
   .tools:hover .tb{width:128px!important;justify-content:flex-start!important;padding:0 10px!important;gap:8px!important;font-size:14px!important}
@@ -244,12 +246,14 @@
   <button class="tb game" id="bPilot"><span class="ic">✈️</span><span class="tx">Letalo</span></button>
   <button class="tb game" id="bRegions"><span class="ic">🗺️</span><span class="tx">Regije</span></button>
   <button class="tb game" id="bKekec"><span class="ic">🧒</span><span class="tx">Misija Kekec</span></button>
+  <button class="tb game" id="bBoat"><span class="ic">⛵</span><span class="tx">Ladjica</span></button>
   <button class="tb" id="b2D" onclick="location.href='../'"><span class="ic">🖼️</span><span class="tx">2D zemljevid</span></button>
 </div>
 <div class="card" id="card"><button class="x" id="cardX">✖</button><div class="emo" id="cEmo"></div><h2 id="cName"></h2><p id="cText"></p><div class="more" id="cMore"></div><div class="btns" id="cBtns"></div></div>
 <div class="phelp" id="pHelp"><b>Kako letiš:</b> <span>◀ ▶ obračaj</span> <span>▲ ▼ gor in dol</span> <span>Sledi puščici do ⭐</span></div><div class="parrow" id="pArrow"><div>➤</div></div><div class="pctl" id="pctl"><button data-k="l">◀</button><div><button data-k="u">▲</button><button data-k="d">▼</button></div><button data-k="r">▶</button><button class="pexit" id="pExit">Pristani</button></div>
 <div class="quest" id="quest"><div class="q" id="qEmo"></div><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div><div class="stars" id="qStars"></div></div><button id="qHelp" onclick="gameHelp()">💡 Pomoč</button></div>
 <div id="misSub"></div>
+<div class="book" id="boatWin"><div class="in" style="text-align:center;width:min(460px,92vw)"><div style="font-size:54px">⛵</div><h2 style="margin:4px 0 12px">Izberi reko</h2><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="bw" onclick="boatStart('sava')">🌊<br>Sava</button><button class="bw" onclick="boatStart('soca')">💎<br>Soča</button><button class="bw" onclick="boatStart('drava')">🛶<br>Drava</button></div><button class="bw" style="margin-top:14px;font-size:15px;padding:6px 16px;background:#eee" onclick="document.getElementById('boatWin').classList.remove('show')">Zapri</button></div></div>
 <div class="book" id="regWin"><div class="in" style="text-align:center;width:min(520px,92vw)"><div style="font-size:70px">🏆</div><h2 id="rwT"></h2><p id="rwP" style="font-size:20px;line-height:1.4"></p><button class="tb" id="rwB" style="margin:10px auto 0;font-size:22px">Naprej ▶</button></div></div>
 <button class="ride" id="rideBtn">🚪 Izstopi</button>
 <button class="ride view" id="viewBtn">Pogled od zunaj</button>
@@ -1236,7 +1240,7 @@ function kinematics(dt){
 function drawModels(E){
   IB={sphere:[],cyl:[],cone:[],box:[],tcyl:[]};
   for(const it of ITEMS){ if(!it.model) continue; if(rideFP&&follow===it&&fpTrans>=1&&it.id==='balon') continue; drawModel(it); }
-  drawLandmarks(); drawTraffic(lastDt); drawFauna(); drawTreasures(); drawPostVan(); drawPilot(); drawMission(); drawRainbow();
+  drawLandmarks(); drawTraffic(lastDt); drawFauna(); drawTreasures(); drawPostVan(); drawPilot(); drawMission(); drawBoat(); drawRainbow();
   const P=prims.P; setCommon(P,E,T);
   for(const k of ['sphere','cyl','cone','box','tcyl']){ const arr=IB[k]; if(!arr.length) continue; const pr=prims[k]; const n=arr.length/20;
     gl.bindBuffer(gl.ARRAY_BUFFER,pr.ib); const data=new Float32Array(arr); if(data.byteLength>4*20*4000){ gl.bufferData(gl.ARRAY_BUFFER,data,gl.DYNAMIC_DRAW); } else gl.bufferSubData(gl.ARRAY_BUFFER,0,data);
@@ -1636,7 +1640,7 @@ function postVan(F,rot){ const Y=[.98,.8,.12,.6]; put('box',fr(F,[0,.66,-.2]),[.
   for(const sx of [1,-1]){ const E=fr(F,[sx*.465,.72,-.2]); put('box',E,[.02,.4,.62],[.98,.98,.98]); put('box',fr(E,[sx*.006,.06,-.15],[.55,0,0]),[.022,.05,.36],[.85,.15,.15]); put('box',fr(E,[sx*.006,.06,.15],[-.55,0,0]),[.022,.05,.36],[.85,.15,.15]); }
   for(const sx of [1,-1]) put('sphere',fr(F,[sx*.3,.45,1.02]),[.08,.06,.03],[1,.97,.75,1]);
   wheels(F,[[.46,.21,.55],[-.46,.21,.55],[.46,.21,-.6],[-.46,.21,-.6]],.21,.15,rot); }
-function startPost(){ misStop(); regStop(); stopPilot(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); stopRide();
+function startPost(){ boatStop(); misStop(); regStop(); stopPilot(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); stopRide();
   const [x,z]=ll(14.51,46.05); postal={van:{pos:[x,groundY(x,z),z],yaw:0,rot:0},score:0,tries:0,target:null,driving:null,area:null,recent:[]}; $('bPost').classList.add('on'); nextLetter(); }
 function stopPost(){ if(!postal) return; clearTimeout(postal.timer); postal=null; follow=null; northUp(); $('bPost').classList.remove('on'); $('quest').classList.remove('show'); }
 function nextLetter(){ const pool=ITEMS.filter(i=>i.lm&&i.c==='mesto'&&!postal.recent.includes(i.id)); const t=pool[Math.floor(Math.random()*pool.length)]; postal.target=t; postal.tries=0; postal.area=null;
@@ -2533,7 +2537,7 @@ function showMore(it){ const box=$('cMore'); if(!box) return; box.innerHTML='';
 
 // ---------------- Pilot ----------------
 let pilot=null; const pkeys={l:0,r:0,u:0,d:0};
-function startPilot(){ misStop(); regStop(); stopPost(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); stopRide();
+function startPilot(){ boatStop(); misStop(); regStop(); stopPost(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); stopRide();
   const [x,z]=ll(14.46,46.22); const rnd=Math.random;
   const pool=ITEMS.filter(i=>i.lm&&!i.kraj&&!i.det&&i.c!=='drzava'); const pick=[]; while(pick.length<12&&pool.length){ pick.push(pool.splice(Math.floor(rnd()*pool.length),1)[0]); }
   pilot={pos:[x,groundY(x,z)+7,z],yaw:Math.PI*.6,roll:0,speed:3.2,alt:7,base:0,score:0,stars:pick.map(it=>{ const q=ll(...it.lm.at); return {it,x:q[0],z:q[1],y:groundY(q[0],q[1])+6,got:false}; })};
@@ -3103,7 +3107,7 @@ function pickTerrain(px,py){ const P=hitTerrain(px,py); if(!P) return null; cons
   if(best) return best;
   if(cam.D>60){ let br=null,brd=14; for(const it of ITEMS){ if(!it.range||it.country||!it.home) continue; const d=Math.hypot(it.home[0]-x,it.home[1]-z); if(d<brd){brd=d;br=it;} } if(br) return br; }
   return null; }
-function click(x,y){ if(mis){ audioInit(); misTap(x,y); return; } if(regG){ audioInit(); regTap(x,y); return; } let it=pick(x,y); if(!it) it=pickTerrain(x,y); if(!it) return; audioInit(); if(pilot){ play(it.snd); showCard(it,nextFact(it)); return; }
+function click(x,y){ if(boat){ audioInit(); boatTap(x,y); return; } if(mis){ audioInit(); misTap(x,y); return; } if(regG){ audioInit(); regTap(x,y); return; } let it=pick(x,y); if(!it) it=pickTerrain(x,y); if(!it) return; audioInit(); if(pilot){ play(it.snd); showCard(it,nextFact(it)); return; }
   if(it.fauna||it.treasure){ play(it.snd); const fact=nextFact(it); showCard(it,fact);
     if(it.treasure && !found.has(it.id)){ found.add(it.id); saveFound(); setTimeout(()=>play('cheer'),400); burst(); updateBag(); }
     if(it.k==='mushroom'){ it.flee=performance.now()/1000; play('squeak'); setTimeout(()=>play('squeak'),200); }
@@ -3235,9 +3239,9 @@ $('bPass').onclick=()=>{ const g=$('passGrid'); g.innerHTML=''; const towns=ITEM
   $('passCount').textContent=`${stamps.size} / ${towns.length}`; $('pass').classList.add('show'); audioInit(); play('pop'); };
 $('passX').onclick=()=>$('pass').classList.remove('show');
 $('pass').onclick=e=>{ if(e.target===$('pass')) $('pass').classList.remove('show'); };
-function startGame(animals){ audioInit(); misStop(); regStop(); stopPost(); stopPilot(); stopRide(); const was=game&&!!game.animalsOnly===!!animals; if(game){ clearTimeout(game.timer); game=null; $('quest').classList.remove('show'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); game=null; if(was) return; }
+function startGame(animals){ audioInit(); boatStop(); misStop(); regStop(); stopPost(); stopPilot(); stopRide(); const was=game&&!!game.animalsOnly===!!animals; if(game){ clearTimeout(game.timer); game=null; $('quest').classList.remove('show'); $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); game=null; if(was) return; }
   game={score:0,target:null,tries:0,recent:[],animalsOnly:!!animals}; $(animals?'bAnimals':'bGame').classList.add('on'); closeCard(); stopRide(); setHome(); nextQ(); }
-$('bAnimals').onclick=()=>startGame(true); $('bRegions').onclick=regStart; $('bKekec').onclick=misStart;
+$('bAnimals').onclick=()=>startGame(true); $('bRegions').onclick=regStart; $('bKekec').onclick=misStart; $('bBoat').onclick=boatMenu;
 $('bGame').onclick=()=>startGame(false);
 const _unusedGame=()=>{ audioInit(); stopPost(); if(game){ clearTimeout(game.timer); game=null; $('quest').classList.remove('show'); $('bGame').classList.remove('on'); return; }
   game={score:0,target:null,tries:0,recent:[]}; $('bGame').classList.add('on'); closeCard(); stopRide(); setHome(); nextQ(); };
@@ -3295,7 +3299,7 @@ function regDraw(){ if(!regCv) return; const dpr=Math.min(window.devicePixelRati
     const p=REGC[regShow], q=M4.xf(VP,p[0],p[1],p[2]); if(q[3]>0){ const x=(q[0]*.5+.5)*W, y=(-q[1]*.5+.5)*H; c.font='800 '+Math.round(Math.max(18,Math.min(34,W/34)))+'px Grandstander,Nunito,sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.lineWidth=7; c.strokeStyle='#fff'; c.strokeText(REGINFO[regShow][0],x,y); c.fillStyle='#5a3a1a'; c.fillText(REGINFO[regShow][0],x,y); } } }
 function regModal(t,p,cb){ $('rwT').textContent=t; $('rwP').textContent=p; $('regWin').classList.add('show'); $('rwB').onclick=()=>{ $('regWin').classList.remove('show'); if(regG) cb(); }; }
 function regStop(){ if(!regG) return; regG=null; regShow=null; $('quest').classList.remove('show'); $('bRegions').classList.remove('on'); $('regWin').classList.remove('show'); }
-function regStart(){ audioInit(); if(regG){ regStop(); return; } misStop(); stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); regInit();
+function regStart(){ audioInit(); if(regG){ regStop(); return; } boatStop(); misStop(); stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); regInit();
   let pool=ITEMS.filter(it=>it.home&&!it.labelOnly&&!it.kraj&&(it.c==='mesto'||it.c==='gora'||it.c==='zanim')&&regClear(it)); if(AUD){ const rec=pool.filter(it=>AUD.has(h32('V kateri regiji je '+it.n+'?'))); if(rec.length>=20) pool=rec; }
   regG={round:1,n:0,ok:0,done:new Set(),used:new Set(),pool}; $('bRegions').classList.add('on'); $('qEmo').textContent='🗺️'; regNext(); }
 function regQ(kind,name,txt){ $('qHelp').style.display='none'; $('qKind').textContent=kind; $('qName').textContent=name; $('qStars').textContent=txt; $('quest').classList.add('show'); }
@@ -3331,7 +3335,7 @@ const MIS_T={
 function ovInit(){ if(regCv) return; regCv=document.createElement('canvas'); regCv.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none'; cv.after(regCv); regCx=regCv.getContext('2d'); }
 function misW(l){ const [x,z]=ll(l[0],l[1]); return [x,z]; }
 function misStop(){ if(!mis) return; mis=null; stopSay(); $('quest').classList.remove('show'); $('bKekec').classList.remove('on'); $('misSub').classList.remove('show'); $('regWin').classList.remove('show'); setHome(); }
-function misStart(){ audioInit(); if(mis){ misStop(); return; } regStop(); stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); ovInit();
+function misStart(){ audioInit(); if(mis){ misStop(); return; } boatStop(); regStop(); stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard(); ovInit();
   const B=misW(MIS_LL.hutB), P=misW(MIS_LL.hutP);
   mis={step:0,t:0,dark:0,peek:0,callT:0,nextCall:3,hoot:2,help:false,area:null,target:null,busy:true,B,P,O:misW(MIS_LL.owl),ST:MIS_LL.st.map(misW).concat([[P[0]+1.1,P[1]+.9]]),sti:0,bottle:false,
     kekec:{p:[B[0]+1.0,B[1]+.5],yaw:.6,vis:true,sit:true,ph:0}, bedanec:{p:[B[0]+1.9,B[1]+1.0],yaw:-2,vis:true,ph:0}, pehta:{p:[P[0]+.2,P[1]+1.2],yaw:.5,vis:true,ph:0}, mojca:{p:[P[0]-.8,P[1]+1.1],yaw:-.3,vis:true,ph:0}, owl:{p:null,fly:null}};
@@ -3392,6 +3396,54 @@ function misOverlay(c){ const g=mis; if(!g||g.dark<=0.01) return; const m=g.mojc
   const ks=misScr([k.p[0],groundY(k.p[0],k.p[1])+.6,k.p[1]]); let ang; if(ks) ang=Math.atan2(ks[1]-ms[1],ks[0]-ms[0]); else return;
   const loud=g.callT>0?1:.35; c.lineCap='round'; for(let i=0;i<3;i++){ const ph=(T*1.4+i/3)%1; const rr=r*(.62+.3*ph); c.beginPath(); c.arc(ms[0],ms[1],rr,ang-.3,ang+.3); c.strokeStyle='rgba(255,213,74,'+(loud*(1-ph)).toFixed(2)+')'; c.lineWidth=6; c.stroke(); }
   if(g.callT>0){ c.font='800 26px Nunito,sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillStyle='rgba(255,213,74,.95)'; c.fillText('♪',ms[0]+Math.cos(ang)*r*.5,ms[1]+Math.sin(ang)*r*.5); } }
+
+// ---------------- LADJICA: od izvira do meje ----------------
+var boat=null;
+const BOAT_P={"sava":[[13.805,46.4845],[13.8216,46.4816],[13.8401,46.4785],[13.8604,46.4746],[13.8826,46.4703],[13.9063,46.4655],[13.9318,46.4601],[13.9574,46.4547],[13.9831,46.4493],[14.0066,46.4434],[14.0262,46.437],[14.0441,46.4307],[14.0613,46.423],[14.0786,46.4141],[14.0952,46.4052],[14.1109,46.3961],[14.1282,46.3865],[14.1441,46.3763],[14.159,46.3658],[14.1728,46.3554],[14.187,46.345],[14.2021,46.3336],[14.2179,46.3213],[14.2356,46.3081],[14.2541,46.2944],[14.2737,46.2802],[14.2936,46.2658],[14.3127,46.2522],[14.3289,46.2402],[14.344,46.2275],[14.3593,46.2146],[14.3725,46.2021],[14.3863,46.1904],[14.4014,46.1796],[14.4169,46.1685],[14.4311,46.1572],[14.4428,46.147],[14.4553,46.1374],[14.4678,46.1288],[14.4809,46.1213],[14.4949,46.1146],[14.5089,46.1086],[14.5227,46.1032],[14.5381,46.0983],[14.5551,46.0951],[14.5726,46.0929],[14.5913,46.0912],[14.6109,46.0905],[14.6303,46.0896],[14.6515,46.0876],[14.6737,46.0867],[14.6974,46.087],[14.7235,46.0884],[14.7509,46.0911],[14.7785,46.0944],[14.8082,46.0981],[14.839,46.1013],[14.8723,46.1037],[14.907,46.1044],[14.9417,46.1032],[14.9766,46.1007],[15.0098,46.0974],[15.0413,46.0935],[15.0721,46.0893],[15.1019,46.0872],[15.1314,46.0848],[15.1635,46.0803],[15.1967,46.0746],[15.2278,46.0668],[15.2584,46.0576],[15.2858,46.0479],[15.3114,46.0376],[15.3354,46.0277],[15.3576,46.0187],[15.3813,46.0098],[15.4039,46.0019],[15.4264,45.9948],[15.4499,45.9876],[15.4727,45.9809],[15.4941,45.9739],[15.5156,45.9658],[15.5372,45.9554],[15.5588,45.9443],[15.5799,45.9329],[15.6023,45.9227],[15.6254,45.9124],[15.65,45.9013],[15.6743,45.8901],[15.6989,45.8791],[15.728,45.8689]],"soca":[[13.7457,46.3925],[13.7427,46.3869],[13.739,46.3824],[13.734,46.3773],[13.7276,46.3716],[13.7239,46.3689],[13.7196,46.3661],[13.7151,46.3632],[13.7099,46.3607],[13.7049,46.3584],[13.7,46.3563],[13.695,46.354],[13.6901,46.3519],[13.6851,46.3501],[13.6799,46.3481],[13.675,46.3465],[13.67,46.3451],[13.665,46.3435],[13.6601,46.3421],[13.65,46.34],[13.64,46.3388],[13.6299,46.3379],[13.62,46.3372],[13.6101,46.3375],[13.5999,46.3375],[13.59,46.3376],[13.5801,46.3376],[13.57,46.3376],[13.56,46.3376],[13.5499,46.3369],[13.54,46.3351],[13.535,46.3334],[13.5301,46.3318],[13.5249,46.33],[13.5199,46.3279],[13.5154,46.3255],[13.5081,46.3205],[13.5033,46.3148],[13.5014,46.3082],[13.502,46.3021],[13.5053,46.2968],[13.5113,46.2922],[13.5199,46.2882],[13.5249,46.2864],[13.5301,46.2847],[13.535,46.2831],[13.54,46.2814],[13.545,46.2798],[13.5499,46.2781],[13.559,46.2742],[13.5667,46.2697],[13.5741,46.2643],[13.5777,46.2616],[13.5814,46.2585],[13.5851,46.2553],[13.5887,46.252],[13.5924,46.2484],[13.5961,46.245],[13.5997,46.2415],[13.6034,46.2382],[13.6071,46.2349],[13.6109,46.2319],[13.6152,46.2291],[13.62,46.2266],[13.6249,46.2243],[13.6299,46.2219],[13.6351,46.2198],[13.64,46.2177],[13.645,46.2156],[13.65,46.2135],[13.6549,46.2114],[13.6601,46.2093],[13.665,46.2072],[13.6696,46.2051],[13.6741,46.2027],[13.6784,46.2005],[13.6823,46.1979],[13.6864,46.1951],[13.6901,46.1921],[13.6933,46.1888],[13.6963,46.1855],[13.6993,46.182],[13.7019,46.1784],[13.7043,46.175],[13.7062,46.1715],[13.7092,46.1645],[13.711,46.1575],[13.7121,46.1506],[13.7114,46.1435],[13.709,46.1365],[13.7049,46.1297],[13.6993,46.1239],[13.6924,46.1188],[13.6883,46.1162],[13.684,46.1137],[13.6797,46.111],[13.675,46.1084],[13.67,46.1059],[13.665,46.1034],[13.6603,46.1008],[13.6556,46.0983],[13.6513,46.0957],[13.6469,46.0932],[13.6426,46.0903],[13.6383,46.0873],[13.634,46.084],[13.6297,46.0806],[13.6254,46.077],[13.6211,46.0735],[13.6168,46.0699],[13.6127,46.0665],[13.609,46.063],[13.6058,46.0594],[13.6027,46.056],[13.5999,46.0525],[13.598,46.0489],[13.5954,46.0421],[13.595,46.035],[13.595,46.028],[13.595,46.0211],[13.5967,46.014],[13.5993,46.007],[13.6027,45.9999],[13.606,45.993],[13.6086,45.986],[13.6107,45.979],[13.6127,45.9721]],"drava":[[14.963,46.6344],[14.9854,46.6314],[15.0092,46.6288],[15.0329,46.6252],[15.0575,46.621],[15.0814,46.617],[15.1051,46.6129],[15.1321,46.6093],[15.1594,46.6065],[15.1868,46.6051],[15.2151,46.6037],[15.2429,46.6026],[15.2679,46.6008],[15.2923,46.5968],[15.316,46.5924],[15.3395,46.5884],[15.3654,46.5857],[15.3908,46.5827],[15.4175,46.58],[15.4475,46.577],[15.4777,46.574],[15.507,46.5701],[15.532,46.5648],[15.5557,46.559],[15.579,46.5527],[15.6042,46.5458],[15.6306,46.5373],[15.6577,46.5277],[15.6888,46.5172],[15.7207,46.5062],[15.7528,46.495],[15.7873,46.4837],[15.8207,46.4721],[15.8528,46.4599],[15.8811,46.4485],[15.9087,46.4377],[15.9363,46.4287],[15.9647,46.4209],[15.9958,46.4133],[16.0296,46.4063],[16.0609,46.4001],[16.0909,46.3952],[16.1196,46.3911],[16.1448,46.3892],[16.1698,46.3883],[16.1937,46.3875],[16.2125,46.385],[16.2304,46.382],[16.2474,46.3791],[16.2638,46.3763]]};
+const BOAT_R={
+ sava:{n:'Sava',e:'🌊',start:'Spusti ladjico v Savo Dolinko pri Kranjski Gori. Poglejmo, kam jo odnese voda!',
+  ev:[[14.06,46.43,'Ladjica pluje mimo Jesenic.'],[14.16,46.345,'Pri Radovljici se pridruži Sava Bohinjka. Zdaj je to velika reka Sava.'],[14.36,46.24,'To je Kranj. Tu se v Savo zlije reka Kokra.'],[14.41,46.14,'Pri Medvodah priteče reka Sora.'],[14.53,46.09,'Ladjica pluje mimo Ljubljane, našega glavnega mesta.'],[14.64,46.08,'Tu se Savi pridruži Ljubljanica.'],[14.83,46.06,'Reka teče med hribi mimo Litije.'],[15.05,46.11,'To je Zasavje. Tu so rudarji kopali premog.'],[15.17,46.085,'Pri Zidanem Mostu se v Savo zlije Savinja.'],[15.30,46.01,'Ladjica pluje mimo Sevnice.'],[15.49,45.96,'To je Krško. Tu je velika elektrarna.'],[15.60,45.90,'Pri Brežicah se Savi pridruži reka Krka.']],
+  end:'Sava zapusti Slovenijo. Teče naprej čez Hrvaško do Beograda. Tam se zlije v Donavo, Donava pa v Črno morje. Ladjica je odplula na dolgo pot!'},
+ soca:{n:'Soča',e:'💎',start:'Spusti ladjico v Sočo blizu izvira v dolini Trenta. Soča je smaragdno zelena!',
+  ev:[[13.55,46.335,'Ladjica pluje mimo Bovca. Tu se ljudje vozijo s čolni po brzicah.'],[13.58,46.25,'To je Kobarid.'],[13.73,46.18,'Ladjica pluje mimo Tolmina.'],[13.76,46.15,'Pri Mostu na Soči se pridruži reka Idrijca.'],[13.64,46.085,'To je Kanal. Tu pogumni skakalci skačejo z mostu v Sočo.'],[13.65,45.985,'Poglej, solkanski most! Ima največji kamniti lok na svetu.']],
+  end:'Soča zapusti Slovenijo in teče v Italijo. Tam se izlije v Jadransko morje.'},
+ drava:{n:'Drava',e:'🛶',start:'Drava priteče k nam iz Avstrije. Spusti ladjico pri Dravogradu!',
+  ev:[[15.03,46.59,'Pri Dravogradu se Dravi pridružita reki Meža in Mislinja.'],[15.30,46.59,'Reka teče med Pohorjem in Kozjakom. Včasih so tu pluli splavarji.'],[15.65,46.555,'Ladjica pluje mimo Maribora. Na bregu raste najstarejša trta na svetu.'],[15.87,46.42,'To je Ptuj, naše najstarejše mesto.'],[15.93,46.39,'Ladjica pluje čez Ptujsko jezero.'],[16.15,46.40,'Ladjica pluje mimo Ormoža.']],
+  end:'Drava zapusti Slovenijo. Teče čez Hrvaško v Donavo, Donava pa v Črno morje.'}};
+const BOAT_SNAG=['Ojoj, ladjica se je zataknila ob vejo! Tapni ladjico, da jo rešiš.','Ladjica se je ujela med kamne! Tapni ladjico.'];
+function boatPath(k){ const raw=BOAT_P[k].map(p=>ll(p[0],p[1])); const pts=[]; for(let i=0;i<raw.length-1;i++){ const a=raw[i], b=raw[i+1], d=Math.hypot(b[0]-a[0],b[1]-a[1]), n=Math.max(1,Math.round(d/.22)); for(let j=0;j<n;j++) pts.push([a[0]+(b[0]-a[0])*j/n,a[1]+(b[1]-a[1])*j/n]); } pts.push(raw[raw.length-1]);
+  const sn=pts.map(p=>{ if(ovAt(p[0],p[1])[1]>.6) return p; let best=null,bd=1e9; for(let dx=-2.6;dx<=2.6;dx+=.2) for(let dz=-2.6;dz<=2.6;dz+=.2){ const d=dx*dx+dz*dz; if(d<bd&&ovAt(p[0]+dx,p[1]+dz)[1]>.6){ bd=d; best=[p[0]+dx,p[1]+dz]; } } return best||p; });
+  const avg=(A,r)=>A.map((p,i)=>{ let x=0,z=0,n=0; for(let j=Math.max(0,i-r);j<=Math.min(A.length-1,i+r);j++){ x+=A[j][0]; z+=A[j][1]; n++; } return [x/n,z/n]; });
+  const snap2=p=>{ if(ovAt(p[0],p[1])[1]>.6) return p; let best=null,bd=1e9; for(let dx=-.6;dx<=.6;dx+=.1) for(let dz=-.6;dz<=.6;dz+=.1){ const d=dx*dx+dz*dz; if(d<bd&&ovAt(p[0]+dx,p[1]+dz)[1]>.6){ bd=d; best=[p[0]+dx,p[1]+dz]; } } return best||p; };
+  const sm=avg(avg(avg(sn,3).map(snap2),1).map(snap2),1);
+  const cum=[0]; for(let i=1;i<sm.length;i++) cum.push(cum[i-1]+Math.hypot(sm[i][0]-sm[i-1][0],sm[i][1]-sm[i-1][1])); return {p:sm,cum,L:cum[cum.length-1]}; }
+function boatAt(P,s){ s=clamp(s,0,P.L); let i=boat&&boat.pi||0; if(i>=P.cum.length-1||P.cum[i]>s) i=0; while(i<P.cum.length-2&&P.cum[i+1]<s) i++; if(boat) boat.pi=i; const a=P.p[i], b=P.p[i+1], t=(s-P.cum[i])/Math.max(1e-6,P.cum[i+1]-P.cum[i]); return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,Math.atan2(b[0]-a[0],b[1]-a[1])]; }
+function boatStop(){ if(!boat) return; boat=null; follow=null; stopSay(); $('quest').classList.remove('show'); $('bBoat').classList.remove('on'); $('misSub').classList.remove('show'); $('boatWin').classList.remove('show'); $('regWin').classList.remove('show'); setHome(); }
+function boatMenu(){ audioInit(); if(boat){ boatStop(); return; } $('boatWin').classList.add('show'); play('pop'); }
+function boatSay(txt,cb){ const b=boat; if(!b) return; const tok={}; b.tok=tok; const sub=$('misSub'); sub.textContent=txt; sub.classList.add('show'); b.talk=true;
+  const done=()=>{ if(tok.d) return; tok.d=true; if(boat!==b||b.tok!==tok) return; sub.classList.remove('show'); b.talk=false; if(cb) cb(); };
+  const S=splitS(txt); setTimeout(done,2500+txt.length*120);
+  if(sfxOn&&AUD&&S.length&&S.every(x=>AUD.has(h32(x)))){ stopSay(); const q={}; sayQ=q; let i=0; const next=()=>{ if(sayQ!==q) return; if(i>=S.length){ setTimeout(done,300); return; } const a=new Audio('../audio/'+h32(S[i++])+'.mp3'); q.a=a; a.onended=()=>setTimeout(next,90); a.onerror=()=>next(); const p=a.play(); if(p&&p.catch) p.catch(()=>{}); }; next(); }
+  else { say(txt); setTimeout(done,900+txt.length*(sfxOn?75:50)); } }
+function boatStart(k){ $('boatWin').classList.remove('show'); misStop(); regStop(); stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard();
+  const R=BOAT_R[k], P=boatPath(k); boat={k,R,P,s:0,v:0,spd:P.L/125,pos:[0,0,0],yaw:0,evi:0,snags:[.3,.66].map(f=>f*P.L),sni:0,stuck:false,wait:true,boost:0,pi:0,done:false};
+  boat.ev=R.ev.map(e=>{ const q=ll(e[0],e[1]); let bi=0,bd=1e9; for(let i=0;i<P.p.length;i++){ const d=Math.hypot(P.p[i][0]-q[0],P.p[i][1]-q[1]); if(d<bd){ bd=d; bi=i; } } return {s:P.cum[bi],t:e[2]}; }).sort((a,b)=>a.s-b.s);
+  const a=boatAt(P,0); boat.pos=[a[0],groundY(a[0],a[1])+.12,a[1]]; boat.yaw=a[2]; follow={pos:boat.pos}; cam.dist=11; cam.pitch=.5; cam.yaw=boat.yaw+Math.PI;
+  $('bBoat').classList.add('on'); $('qEmo').textContent=R.e; $('qKind').textContent='Ladjica na reki'; $('qName').textContent=R.n; $('qStars').textContent=''; $('qHelp').style.display='none'; $('quest').classList.add('show');
+  boatSay(R.start,()=>{ if(boat) boat.wait=false; }); }
+function boatTap(x,y){ const b=boat; if(!b||b.done) return; const q=misScr([b.pos[0],b.pos[1]+.3,b.pos[2]]); if(!q||Math.hypot(q[0]-x,q[1]-y)>90) return;
+  if(b.stuck){ b.stuck=false; play('cheer'); burst(); toast('⛵ Ladjica spet pluje!'); $('qName').textContent=b.R.n; } else { b.boost=2.5; play('pop'); } }
+function boatTick(dt){ const b=boat; if(!b) return; const P=b.P;
+  if(!b.wait&&!b.stuck&&!b.done){ const tv=b.spd*(b.boost>0?2.2:1)*(b.talk?.55:1); b.v=lerp(b.v,tv,1-Math.pow(.05,dt)); b.s+=b.v*dt; if(b.boost>0) b.boost-=dt;
+    if(b.sni<b.snags.length&&b.s>=b.snags[b.sni]&&!b.talk){ b.stuck=true; b.v=0; const t=BOAT_SNAG[b.sni%BOAT_SNAG.length]; b.sni++; play('boing'); $('qName').textContent='Tapni ladjico!'; boatSay(t); }
+    else if(b.evi<b.ev.length&&b.s>=b.ev[b.evi].s){ if(!b.talk){ boatSay(b.ev[b.evi].t); b.evi++; } }
+    if(b.s>=P.L){ b.done=true; play('cheer'); confetti(); boatSay(b.R.end,()=>{ regModal('Ladjica je priplula do meje!','Reka '+b.R.n+' teče naprej v svet. 🎉',()=>{}); $('rwB').onclick=()=>{ $('regWin').classList.remove('show'); boatStop(); $('boatWin').classList.add('show'); }; }); } }
+  const a=boatAt(P,b.s); b.pos[0]=a[0]; b.pos[2]=a[1]; b.pos[1]=groundY(a[0],a[1])+.12; let dy=((a[2]-b.yaw+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI; b.yaw+=dy*(1-Math.pow(.02,dt));
+  const want=b.yaw+Math.PI; let dc=((want-cam.yaw+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI; cam.yaw+=dc*(1-Math.pow(.45,dt)); cam.pitch=.5; }
+function drawBoat(){ const b=boat; if(!b) return; const S=clamp(.5+cam.D*.05,.8,2.2); const bob=Math.sin(T*3)*.03, roll=Math.sin(T*2.1)*.08+(b.stuck?Math.sin(T*14)*.12:0);
+  const F=M4.mul(M4.mul(M4.mul(mT(b.pos[0],b.pos[1]+bob,b.pos[2]),mRy(b.yaw)),mRz(roll)),mS(S,S,S)); const W1=[.99,.98,.94,.15], W2=[.9,.9,.86];
+  put('sphere',fr(F,[0,.08,0]),[.26,.13,.62],W1); put('box',fr(F,[0,.14,0]),[.36,.05,.8],W2); put('cone',fr(F,[0,.14,0]),[.2,.62,.2],W1); put('box',fr(F,[0,.2,.5],[.5,0,0]),[.2,.04,.34],W1); put('box',fr(F,[0,.2,-.5],[-.5,0,0]),[.2,.04,.34],W1);
+  if(b.stuck){ put('cyl',fr(F,[.3,.1,.5],[0,0,1.3]),[.05,.9,.05],[.42,.28,.16]); put('sphere',fr(F,[-.35,.05,.45]),[.2,.14,.2],[.55,.55,.56]); } }
 function confetti(){ const c=$('confetti'), e=['🎉','⭐','🎈','🐻','🏔️','🐝','💚','🍇']; for(let i=0;i<70;i++){ const s=document.createElement('span'); s.textContent=e[i%e.length]; s.style.left=Math.random()*100+'vw'; s.style.animationDuration=(2.2+Math.random()*2.5)+'s'; s.style.animationDelay=Math.random()+'s'; c.appendChild(s); setTimeout(()=>s.remove(),5500);} }
 function burst(){ const c=$('confetti'); for(let i=0;i<22;i++){ const s=document.createElement('span'); s.textContent=['⭐','✨','🌟'][i%3]; s.style.left=(35+Math.random()*30)+'vw'; s.style.animationDuration=(1.6+Math.random()*1.4)+'s'; c.appendChild(s); setTimeout(()=>s.remove(),3500);} }
 let helpHidden=false; function hideHelpSoon(){ if(helpHidden) return; helpHidden=true; setTimeout(()=>$('help').style.opacity=0,4000); }
@@ -3519,7 +3571,7 @@ function frame(now){ try{ frameInner(now); }catch(e){ console.error(e); requestA
 function frameInner(now){
   const dt=Math.min(.05,(now-last)/1000); last=now; T+=dt; lastDt=dt;
   dayT=lerp(dayT,day,1-Math.pow(.3,dt)); for(let i=0;i<4;i++) seasonT[i]=lerp(seasonT[i],season===i?1:0,1-Math.pow(.25,dt)); rainbow=Math.max(0,rainbow-dt/30); for(let i=0;i<3;i++) weatherT[i]=lerp(weatherT[i],weather===i?1:0,1-Math.pow(.25,dt));
-  if(mis) misTick(dt); updateCam(dt); const E=envState(); lastEnv=E; regDraw();
+  if(mis) misTick(dt); if(boat) boatTick(dt); updateCam(dt); const E=envState(); lastEnv=E; regDraw();
   updFauna(dt); updSeasonal(dt); updPost(dt); updPilot(dt); checkStamps(dt);
   for(const it of ITEMS){ updateItem(it,T,dt); } if(window.__sc){ const s=window.__sc; s.pos=[Math.sin(T*.25)*3,40+(s.__y||0),Math.cos(T*.25)*3]; } kinematics(dt);
   if(WC){ try{ wcEnsure(); }catch(e){ setWC(false); } if(WC&&wc.fb) gl.bindFramebuffer(gl.FRAMEBUFFER,wc.ms||wc.fb); }

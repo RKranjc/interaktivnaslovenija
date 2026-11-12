@@ -1,5 +1,5 @@
 name: Glas Maya1 (vsi stavki)
-# zagon 2026-11-12: misija Kekec
+# zagon 2026-11-13: ladjica na reki
 on:
   workflow_dispatch: {}
   push: { branches: [main], paths: ['.github/workflows/maya-vse.yml'] }
