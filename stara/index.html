@@ -2843,7 +2843,7 @@ function fpCam(dt){ const it=follow; const S=it.S||1; const o=FPV[it.id]||[.5,.8
 function updateCam(dt){
   if(follow&&rideFP&&!pilot&&follow.model){ fpCam(dt); return; }
   if(follow){ cam.tx=follow.pos[0]; cam.tz=follow.pos[2]; cam.ty=follow.pos[1]; }
-  const iso=true; isoK=lerp(isoK,iso?ISOK:1,1-Math.pow(.02,dt)); if(Math.abs(isoK-(iso?ISOK:1))<.01) isoK=iso?ISOK:1;
+  const iso=ISO25&&!follow&&!pilot; isoK=lerp(isoK,iso?ISOK:1,1-Math.pow(.02,dt)); if(Math.abs(isoK-(iso?ISOK:1))<.01) isoK=iso?ISOK:1;
   if(iso){ cam.yaw=HOME.yaw; cam.pitch=innerWidth<innerHeight?1.02:.86; }
   if(!dragging){ const k=1-Math.pow(.003,dt); const kf=follow?1-Math.pow(.02,dt):k;
     cam.Y=lerp(cam.Y,cam.yaw,k); cam.P=lerp(cam.P,cam.pitch,k); cam.D=lerp(cam.D,cam.dist,k); cam.X=lerp(cam.X,cam.tx,kf); cam.Z=lerp(cam.Z,cam.tz,kf); cam.TY=lerp(cam.TY,cam.ty,k);
@@ -3107,7 +3107,7 @@ function startFlightSound(it){ stopFlightSound(); if(!AC||!(it.id==='letalo'||it
 function stopFlightSound(){ if(!flightSnd) return; const s=flightSnd; flightSnd=null; s.g.gain.setTargetAtTime(0,AC.currentTime,.4); setTimeout(()=>{ s.nodes.forEach(n=>{ try{n.stop();}catch(e){} }); s.g.disconnect(); },2000); }
 const HORNV=['vlak','vlak2','avto','ladja','traktor'];
 function hornSync(cardIt){ $('hornBtn').classList.toggle('show',!!follow&&!pilot&&HORNV.includes(follow.id)&&(!cardIt||cardIt===follow)); }
-function startRide(it){ fpFrom={e:eyeF?eyeF.slice():[0,100,100],t:[cam.X,cam.TY,cam.Z]}; fpTrans=0; fpStart=performance.now(); follow=it; rideFP=false; lookYaw=0; lookPitch=it.id==='letalo'?-.38:it.id==='balon'?-.6:-.1; fpYaw=null; startFlightSound(it); cam.dist=it.id==='letalo'?55:it.id==='balon'?35:it.id==='ladja'||it.id==='jadrnica'?26:20; $('rideBtn').classList.add('show'); setBtnTxt(); $('hornBtn').classList.toggle('show',HORNV.includes(it.id)); $('hornBtn').textContent=it.model==='train'?'📯 Ču-čuuu!':'📯 Hupa'; if(it.model==='train'){ audioInit(); play('whistle'); setTimeout(()=>{ if(follow===it) startTrainMusic(); },1600); } }
+function startRide(it){ fpFrom={e:eyeF?eyeF.slice():[0,100,100],t:[cam.X,cam.TY,cam.Z]}; fpTrans=0; fpStart=performance.now(); follow=it; rideFP=!!FPV[it.id]; lookYaw=0; lookPitch=it.id==='letalo'?-.38:it.id==='balon'?-.6:-.1; fpYaw=null; startFlightSound(it); cam.dist=it.id==='letalo'?60:it.id==='balon'?40:28; cam.pitch=.42; $('rideBtn').classList.add('show'); $('viewBtn').classList.add('show'); setBtnTxt(); $('hornBtn').classList.toggle('show',HORNV.includes(it.id)); $('hornBtn').textContent=it.model==='train'?'📯 Ču-čuuu!':'📯 Hupa'; if(it.model==='train'){ audioInit(); play('whistle'); setTimeout(()=>{ if(follow===it) startTrainMusic(); },1600); } }
 function toggleView(){ fpFrom={e:eye.slice(),t:[cam.X,cam.TY,cam.Z]}; fpTrans=rideFP?1:0; fpStart=performance.now(); rideFP=!rideFP; if(!rideFP){ cam.yaw=(fpYaw||0)+Math.PI; cam.pitch=.42; cam.dist=follow&&follow.id==='letalo'?60:28; snapCam(); } setBtnTxt(); }
 function setBtnTxt(){ $('viewBtn').textContent=rideFP?'🎥 Pogled od zunaj':'👀 Pogled iz vozila'; }
 function stopRide(){ if(pilot||!follow) return; stopTrainMusic(); stopFlightSound(); const wasFP=rideFP; follow=null; rideFP=false; $('rideBtn').classList.remove('show'); $('viewBtn').classList.remove('show'); $('hornBtn').classList.remove('show'); northUp(); if(wasFP){ cam.dist=40; cam.pitch=.7; snapCam(); } }
@@ -3145,7 +3145,7 @@ function setIc(id,key){ const el=$(id).querySelector('.ic'); el.innerHTML=ICONS[
 const WICONS=['Sonce','Dež','Sneg'];
 const EMO2IC={'🌙':'moon','☀️':'sun','🌧️':'rain','❄️':'snow','🌻':'summer','🍂':'autumn','⛄':'winter','🌸':'spring','🔊':'sound','🔇':'mute'};
 function setBtn(id,ic,tx){ const b=$(id); if(EMO2IC[ic]) setIc(id,EMO2IC[ic]); else b.querySelector('.ic').textContent=ic; b.querySelector('.tx').textContent=tx; }
-function initIcons(){ for(const [id,k] of [['bHome','home'],['bDay','moon'],['bWeather','sun'],['bSeason','summer'],['bLabels','labels'],['bSound','sound'],['bMusic','nature'],['bBook','book'],['bPass','pass'],['bGame','find'],['bAnimals','paw'],['bPost','post']]) setIc(id,k); }
+function initIcons(){ for(const [id,k] of [['bHome','home'],['bDay','moon'],['bWeather','sun'],['bSeason','summer'],['bLabels','labels'],['bSound','sound'],['bMusic','nature'],['bBook','book'],['bPass','pass'],['bGame','find'],['bAnimals','paw'],['bPost','post'],['bPilot','plane']]) setIc(id,k); }
 function weatherOpts(){ return season===2?[0,2]:[0,1]; }
 function applyWeather(){ setBtn('bWeather',['☀️','🌧️','❄️'][weather],WICONS[weather]); }
 $('bSeason').onclick=()=>{ audioInit(); season=(season+1)%4; setBtn('bSeason',['🌻','🍂','⛄','🌸'][season],['Poletje','Jesen','Zima','Pomlad'][season]); if(!weatherOpts().includes(weather)){ weather=weather===1&&season===2?2:weather===2?1:0; if(!weatherOpts().includes(weather)) weather=0; } applyWeather(); play('pop'); };
