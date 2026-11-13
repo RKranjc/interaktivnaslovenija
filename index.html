@@ -65,6 +65,24 @@ canvas.drag{cursor:grabbing}
 .wbox button{font:900 20px Nunito;color:var(--brown);background:#bfe8a0;border:4px solid var(--brown);border-radius:18px;padding:8px 22px;cursor:pointer}
 .zoom{position:fixed;right:10px;bottom:calc(14px + var(--cardH));display:flex;flex-direction:column;gap:6px;z-index:3}
 .zoom button{width:46px;height:46px;font:900 26px Nunito;color:var(--brown);background:var(--cream);border:3px solid var(--brown);border-radius:14px;box-shadow:0 3px 0 rgba(0,0,0,.22);cursor:pointer}
+
+#chooser{position:fixed;inset:0;z-index:60;display:none;overflow:auto;background:linear-gradient(#8fd0f7,#dff3ff 60%,#c8ecb8);padding:calc(14px + env(safe-area-inset-top)) 14px 20px;box-sizing:border-box;touch-action:pan-y}
+#chooser.show{display:block}
+#chooser h1{font:800 34px/1.05 Grandstander,Nunito,sans-serif;color:#fff;text-shadow:0 3px 0 rgba(90,58,26,.55);text-align:center;margin:4px 0 2px}
+#chooser .sub{text-align:center;font-weight:900;font-size:17px;color:#5a3a1a;margin-bottom:12px}
+#chooser .row{display:flex;gap:16px;justify-content:center;align-items:stretch;flex-wrap:wrap;max-width:980px;margin:0 auto}
+#chooser .opt{flex:1 1 320px;max-width:460px;background:#fff7e6;border:4px solid #5a3a1a;border-radius:26px;overflow:hidden;box-shadow:0 8px 0 rgba(0,0,0,.2);display:flex;flex-direction:column;cursor:pointer;text-align:left;padding:0;font:inherit;color:#5a3a1a}
+#chooser .opt:active{transform:translateY(4px);box-shadow:0 4px 0 rgba(0,0,0,.2)}
+#chooser .opt img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border-bottom:4px solid #5a3a1a;background:#cfe8c4}
+#chooser .opt .in{padding:10px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+#chooser .opt h2{margin:0;font:800 25px Grandstander,Nunito,sans-serif}
+#chooser .opt p{margin:0;font-weight:800;font-size:15px;line-height:1.3}
+#chooser .opt ul{margin:2px 0 0;padding:0;list-style:none;font-weight:800;font-size:14.5px;line-height:1.45}
+#chooser .opt .warn{display:none;background:#ffe2a8;border-radius:10px;padding:5px 9px;font-weight:900;font-size:13.5px}
+#chooser .opt .go{margin-top:auto;align-self:center;background:#2f9be0;color:#fff;border-radius:18px;padding:8px 30px;font:900 21px Nunito,sans-serif;box-shadow:0 5px 0 #1b639a}
+#chooser .opt.o3 .go{background:#f08a2c;box-shadow:0 5px 0 #a85a14}
+#chooser .lj{display:block;margin:16px auto 0;border:3px solid #5a3a1a;background:#fff7e6;border-radius:18px;padding:7px 18px;font:900 16px Nunito,sans-serif;color:#5a3a1a;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+@media (max-width:700px){#chooser h1{font-size:26px}#chooser .opt img{aspect-ratio:2/1}#chooser .opt h2{font-size:21px}}
 </style><script>
 // samodejna osvežitev, če je brskalnik naložil staro shranjeno različico strani
 (function(){ try{ fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(function(r){ var lm=r.headers.get('last-modified'); if(!lm) return; var srv=Date.parse(lm), cur=Date.parse(document.lastModified); if(!(srv>cur+5000)) return; var k='fresh:'+location.pathname; if(sessionStorage.getItem(k)===lm) return; sessionStorage.setItem(k,lm); location.replace(location.pathname+'?v='+srv); }).catch(function(){}); }catch(e){} })();
@@ -80,11 +98,28 @@ canvas.drag{cursor:grabbing}
  <button class="tb" id="bRegions"><span class="ic">🗺️</span><span class="tx">Regije</span></button>
  <button class="tb" id="bPlane"><span class="ic">✈️</span><span class="tx">Letalo</span></button>
  <button class="tb" id="bAnimals"><span class="ic">🐾</span><span class="tx">Živali</span></button>
- <button class="tb" id="b3D" onclick="location.href='stara/'"><span class="ic">🧊</span><span class="tx">3D zemljevid</span></button>
+ <button class="tb" id="bLjub" onclick="location.href='ljubljanica/'"><span class="ic">💧</span><span class="tx">Ljubljanica</span></button>
+ <button class="tb" id="b3D" onclick="document.getElementById('chooser').classList.add('show')"><span class="ic">🔀</span><span class="tx">Izbira zemljevida</span></button>
 </div>
 <div class="quest" id="quest"><span id="qPic"></span><div><div class="qk" id="qKind">Poišči</div><div class="qn" id="qName"></div></div><button id="qHelp" class="off" title="Pomoč: pokaži krog">💡</button><button id="qX">✕</button></div>
 <div class="zoom"><button id="zIn">+</button><button id="zOut">−</button></div>
 <div class="card" id="card"><button class="x" id="cardX">✕</button><div class="pic" id="cPic"></div><div style="flex:1;min-width:0"><h2 id="cName"></h2><p id="cText"></p><div class="btns" id="cBtns"></div><div class="more" id="cMore"></div></div></div>
+
+<div id="chooser" class="show">
+ <h1>Moja Slovenija</h1><div class="sub">Izberi zemljevid</div>
+ <div class="row">
+  <button class="opt o2" id="ch2d"><img src="menu/2d.jpg" alt=""><div class="in"><h2>🎨 Slikanica</h2>
+   <p>Ročno naslikan zemljevid. Bolj realističen: hiše, gradovi in znamenitosti so narisani tako, kot so videti v resnici.</p>
+   <ul><li>🏰 vsaka znamenitost je svoja slika</li><li>🔍 igre: Poišči, Živali, Regije, Letalo</li><li>📱 dela hitro na vseh napravah</li></ul>
+   <span class="go">▶ Igraj</span></div></button>
+  <button class="opt o3" id="ch3d"><img src="menu/3d.jpg" alt=""><div class="in"><h2>🧊 3D svet</h2>
+   <p>Pravi 3D svet z gorami in dolinami. Bolj igriv in poenostavljen, zato pa se lahko spustiš čisto blizu in se voziš naokrog.</p>
+   <ul><li>🏔️ gore, doline in reke v 3D</li><li>🎮 več iger: Misija Kekec, Ladjica, Poštar, vožnja z vlakom</li><li>💻 potrebuje zmogljivejšo napravo</li></ul>
+   <div class="warn" id="chWarn">⚠️ Na tej napravi bo 3D svet morda počasen.</div>
+   <span class="go">▶ Igraj</span></div></button>
+ </div>
+ <button class="lj" onclick="location.href='ljubljanica/'">💧 Zgodba: Ljubljanica, reka sedmih imen</button>
+</div>
 <div class="toast" id="toast"></div>
 <div class="win" id="win"><div class="wbox"><div class="wst">🏆</div><h2 id="wT">Čestitam!</h2><p id="wP"></p><button id="wB">Naprej ➜</button></div></div>
 <div class="pad" id="pad"><button data-k="L">◀</button><button data-k="U">⏫</button><button data-k="D">⏬</button><button data-k="R">▶</button></div>
@@ -707,6 +742,10 @@ function answer(it,o){ if(!game) return false; if(game.wait) return false; if(it
 $('bGame').onclick=()=>{ audioInit(); stopPilot(); if(game&&game.kind==='find') stopGame(); else startGame('find'); };
 $('bAnimals').onclick=()=>{ audioInit(); if(game&&game.kind==='animals') stopGame(); else startGame('animals'); };
 $('qX').onclick=()=>{ if(pilot) stopPilot(); stopGame(); };
+// začetna izbira zemljevida (vedno ob odprtju)
+$('ch2d').onclick=()=>{ $('chooser').classList.remove('show'); try{ audioInit(); play('pop'); }catch(e){} };
+$('ch3d').onclick=()=>{ location.href='stara/'; };
+try{ const weak=(navigator.deviceMemory&&navigator.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4)||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent); if(weak) $('chWarn').style.display='block'; }catch(e){}
 $('quest').onclick=e=>{ if(e.target.id==='qX') return; if(pilot&&pilot.cur){ say('Tvoj cilj: '+pilot.cur.n+'.'); return; } if(!game) return;
   if(game.kind==='regions'){ const q=game.q; if(q) say(q.text||(q.item?'V kateri regiji je '+q.item.n+'?':'Poišči regijo '+REGINFO[q.reg][0]+'.')); return; } if(game.cur) say('Poišči: '+game.cur.n); };
 const TREASURES=[
@@ -968,6 +1007,7 @@ function select(it,o){ audioInit(); if(game&&answer(it,o)) return; if(o) o.pulse
 function showCard(it,fact){ const p=$('cPic'); p.innerHTML=''; const src=picFor(it); if(src){ const im=new Image(); im.src=src; p.appendChild(im); } else { p.textContent=it.e||''; p.style.fontSize='46px'; }
   $('cName').textContent=it.n; $('cText').textContent=fact; const b=$('cBtns'); b.innerHTML=''; $('cMore').style.display='none';
   const add=(t,f)=>{ const x=document.createElement('button'); x.textContent=t; x.onclick=f; b.appendChild(x); };
+  if(it.id==='ljubljanica') add('💧 Reka sedmih imen',()=>{ location.href='ljubljanica/'; });
   add('🔊 Preberi',()=>say(it.n+'. '+fact)); add('Povej mi več',()=>more(it)); if(it.snd) add('🎵 Zvok',()=>play(it.snd));
   $('card').classList.add('show'); requestAnimationFrame(()=>document.documentElement.style.setProperty('--cardH',($('card').offsetHeight+16)+'px')); }
 function more(it){ const box=$('cMore'); box.innerHTML=''; const extra=[...(MORE[it.id]||[]),...(it.f||[])];

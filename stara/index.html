@@ -247,7 +247,8 @@
   <button class="tb game" id="bRegions"><span class="ic">🗺️</span><span class="tx">Regije</span></button>
   <button class="tb game" id="bKekec"><span class="ic">🧒</span><span class="tx">Misija Kekec</span></button>
   <button class="tb game" id="bBoat"><span class="ic">⛵</span><span class="tx">Ladjica</span></button>
-  <button class="tb" id="b2D" onclick="location.href='../'"><span class="ic">🖼️</span><span class="tx">2D zemljevid</span></button>
+  <button class="tb" id="bLjub" onclick="location.href='../ljubljanica/'"><span class="ic">💧</span><span class="tx">Ljubljanica</span></button>
+  <button class="tb" id="b2D" onclick="location.href='../'"><span class="ic">🔀</span><span class="tx">Izbira zemljevida</span></button>
 </div>
 <div class="card" id="card"><button class="x" id="cardX">✖</button><div class="emo" id="cEmo"></div><h2 id="cName"></h2><p id="cText"></p><div class="more" id="cMore"></div><div class="btns" id="cBtns"></div></div>
 <div class="phelp" id="pHelp"><b>Kako letiš:</b> <span>◀ ▶ obračaj</span> <span>▲ ▼ gor in dol</span> <span>Sledi puščici do ⭐</span></div><div class="parrow" id="pArrow"><div>➤</div></div><div class="pctl" id="pctl"><button data-k="l">◀</button><div><button data-k="u">▲</button><button data-k="d">▼</button></div><button data-k="r">▶</button><button class="pexit" id="pExit">Pristani</button></div>
@@ -3109,6 +3110,7 @@ function showCard(it,fact){ fact=fact||curFact(it); it._shown=fact; $('cEmo').in
   const bs=document.createElement('button'); bs.textContent='Zvok'; bs.title='Zvok'; bs.onclick=()=>{audioInit(); play(it.snd);}; b.appendChild(bs);
   if(slVoice||AUD){ const bv=document.createElement('button'); bv.textContent='Preberi'; bv.title='Preberi'; bv.onclick=()=>say(it.n+'. '+fact); b.appendChild(bv); }
   if(it.id==='t_povodni'){ const bp=document.createElement('button'); bp.textContent='📜 Pesmica'; bp.onclick=openPoem; b.appendChild(bp); }
+  if(it.id==='ljubljanica'){ const bl=document.createElement('button'); bl.textContent='💧 Reka sedmih imen'; bl.onclick=()=>$('bLjub').click(); b.appendChild(bl); }
   { const bm=document.createElement('button'); bm.textContent='Povej mi več'; bm.onclick=()=>showMore(it); b.appendChild(bm); }
   $('cMore').style.display='none';
   b.querySelectorAll('button').forEach(x=>x.addEventListener('click',()=>{ if(game&&game.waiting){ clearTimeout(game.timer); game.paused=true; } }));

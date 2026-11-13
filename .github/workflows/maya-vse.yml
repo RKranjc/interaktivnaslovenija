@@ -1,5 +1,5 @@
 name: Glas Maya1 (vsi stavki)
-# zagon 2026-11-13d: ladjica začne sama
+# zagon 2026-11-13e: Ljubljanica, reka sedmih imen
 on:
   workflow_dispatch: {}
   push: { branches: [main], paths: ['.github/workflows/maya-vse.yml'] }
