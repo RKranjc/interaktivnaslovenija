@@ -1,5 +1,5 @@
 name: Glas Maya1 (vsi stavki)
-# zagon 2026-11-13b: ladjica, izviri in zanimivosti
+# zagon 2026-11-13c: ladjica – Savinja, Idrijca, Mura, Kolpa
 on:
   workflow_dispatch: {}
   push: { branches: [main], paths: ['.github/workflows/maya-vse.yml'] }
