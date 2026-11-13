@@ -3468,7 +3468,7 @@ function boatSay(txt,cb){ const b=boat; if(!b) return; const tok={}; b.tok=tok; 
   if(sfxOn&&AUD&&S.length&&S.every(x=>AUD.has(h32(x)))){ stopSay(); const q={}; sayQ=q; let i=0; const next=()=>{ if(sayQ!==q) return; if(i>=S.length){ setTimeout(done,300); return; } const a=new Audio('../audio/'+h32(S[i++])+'.mp3'); q.a=a; a.onended=()=>setTimeout(next,90); a.onerror=()=>next(); const p=a.play(); if(p&&p.catch) p.catch(()=>{}); }; next(); }
   else { say(txt); setTimeout(done,900+txt.length*(sfxOn?75:50)); } }
 function boatStart(k){ $('boatWin').classList.remove('show'); misStop(); regStop(); stopPost(); stopPilot(); stopRide(); if(game){ clearTimeout(game.timer); game=null; $('bGame').classList.remove('on'); $('bAnimals').classList.remove('on'); } closeCard();
-  const R=BOAT_R[k], P=boatPath(k); boat={k,R,P,s:0,v:0,spd:P.L/(55+R.ev.length*8),pos:[0,0,0],yaw:0,evi:0,snags:[.3,.66].map(f=>f*P.L),sni:0,stuck:false,wait:false,boost:0,pi:0,done:false};
+  const R=BOAT_R[k], P=boatPath(k); boat={k,R,P,s:0,v:0,spd:P.L/(36+R.ev.length*5.5),pos:[0,0,0],yaw:0,evi:0,snags:[.3,.66].map(f=>f*P.L),sni:0,stuck:false,wait:false,boost:0,pi:0,done:false};
   boat.ev=R.ev.map(e=>{ if(e.length===2) return {s:e[0]*P.L,t:e[1]}; const q=ll(e[0],e[1]); let bi=0,bd=1e9; for(let i=0;i<P.p.length;i++){ const d=Math.hypot(P.p[i][0]-q[0],P.p[i][1]-q[1]); if(d<bd){ bd=d; bi=i; } } return {s:Math.min(P.cum[bi],P.L-5),t:e[2]}; }).sort((a,b)=>a.s-b.s);
   const a=boatAt(P,0); boat.pos=[a[0],groundY(a[0],a[1])+.12,a[1]]; boat.yaw=a[2]; follow={pos:boat.pos}; cam.dist=11; cam.pitch=.5; cam.yaw=boat.yaw+Math.PI;
   $('bBoat').classList.add('on'); $('qEmo').textContent=R.e; $('qKind').textContent='Ladjica na reki'; $('qName').textContent=R.n; $('qStars').textContent=''; $('qHelp').style.display='none'; $('quest').classList.add('show');
@@ -3477,7 +3477,7 @@ function boatTap(x,y){ const b=boat; if(!b||b.done) return; const q=misScr([b.po
   if(b.stuck){ b.stuck=false; play('cheer'); burst(); toast('⛵ Ladjica spet pluje!'); $('qName').textContent=b.R.n; } else { b.boost=2.5; play('pop'); } }
 function boatBack(){ const b=boat; if(!b) return; play('pop'); flying=false; follow=b.fw; cam.dist=11; cam.pitch=.5; cam.yaw=b.yaw+Math.PI; }
 function boatTick(dt){ const b=boat; if(!b) return; const P=b.P; const lost=follow!==b.fw; if(lost!==b.lost){ b.lost=lost; $('boatBack').classList.toggle('show',lost); }
-  if(!b.wait&&!b.stuck&&!b.done){ const tv=b.spd*(b.boost>0?2.2:1)*(b.talk?.55:1); b.v=lerp(b.v,tv,1-Math.pow(.05,dt)); b.s+=b.v*dt; if(b.boost>0) b.boost-=dt;
+  if(!b.wait&&!b.stuck&&!b.done){ const tv=b.spd*(b.boost>0?2.2:1)*(b.talk?.75:1); b.v=lerp(b.v,tv,1-Math.pow(.05,dt)); b.s+=b.v*dt; if(b.boost>0) b.boost-=dt;
     if(b.sni<b.snags.length&&b.s>=b.snags[b.sni]&&!b.talk){ b.stuck=true; b.v=0; const t=BOAT_SNAG[b.sni%BOAT_SNAG.length]; b.sni++; play('boing'); $('qName').textContent='Tapni ladjico!'; boatSay(t); }
     else if(b.evi<b.ev.length&&b.s>=b.ev[b.evi].s){ if(!b.talk){ boatSay(b.ev[b.evi].t); b.evi++; } }
     if(b.s>=P.L){ b.s=P.L; } if(b.s>=P.L&&!b.talk&&b.evi>=b.ev.length){ b.done=true; play('cheer'); confetti(); boatSay(b.R.end,()=>{ regModal('Ladjica je priplula do meje!','Reka '+b.R.n+' teče naprej v svet. 🎉',()=>{}); $('rwB').onclick=()=>{ $('regWin').classList.remove('show'); boatStop(); $('boatWin').classList.add('show'); }; }); } }
