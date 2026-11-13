@@ -1261,7 +1261,7 @@ function kinematics(dt){
 function drawModels(E){
   IB={sphere:[],cyl:[],cone:[],box:[],tcyl:[]};
   for(const it of ITEMS){ if(!it.model) continue; if(rideFP&&follow===it&&fpTrans>=1&&it.id==='balon') continue; drawModel(it); }
-  drawLandmarks(); drawTraffic(lastDt); drawFauna(); drawTreasures(); drawPostVan(); drawPilot(); drawMission(); drawBoat(); drawRainbow();
+  drawLandmarks(); drawTraffic(lastDt); drawFauna(); drawTreasures(); drawPostVan(); drawPilot(); drawMission(); drawMill(); drawBoat(); drawRainbow();
   const P=prims.P; setCommon(P,E,T);
   for(const k of ['sphere','cyl','cone','box','tcyl']){ const arr=IB[k]; if(!arr.length) continue; const pr=prims[k]; const n=arr.length/20;
     gl.bindBuffer(gl.ARRAY_BUFFER,pr.ib); const data=new Float32Array(arr); if(data.byteLength>4*20*4000){ gl.bufferData(gl.ARRAY_BUFFER,data,gl.DYNAMIC_DRAW); } else gl.bufferSubData(gl.ARRAY_BUFFER,0,data);
@@ -3483,6 +3483,18 @@ function boatTick(dt){ const b=boat; if(!b) return; const P=b.P; const lost=foll
     if(b.s>=P.L){ b.s=P.L; } if(b.s>=P.L&&!b.talk&&b.evi>=b.ev.length){ b.done=true; play('cheer'); confetti(); boatSay(b.R.end,()=>{ regModal('Ladjica je priplula do meje!','Reka '+b.R.n+' teče naprej v svet. 🎉',()=>{}); $('rwB').onclick=()=>{ $('regWin').classList.remove('show'); boatStop(); $('boatWin').classList.add('show'); }; }); } }
   const a=boatAt(P,b.s); b.pos[0]=a[0]; b.pos[2]=a[1]; b.pos[1]=groundY(a[0],a[1])+.12; let dy=((a[2]-b.yaw+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI; b.yaw+=dy*(1-Math.pow(.02,dt));
   if(!b.lost){ const want=b.yaw+Math.PI; let dc=((want-cam.yaw+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI; cam.yaw+=dc*(1-Math.pow(.45,dt)); cam.pitch=.5; } }
+// plavajoči mlin na Muri pri Veržeju (Babičev mlin): hišica na dveh čolnih, med njima se vrti vodno kolo
+var MILL=null;
+function drawMill(){ if(MILL===null){ try{ const P=boatPath('mura'), q=ll(16.165,46.585); let bi=0,bd=1e9; for(let i=0;i<P.p.length;i++){ const d=Math.hypot(P.p[i][0]-q[0],P.p[i][1]-q[1]); if(d<bd){ bd=d; bi=i; } } const a=P.p[Math.max(0,bi-2)], b=P.p[Math.min(P.p.length-1,bi+2)], c=P.p[bi]; MILL={x:c[0],z:c[1],yaw:Math.atan2(b[0]-a[0],b[1]-a[1])}; }catch(e){ MILL=false; } }
+  if(!MILL) return; if(Math.hypot(MILL.x-cam.X,MILL.z-cam.Z)>cam.D*1.6+25) return; const S=clamp(.55+cam.D*.035,.9,2.4), y=groundY(MILL.x,MILL.z)+.06;
+  const F=M4.mul(M4.mul(mT(MILL.x,y+Math.sin(T*1.7)*.012,MILL.z),mRy(MILL.yaw+Math.PI/2)),mS(S,S,S)); const WD=[.5,.34,.2,.1], WL=[.66,.48,.3,.1], RF=[.36,.24,.16,.1], DK=[.3,.2,.12,.1];
+  put('sphere',fr(F,[0,.07,-.34]),[.62,.11,.2],WD); put('box',fr(F,[0,.14,-.34]),[1.05,.05,.3],WL);          // veliki čoln s hišico
+  put('sphere',fr(F,[0,.06,.42]),[.5,.09,.12],WD); put('box',fr(F,[0,.12,.42]),[.85,.04,.16],WL);             // mali čoln
+  put('box',fr(F,[0,.36,-.34]),[.78,.38,.3],WL); for(const sz of [1,-1]) put('box',fr(F,[0,.6,-.34+sz*.1],[sz*.7,0,0]),[.86,.04,.28],RF); put('box',fr(F,[0,.52,-.34]),[.78,.1,.26],WL); put('box',fr(F,[.2,.32,-.185]),[.14,.24,.02],DK); put('box',fr(F,[-.18,.4,-.185]),[.12,.1,.02],[.95,.88,.55,1]);
+  put('cyl',fr(F,[0,.3,-.22],[1.5708,0,0]),[.03,.74,.03],DK);                                                    // os kolesa
+  const a0=T*1.3; for(let k=0;k<8;k++){ const a=a0+k*Math.PI/4, cy=.3+Math.cos(a)*.2, cx=Math.sin(a)*.2; put('box',fr(F,[cx,cy,.1],[0,0,-a]),[.03,.2,.4],WL); put('box',fr(F,[Math.sin(a)*.3,.3+Math.cos(a)*.3,.1],[0,0,-a]),[.16,.02,.42],WD); }
+  put('box',fr(F,[.45,.1,.04],[0,.5,0]),[.03,.03,.9],DK); put('box',fr(F,[-.45,.1,.04],[0,-.5,0]),[.03,.03,.9],DK);                                                // brv med čolnoma
+  put('box',fr(F,[0,.13,-.62]),[.2,.03,.36],WL); }
 function drawBoat(){ const b=boat; if(!b) return; const S=clamp(.5+cam.D*.05,.8,2.2); const bob=Math.sin(T*3)*.03, roll=Math.sin(T*2.1)*.08+(b.stuck?Math.sin(T*14)*.12:0);
   const F=M4.mul(M4.mul(M4.mul(mT(b.pos[0],b.pos[1]+bob,b.pos[2]),mRy(b.yaw)),mRz(roll)),mS(S,S,S)); const W1=[.99,.98,.94,.15], W2=[.9,.9,.86];
   put('sphere',fr(F,[0,.08,0]),[.26,.13,.62],W1); put('box',fr(F,[0,.14,0]),[.36,.05,.8],W2); put('cone',fr(F,[0,.14,0]),[.2,.62,.2],W1); put('box',fr(F,[0,.2,.5],[.5,0,0]),[.2,.04,.34],W1); put('box',fr(F,[0,.2,-.5],[-.5,0,0]),[.2,.04,.34],W1);
