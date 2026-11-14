@@ -173,15 +173,36 @@ function drawUnderLabels(x0,x1){ const cl=(a,b,km)=>{ const x=(a+b)/2; if(x<x0-2
     const x=POS[0]+60+Math.sin(T*.7)*30, y=POS[1]+36+Math.sin(T*1.3)*4; ctx.strokeStyle='#f6b8b0'; ctx.lineWidth=7; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(x-24,y); ctx.quadraticCurveTo(x-8,y-8+Math.sin(T*4)*4,x+6,y); ctx.quadraticCurveTo(x+16,y+6,x+26,y-1); ctx.stroke(); ctx.strokeStyle='#e88f86'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x-10,y+2); ctx.lineTo(x-13,y+9); ctx.moveTo(x+10,y+3); ctx.lineTo(x+8,y+10); ctx.moveTo(x+28,y-5); ctx.lineTo(x+33,y-10); ctx.moveTo(x+28,y-1); ctx.lineTo(x+35,y-1); ctx.stroke();
     const tx=POS[0]-150+((T*26)%200), ty=POS[1]+44; ctx.fillStyle='#e8c74a'; for(let k=0;k<3;k++) ctx.fillRect(tx-k*30,ty-14,26,12); ctx.fillStyle='#e9574a'; ctx.fillRect(tx+2,ty-22,14,9); ctx.fillStyle='#333'; for(let k=0;k<3;k++){ ctx.beginPath(); ctx.arc(tx-k*30+6,ty,4,0,7); ctx.arc(tx-k*30+20,ty,4,0,7); ctx.fill(); } }
   if(!(JY[0]+250<x0||JY[0]-250>x1)) label(JY[0],JY[1]+72,'Planinska jama'); if(pivT>.15&&!(PIV[2][0]+300<x0||PIV[0][0]-300>x1)) label(PIV[1][0],PIV[1][1]-52,'Pivka · pod zemljo ≈ 9 km','#bfe4ff'); }
+// ---------------- kako voda topi apnenec (povečava na začetku) ----------------
+const KCR=[[.16,.52,.3],[.33,.9,-.2],[.5,.62,.25],[.66,.95,-.3],[.84,.55,.2]];   // razpoke: x, globina, nagib
+function drawKarst(){ const t=karT, e=smooth(t); ctx.save(); ctx.setTransform(DPR,0,0,DPR,0,0); ctx.globalAlpha=clamp(karA,0,1); ctx.fillStyle='rgba(14,20,44,.6)'; ctx.fillRect(0,0,VW,VH);
+  const w=Math.min(VW-28,620), h=Math.min(VH-170,400), x0=(VW-w)/2, y0=Math.max(84,(VH-h)/2-10), g=h*.2, ry=y0+g;
+  ctx.beginPath(); ctx.roundRect(x0,y0,w,h,18); ctx.clip();
+  const sk=ctx.createLinearGradient(0,y0,0,ry); sk.addColorStop(0,'#8fa9bd'); sk.addColorStop(1,'#c9d9e2'); ctx.fillStyle=sk; ctx.fillRect(x0,y0,w,g);
+  ctx.fillStyle='#d9d4c6'; ctx.fillRect(x0,ry,w,h-g);
+  ctx.strokeStyle='rgba(120,112,95,.4)'; ctx.lineWidth=1.5; for(let r=1;r<7;r++){ const y=ry+(h-g)*r/7; ctx.beginPath(); ctx.moveTo(x0,y); for(let x=x0;x<=x0+w;x+=24) ctx.lineTo(x,y+Math.sin(x*.05+r)*3); ctx.stroke(); for(let k=0;k<6;k++){ const x=x0+w*((k+.5+(r%2)*.5)/6); ctx.beginPath(); ctx.moveTo(x,y-(h-g)/7); ctx.lineTo(x+3,y); ctx.stroke(); } }
+  // jama, ki jo voda počasi izdolbe
+  const cv2=smooth(clamp((t-.38)/.62,0,1)), cx=x0+w*.5, cy=ry+(h-g)*.74; if(cv2>0){ ctx.fillStyle='#5d5648'; ctx.beginPath(); ctx.ellipse(cx,cy,w*.4*cv2+6,(h-g)*.17*cv2+5,0,0,7); ctx.fill(); ctx.fillStyle='#2a2733'; ctx.beginPath(); ctx.ellipse(cx,cy,w*.4*cv2,(h-g)*.17*cv2,0,0,7); ctx.fill();
+    ctx.fillStyle='#3ea4f0'; ctx.beginPath(); ctx.ellipse(cx,cy+(h-g)*.12*cv2,w*.3*cv2,(h-g)*.035*cv2,0,0,7); ctx.fill();
+    const kp=smooth(clamp((t-.62)/.38,0,1)); ctx.fillStyle='#e6dcc4'; for(const dx of [-.22,-.08,.07,.2]){ const x=cx+w*dx, top=cy-(h-g)*.17*cv2*Math.sqrt(1-Math.pow(dx/.4,2)); ctx.beginPath(); ctx.moveTo(x-6,top-1); ctx.lineTo(x+6,top-1); ctx.lineTo(x,top+26*kp+2); ctx.closePath(); ctx.fill(); } }
+  // razpoke se širijo navzdol
+  ctx.lineCap='round'; ctx.lineJoin='round'; for(const [fx2,dep,sl] of KCR){ const d=(h-g)*dep*clamp(e*1.5,0,1), n=7, pts=[]; for(let k=0;k<=n;k++){ const u=k/n; pts.push([x0+w*fx2+sl*u*50+Math.sin(u*9+fx2*20)*7, ry+d*u]); }
+    for(const [lw,col] of [[3+e*15,'#5d5648'],[1+e*10,'#2a2733']]){ ctx.strokeStyle=col; ctx.lineWidth=lw; ctx.beginPath(); pts.forEach((q,k)=>k?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])); ctx.stroke(); }
+    for(let k=0;k<3;k++){ const u=((T*.45+k/3+fx2)%1), i=Math.min(n-1,Math.floor(u*n)), f=u*n-i, x=lerp(pts[i][0],pts[i+1][0],f), y=lerp(pts[i][1],pts[i+1][1],f); if(y-ry<d-3){ ctx.fillStyle='#6fc3ff'; ctx.beginPath(); ctx.arc(x,y,3.4,0,7); ctx.fill(); } } }
+  // trava in dež
+  ctx.fillStyle='#6fb84f'; ctx.fillRect(x0,ry-7,w,9); ctx.fillStyle='#d9d4c6'; for(const c of KCR) ctx.fillRect(x0+w*c[0]-(2+e*6),ry-8,4+e*12,11);
+  ctx.strokeStyle='rgba(70,140,220,.85)'; ctx.lineWidth=2.5; for(let i=0;i<34;i++){ const x=x0+rnd(i+3)*w, y=y0+((T*260+rnd(i+60)*g*2)%g); ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-3,y+12); ctx.stroke(); }
+  ctx.restore(); ctx.save(); ctx.setTransform(DPR,0,0,DPR,0,0); ctx.globalAlpha=clamp(karA,0,1); ctx.strokeStyle='#5a3a1a'; ctx.lineWidth=4; ctx.beginPath(); ctx.roundRect(x0,y0,w,h,18); ctx.stroke();
+  ctx.font='900 20px Grandstander,Nunito,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillStyle='#6a5a3c'; ctx.fillText('apnenec',x0+16,y0+h-22); const yrs=Math.round(e*100)*1000; label(VW/2,y0+h+22,yrs?'čez '+yrs.toLocaleString('sl-SI')+' let':'danes','#fff'); ctx.restore(); }
 function frame(now){ const dt=Math.min(.05,(now-(frame.t||now))/1000); frame.t=now; if(!paused){ T+=dt; step(dt); }
   ctx.setTransform(DPR,0,0,DPR,0,0); ctx.clearRect(0,0,VW,VH); const vw=VW/SC; const tx=clamp(rivAt(front)[0]-vw*.42,0,Math.max(0,W-vw)); camX+= (tx-camX)*(1-Math.pow(.02,dt)); if(!running) camX=tx;
   ctx.save(); ctx.scale(SC,SC); ctx.translate(-camX,-Y0); const x0=camX-20, x1=camX+vw+20;
-  drawSky(x0,x1); if(x1>X.lj0-200) drawLjBack(); drawGround(x0,x1); drawCaves(x0,x1); drawPonors(); drawDecor(x0,x1); drawWater(); drawUnderLabels(x0,x1); drawFog(x0,x1); ctx.restore(); requestAnimationFrame(frame); }
+  drawSky(x0,x1); if(x1>X.lj0-200) drawLjBack(); drawGround(x0,x1); drawCaves(x0,x1); drawPonors(); drawDecor(x0,x1); drawWater(); drawUnderLabels(x0,x1); drawFog(x0,x1); ctx.restore(); if(karA>.01) drawKarst(); requestAnimationFrame(frame); }
 
 // ---------------- zgodba ----------------
 const STORY=[
  {x:X.b0-14,say:'To je zgodba o reki, ki se sedemkrat skrije pod zemljo. Vsakič, ko pride spet na dan, dobi novo ime.'},
- {say:'Vse se začne z dežjem na kraških hribih pod goro Snežnik. Tu so tla iz apnenca. To je kamen, ki ga voda počasi topi, zato je v njem polno lukenj in jam.'},
+ {fx:'karst',say:'Vse se začne z dežjem na kraških hribih pod goro Snežnik. Tu so tla iz apnenca. To je kamen, ki ga voda počasi topi, zato je v njem polno lukenj in jam.'},
  {x:X.b0+215,name:'Trbuhovica',say:'Prvo ime je Trbuhovica. Teče po Babnem polju. To je eno najbolj mrzlih polj v Sloveniji.'},
  {x:X.b1-4,say:'Na robu polja voda izgine v luknjo v tleh. Taki luknji rečemo požiralnik.'},
  {x:X.l0+300,name:'Obrh',say:'Na Loškem polju pride voda spet na dan. Zdaj ji je ime Obrh. Teče mimo gradu Snežnik.'},
@@ -197,31 +218,34 @@ const STORY=[
  {x:X.lj0+560,say:'Ljubljanica teče skozi Ljubljano, pod Tromostovjem in mimo zmajev na Zmajskem mostu.'},
  {x:X.s0+90,say:'Na koncu se zlije v reko Savo. Sedem imen, ena reka: Trbuhovica, Obrh, Stržen, Rak, Pivka, Unica in Ljubljanica.'}];
 const ORD=['Prvo','Drugo','Tretje','Četrto','Peto','Šesto','Sedmo'];
-let moveTgt=0, moveRes=null, fx='';
+let moveTgt=0, moveRes=null, fx='', karOn=false, karA=0, karT=0, skipGen=0, skipCbs=[];
 function step(dt){ if(running&&front<moveTgt){ const p=rivAt(front); const sp=(p[2]>0?330:250)*(moveTgt-front>800?1.9:1); front=Math.min(moveTgt,front+sp*dt); } else if(moveRes){ const r=moveRes; moveRes=null; r(); }
-  lake+= (lakeTgt-lake)*(1-Math.pow(.3,dt)); if(fx==='pivka') pivT=Math.min(1,pivT+dt/4.5); rain+=((front<700?1:0)-rain)*(1-Math.pow(.2,dt)); }
+  karA+=((karOn?1:0)-karA)*(1-Math.pow(.01,dt)); if(karOn) karT=Math.min(1,karT+dt/11); lake+= (lakeTgt-lake)*(1-Math.pow(.3,dt)); if(fx==='pivka') pivT=Math.min(1,pivT+dt/4.5); rain+=((front<700?1:0)-rain)*(1-Math.pow(.2,dt)); }
 function moveTo(x){ moveTgt=Math.max(front,sAtX(x)); return new Promise(r=>{ moveRes=r; }); }
+const skippable=p=>Promise.race([p,new Promise(r=>skipCbs.push(r))]);
+function skip(){ if(!running) return; if(paused) $('bPause').click(); skipGen++; stopAudio(); if(front<moveTgt) front=moveTgt; $('sub').classList.remove('show'); const c=skipCbs; skipCbs=[]; c.forEach(f=>f()); }
 // ---------------- glas ----------------
 function h32(s){ let h=0x811c9dc5; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return ('0000000'+h.toString(16)).slice(-8); }
 function splitS(t){ const out=[]; let cur=''; t=String(t).replace(/\s+/g,' ').trim(); for(let i=0;i<t.length;i++){ cur+=t[i]; if('.!?'.includes(t[i])&&(i+1>=t.length||t[i+1]===' ')){ if(cur.trim()) out.push(cur.trim()); cur=''; } } if(cur.trim()) out.push(cur.trim()); return out; }
 const AB=/rkranjc\.github\.io|localhost|127\.0\.0\.1/.test(location.host)?'../audio/':'https://rkranjc.github.io/interaktivnaslovenija/audio/';
 let AUD=null, curA=null; fetch(AB+'index.json').then(r=>r.json()).then(a=>{ AUD=new Set(a); }).catch(()=>{});
 const wait=ms=>new Promise(r=>{ let left=ms; const t0=performance.now(); let last=t0; const tick=()=>{ const n=performance.now(); if(!paused) left-=n-last; last=n; if(left<=0) r(); else setTimeout(tick,60); }; tick(); });
-async function say(txt,id){ const sub=$('sub'); sub.textContent=txt; sub.classList.add('show'); const S=splitS(txt);
-  if(AUD&&S.every(x=>AUD.has(h32(x)))){ for(const x of S){ if(id!==runId) return; await new Promise(res=>{ const a=new Audio(AB+h32(x)+'.mp3'); curA=a; let done=false; const fin=()=>{ if(!done){ done=true; res(); } }; a.onended=fin; a.onerror=fin; const p=a.play(); if(p&&p.catch) p.catch(()=>{ setTimeout(fin,600+x.length*70); }); }); curA=null; await wait(120); } }
+async function say(txt,id){ const g=skipGen; const sub=$('sub'); sub.textContent=txt; sub.classList.add('show'); const S=splitS(txt);
+  if(AUD&&S.every(x=>AUD.has(h32(x)))){ for(const x of S){ if(id!==runId||g!==skipGen) return; await new Promise(res=>{ const a=new Audio(AB+h32(x)+'.mp3'); curA=a; let done=false; const fin=()=>{ if(!done){ done=true; res(); } }; a.onended=fin; a.onerror=fin; const p=a.play(); if(p&&p.catch) p.catch(()=>{ setTimeout(fin,600+x.length*70); }); }); curA=null; await wait(120); } }
   else { let spoke=false; try{ if(window.speechSynthesis){ const v=speechSynthesis.getVoices().find(v=>/^sl/i.test(v.lang)); if(v){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.voice=v; u.lang='sl-SI'; u.rate=.92; spoke=true; await new Promise(res=>{ u.onend=res; u.onerror=res; speechSynthesis.speak(u); setTimeout(res,3000+txt.length*110); }); } } }catch(e){} if(!spoke) await wait(1400+txt.length*62); }
-  if(id===runId) sub.classList.remove('show'); }
+  if(id===runId&&g===skipGen) sub.classList.remove('show'); }
 function stopAudio(){ try{ if(curA){ curA.onended=null; curA.pause(); curA=null; } if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){} }
-async function run(){ const id=++runId; stopAudio(); front=0; pivT=0; lake=0; lakeTgt=0; fx=''; nameIdx=0; running=true; paused=false; $('bPause').textContent='⏸'; $('name').classList.remove('show'); document.querySelectorAll('#dots i').forEach(e=>e.classList.remove('on')); $('ovStart').classList.remove('show'); $('ovEnd').classList.remove('show');
+async function run(){ const id=++runId; stopAudio(); front=0; pivT=0; lake=0; lakeTgt=0; fx=''; karOn=false; karA=0; skipCbs=[]; nameIdx=0; running=true; paused=false; $('bPause').textContent='⏸'; $('name').classList.remove('show'); document.querySelectorAll('#dots i').forEach(e=>e.classList.remove('on')); $('ovStart').classList.remove('show'); $('ovEnd').classList.remove('show');
   for(const st of STORY){ if(id!==runId) return; if(st.x!=null) await moveTo(st.x); if(id!==runId) return;
-    if(st.fx==='lakeUp') lakeTgt=1; if(st.fx==='lakeDown') lakeTgt=0; if(st.fx==='pivka') fx='pivka';
+    if(st.fx==='lakeUp') lakeTgt=1; if(st.fx==='lakeDown') lakeTgt=0; if(st.fx==='pivka') fx='pivka'; if(st.fx==='karst'){ karOn=true; karT=0; }
     if(st.name){ $('name').classList.remove('show'); await wait(250); if(id!==runId) return; $('nk').textContent=ORD[nameIdx]+' ime'; $('nn').textContent=st.name; document.querySelectorAll('#dots i')[nameIdx].classList.add('on'); nameIdx++; $('name').classList.add('show'); }
-    await say(st.say,id); if(id!==runId) return; await wait(350); }
+    const g=skipGen; await skippable(say(st.say,id)); if(id!==runId) return; karOn=false; if(g===skipGen) await skippable(wait(350)); }
   if(id!==runId) return; await moveTo(W); if(id!==runId) return; running=false; $('ovEnd').classList.add('show'); }
 function goBack(){ stopAudio(); runId++; if(document.referrer&&history.length>1) history.back(); else location.href='../'; }
 $('goStart').onclick=run; $('goAgain').onclick=run; $('bAgain').onclick=run; $('bBack').onclick=goBack; $('goBack').onclick=goBack;
+cv.addEventListener('pointerdown',skip); $('sub').addEventListener('pointerdown',skip);
 $('bPause').onclick=()=>{ if(!running) return; paused=!paused; $('bPause').textContent=paused?'▶':'⏸'; try{ if(curA){ paused?curA.pause():curA.play(); } if(window.speechSynthesis){ paused?speechSynthesis.pause():speechSynthesis.resume(); } }catch(e){} };
-addEventListener('keydown',e=>{ if(e.key===' '){ $('bPause').click(); e.preventDefault(); } if(e.key==='Escape') goBack(); });
+addEventListener('keydown',e=>{ if(e.key===' '){ $('bPause').click(); e.preventDefault(); } if(e.key==='Escape') goBack(); if(e.key==='ArrowRight'||e.key==='Enter') skip(); });
 window.__lj={STORY,splitS,h32,get front(){return front;},set front(v){front=v;},rivAt,sAtX,RL};
 requestAnimationFrame(frame);
 </script>
