@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 html,body{margin:0;height:100%;overflow:hidden;background:#bfe6ff;font-family:Nunito,system-ui,sans-serif;color:#4a2f17;-webkit-user-select:none;user-select:none;touch-action:none}
-canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}#vig{position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at 50% 45%,rgba(30,24,50,0) 55%,rgba(30,24,50,.3) 100%)}
 .btn{position:fixed;top:calc(10px + env(safe-area-inset-top));z-index:5;border:3px solid #5a3a1a;background:#fff7e6;border-radius:16px;font:900 20px Nunito,sans-serif;color:#5a3a1a;padding:6px 12px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.2)}
 .btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
 #bBack{left:10px}#bPause{right:10px}#bAgain{right:64px}
@@ -34,7 +34,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<canvas id="cv"></canvas>
+<canvas id="cv"></canvas><div id="vig"></div>
 <button class="btn" id="bBack" title="Nazaj na zemljevid">✕</button>
 <button class="btn" id="bAgain" title="Od začetka">⟲</button>
 <button class="btn" id="bPause" title="Premor">⏸</button>
@@ -47,7 +47,8 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 const $=id=>document.getElementById(id);
 const cv=$('cv'), ctx=cv.getContext('2d');
 let VW=0,VH=0,DPR=1,SC=1,Y0=60;
-function resize(){ DPR=Math.min(window.devicePixelRatio||1,2); VW=innerWidth; VH=innerHeight; cv.width=Math.round(VW*DPR); cv.height=Math.round(VH*DPR); SC=Math.min(VH/600,VW/420); }
+let DCAP=2; const GC=new Map();
+function resize(){ DPR=Math.min(window.devicePixelRatio||1,DCAP); GC.clear(); VW=innerWidth; VH=innerHeight; cv.width=Math.round(VW*DPR); cv.height=Math.round(VH*DPR); SC=Math.min(VH/600,VW/420); }
 let rvY=260;   // zglajena višina reke, po kateri se ravna pogled
 addEventListener('resize',resize); resize();
 const W=10400, H=1000;
@@ -104,10 +105,10 @@ function cloud(x,y,s){ const cn=rnd(Math.round(y)*3.1)>.5?'oblak1':'oblak2'; if(
 
 // ---------------- risanje: svet ----------------
 function hillTile(n,par,x0,x1,tw,by,fill){ if(!sprOK(n)) return false; const im=IMG[n], th=tw*im.naturalHeight/im.naturalWidth, off=camX*par; for(let k=Math.floor((x0-off)/tw);k*tw+off<x1;k++) ctx.drawImage(im,k*tw+off-.5,by-th,tw+1,th); ctx.fillStyle=fill; ctx.fillRect(x0,by-1,x1-x0,900); return true; }
-function drawSky(x0,x1){ const g=ctx.createLinearGradient(0,-200,0,500); g.addColorStop(0,'#4fa8ea'); g.addColorStop(.5,'#9bd6f7'); g.addColorStop(.85,'#e3f5ff'); g.addColorStop(1,'#fff1d2'); ctx.fillStyle=g; ctx.fillRect(x0,-900,x1-x0,1420); const hd=(rvY-470)*.6, sd=Y0+20; ctx.fillRect(x0,-900,x1-x0,2600); if(sprOK('nebo')){ ctx.drawImage(IMG.nebo,x0,Y0-4,x1-x0,Math.max(200,470+hd-Y0)); }
+function drawSky(x0,x1){ const hd=(rvY-470)*.6, sd=Y0+20, sb=Math.max(Y0+200,470+hd), g=ctx.createLinearGradient(0,Y0,0,sb); g.addColorStop(0,'#43b8ff'); g.addColorStop(.3,'#72c9ff'); g.addColorStop(.6,'#a8e0fb'); g.addColorStop(.85,'#e3f2df'); g.addColorStop(1,'#fdf3c2'); ctx.fillStyle=g; ctx.fillRect(x0,Y0-6,x1-x0,sb-Y0+420);
   ctx.save(); ctx.translate(0,sd);
   // sonce z žarki in oblaki (počasna paralaksa)
-  const px=camX*.75+520, sg=ctx.createRadialGradient(px,90,20,px,90,230); sg.addColorStop(0,'rgba(255,244,190,.85)'); sg.addColorStop(.3,'rgba(255,236,150,.35)'); sg.addColorStop(1,'rgba(255,236,150,0)'); ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(px,90,230,0,7); ctx.fill();
+  const px=camX*.75+520; if(!drawSky.glow){ const c=document.createElement('canvas'); c.width=c.height=256; const q=c.getContext('2d'), sg=q.createRadialGradient(128,128,10,128,128,128); sg.addColorStop(0,'rgba(255,244,190,.85)'); sg.addColorStop(.3,'rgba(255,236,150,.35)'); sg.addColorStop(1,'rgba(255,236,150,0)'); q.fillStyle=sg; q.fillRect(0,0,256,256); drawSky.glow=c; } ctx.drawImage(drawSky.glow,px-230,90-230,460,460);
   if(sprOK('sonce')){ ctx.save(); ctx.translate(px,90); ctx.rotate(Math.sin(T*.6)*.08); const ss=150+Math.sin(T*1.5)*4; ctx.drawImage(IMG.sonce,-ss/2,-ss/2,ss,ss); ctx.restore(); } else { ctx.save(); ctx.translate(px,90); ctx.rotate(T*.05); ctx.fillStyle='rgba(255,240,170,.28)'; for(let k=0;k<12;k++){ ctx.rotate(Math.PI/6); ctx.beginPath(); ctx.moveTo(52,-7); ctx.lineTo(104+(k%2)*22,0); ctx.lineTo(52,7); ctx.closePath(); ctx.fill(); } ctx.restore();
   ctx.fillStyle='#ffe27a'; ctx.beginPath(); ctx.arc(px,90,42,0,7); ctx.fill(); ctx.fillStyle='#fff0a8'; ctx.beginPath(); ctx.arc(px-9,81,26,0,7); ctx.fill(); }
   for(let i=0;i<26;i++){ const cx=i*520+((T*6+i*97)%520)+camX*.45-900; if(cx<x0-200||cx>x1+200) continue; cloud(cx,50+rnd(i)*120,.7+rnd(i+9)*.6); }
@@ -116,7 +117,7 @@ function drawSky(x0,x1){ const g=ctx.createLinearGradient(0,-200,0,500); g.addCo
   ctx.restore(); ctx.save(); ctx.translate(0,hd);
   // oddaljeni hribi (trije pasovi, zadnji z gozdom) in meglica
   for(const [col,amp,base,f,ph,par,wood] of [['#cfe4ea',95,300,.0027,4,.72,0],['#b4d6c6',70,335,.004,0,.55,0],['#93c3a6',90,385,.0062,2,.33,1]]){ if(!wood&&par>.6&&hillTile('hribi1',par,x0,x1,1300,372,'rgb(174,207,201)')) continue; if(wood&&hillTile('hribi2',par,x0,x1,1150,432,'rgb(125,161,71)')) continue; ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(x0,540); for(let x=x0;x<=x1+8;x+=8){ const u=x-camX*par; ctx.lineTo(x,base-amp*(.5+.5*Math.sin(u*f+ph))-25*Math.sin(u*f*2.7+1)-(wood?7*Math.abs(Math.sin(u*.11))+4*Math.abs(Math.sin(u*.047+1)):0)); } ctx.lineTo(x1+8,1400); ctx.closePath(); ctx.fill(); }
-  const hz=ctx.createLinearGradient(0,330,0,520); hz.addColorStop(0,'rgba(255,250,235,0)'); hz.addColorStop(1,'rgba(255,250,235,.6)'); ctx.fillStyle=hz; ctx.fillRect(x0,330,x1-x0,190);  ctx.restore(); }
+  ctx.restore(); }
 function drawSnezhnik(){ if(spr('sneznik',262,Yb-12,215))return; const mg=ctx.createLinearGradient(0,68,0,300); mg.addColorStop(0,'#a3b5b4'); mg.addColorStop(1,'#7f9c8f'); ctx.fillStyle=mg; path([[30,300],[260,68],[480,Yb-10]],true); ctx.fill(); ctx.fillStyle='rgba(30,50,60,.16)'; path([[260,68],[480,Yb-10],[345,266],[290,180]],true); ctx.fill(); ctx.fillStyle='#fff'; path([[203,126],[260,68],[320,134],[292,124],[262,146],[234,122]],true); ctx.fill(); label(260,40,'Snežnik · 1796 m','#fff'); }
 function drawLjBack(){ if(spr('ljgrad',X.lj0+440,Yv+8,290)) return; const cx=X.lj0+360, y0=Yv; ctx.fillStyle='#6fb86a'; ctx.beginPath(); ctx.moveTo(cx-260,y0); ctx.quadraticCurveTo(cx,y0-250,cx+260,y0); ctx.closePath(); ctx.fill(); for(let i=0;i<9;i++) blob(cx-160+i*42,y0-55-Math.sin(i/8*3.14)*95,26,24,i%2?'#4f9f45':'#5aae4e');
   const x=cx,y=y0-137; ctx.fillStyle='#efe6d2'; ctx.fillRect(x-70,y-40,140,44); ctx.fillRect(x-14,y-96,26,60); ctx.fillStyle='#b5482f'; path([[x-76,y-40],[x-40,y-62],[x+40,y-62],[x+76,y-40]],true); ctx.fill(); ctx.fillStyle='#efe6d2'; for(let k=0;k<4;k++) ctx.fillRect(x-14+k*7,y-104,4,9); ctx.strokeStyle='#5a3a1a'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x-1,y-104); ctx.lineTo(x-1,y-130); ctx.stroke(); ctx.fillStyle='#3d9b4a'; ctx.fillRect(x-1,y-130,20,7); ctx.fillStyle='#fff'; ctx.fillRect(x-1,y-123,20,6); }
@@ -126,7 +127,7 @@ function drawGround(x0,x1){ // kamnina (apnenec) + prst + trava
   const g=ctx.createLinearGradient(0,150,0,H+200); g.addColorStop(0,'#e3d5b4'); g.addColorStop(.3,'#cfbf9d'); g.addColorStop(.7,'#a89b82'); g.addColorStop(1,'#6f6a62'); ctx.fillStyle=g; ctx.fill();
   if(sprOK('apnenec')){ if(!drawGround.pat){ drawGround.pat=ctx.createPattern(IMG.apnenec,'repeat'); drawGround.pat.setTransform(new DOMMatrix().scale(.72)); }
     ctx.fillStyle=drawGround.pat; ctx.fill(); const dg=ctx.createLinearGradient(0,rvY+40,0,rvY+700); dg.addColorStop(0,'rgba(70,50,30,0)'); dg.addColorStop(1,'rgba(70,50,30,.45)'); ctx.fillStyle=dg; ctx.fill();
-    ctx.save(); ctx.clip(); ctx.lineCap='round'; ctx.lineJoin='round'; surfLine(34,x0,x1); ctx.strokeStyle='rgba(90,64,34,.16)'; ctx.lineWidth=46; ctx.stroke(); ctx.restore(); if(sprOK('prst')){ if(!drawGround.sp){ drawGround.sp=ctx.createPattern(IMG.prst,'repeat'); drawGround.sp.setTransform(new DOMMatrix().scale(.3)); } ctx.lineCap='butt'; ctx.beginPath(); for(let x=x0-12;x<=x1+12;x+=12){ const y=surfY(x)+50+Math.sin(x*.045)*3+Math.sin(x*.013)*4; x===x0-12?ctx.moveTo(x,y):ctx.lineTo(x,y); } ctx.strokeStyle='rgba(60,35,15,.25)'; ctx.lineWidth=44; ctx.stroke(); ctx.strokeStyle=drawGround.sp; ctx.lineWidth=38; ctx.stroke(); } if(grassStrip(x0,x1)) return; }
+    ctx.save(); ctx.clip(); ctx.lineCap='round'; ctx.lineJoin='round'; surfLine(34,x0,x1); ctx.strokeStyle='rgba(90,64,34,.16)'; ctx.lineWidth=46; ctx.stroke(); ctx.restore(); if(grassStrip(x0,x1)) return; }
   ctx.save(); ctx.clip();
   // skladi apnenca z navpičnimi razpokami
   const ly=(k,x)=>250+k*58+26*Math.sin(x*.0021+k*1.7)+12*Math.sin(x*.006+k);
@@ -146,13 +147,20 @@ function drawGround(x0,x1){ // kamnina (apnenec) + prst + trava
   surfLine(1,x0,x1); ctx.strokeStyle='#6bb24c'; ctx.lineWidth=14; ctx.stroke(); surfLine(-2,x0,x1); ctx.strokeStyle='#86cc5e'; ctx.lineWidth=7; ctx.stroke(); surfLine(-5,x0,x1); ctx.strokeStyle='#b4e584'; ctx.lineWidth=2.5; ctx.stroke();
   // travne bilke
   ctx.lineWidth=2; for(let i=Math.floor(x0/9);i<x1/9;i++){ const x=i*9+rnd(i+31)*7, y=surfY(x)-4, hh=4+rnd(i+5)*7, sw=Math.sin(T*1.6+i*.7)*1.6; ctx.strokeStyle=i%4?'#7cc35a':'#5aa544'; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+sw+(rnd(i)-.5)*4,y-hh); ctx.stroke(); } }
-function grassStrip(x0,x1){ if(!sprOK('trava')) return false; const im=IMG.trava, iw=im.naturalWidth, ih=im.naturalHeight, tw=540, k=iw/tw, hh=ih/k, top=hh*0.231+1, st=3;
-  for(let x=Math.floor(x0/st)*st;x<x1;x+=st){ const sx=((x%tw)+tw)%tw*k; ctx.drawImage(im,Math.min(sx,iw-st*k),0,st*k,ih,x,surfY(x+st/2)-top,st+.6,hh); } return true; }
+// trava in prst se narišeta enkrat v kose (512 px sveta) in se potem samo lepita na zaslon
+const GCH=512;
+function grassChunk(ci){ let c=GC.get(ci); if(c){ GC.delete(ci); GC.set(ci,c); return c; } const xa=ci*GCH; let mn=1e9, mx=-1e9; for(let x=xa-4;x<=xa+GCH+4;x+=4){ const y=surfY(x); if(y<mn) mn=y; if(y>mx) mx=y; }
+  const k=SC*DPR, top=mn-24, hgt=mx-mn+24+80, cv2=document.createElement('canvas'); cv2.width=Math.ceil(GCH*k)+2; cv2.height=Math.ceil(hgt*k); const q=cv2.getContext('2d'); q.scale(k,k); q.translate(-xa,-top);
+  if(sprOK('prst')){ const sp=q.createPattern(IMG.prst,'repeat'); sp.setTransform(new DOMMatrix().scale(.3)); q.lineCap='butt'; q.lineJoin='round'; q.beginPath(); for(let x=xa-12;x<=xa+GCH+12;x+=6){ const y=surfY(x)+50+Math.sin(x*.045)*3+Math.sin(x*.013)*4; x===xa-12?q.moveTo(x,y):q.lineTo(x,y); } q.strokeStyle='rgba(60,35,15,.25)'; q.lineWidth=44; q.stroke(); q.strokeStyle=sp; q.lineWidth=38; q.stroke(); }
+  const im=IMG.trava, iw=im.naturalWidth, ih=im.naturalHeight, tw=540, kk=iw/tw, hh=ih/kk, tp=hh*0.231+1, st=2;
+  for(let x=xa-st;x<xa+GCH+st;x+=st){ const sx=((x%tw)+tw)%tw*kk; q.drawImage(im,Math.min(sx,iw-st*kk),0,st*kk,ih,x,surfY(x+st/2)-tp,st+.5,hh); }
+  c={cv:cv2,top,hgt}; GC.set(ci,c); if(GC.size>8) GC.delete(GC.keys().next().value); return c; }
+function grassStrip(x0,x1){ if(!sprOK('trava')) return false; for(let ci=Math.floor(x0/GCH);ci*GCH<x1;ci++){ const c=grassChunk(ci); ctx.drawImage(c.cv,ci*GCH,c.top,c.cv.width/(SC*DPR),c.hgt); } return true; }
 function drawFront(x0,x1){ // kar stoji pred reko: mostovi
   if(sprOK('sneznik')&&x0<520) label(266,Yb-12-215+30,'Snežnik · 1796 m','#fff');
   if(sprOK('most')&&X.r1+80>x0&&X.r0-80<x1){ spr('most',X.r0+62,Yr+8,80); spr('most',X.r0+240,Yr+8,84,1); sign(X.r0+152,'Rakov Škocjan','500 m n. v.'); }
   if(sprOK('tromostovje')&&X.lj1>x0&&X.lj0<x1) spr('tromostovje',X.lj0+510,Yv+16,80); }
-function drawVignette(){ ctx.save(); ctx.setTransform(DPR,0,0,DPR,0,0); const r=Math.hypot(VW,VH)/2, g=ctx.createRadialGradient(VW/2,VH*.45,r*.55,VW/2,VH*.45,r*1.05); g.addColorStop(0,'rgba(30,24,50,0)'); g.addColorStop(1,'rgba(30,24,50,.3)'); ctx.fillStyle=g; ctx.fillRect(0,0,VW,VH); ctx.restore(); }
+function drawVignette(){}
 function caveRuns(){ const runs=[]; let cur=null; for(const p of RIV){ if(p[2]){ if(!cur){ cur=[]; runs.push(cur); } cur.push(p); } else cur=null; } return runs; }
 const CAVES=caveRuns();
 function drawCaves(x0,x1){ ctx.lineCap='round'; ctx.lineJoin='round'; const all=CAVES.concat([PIV]);
@@ -186,7 +194,7 @@ function drawWater(){ if(sprOK('voda')){ if(!drawWater.p) drawWater.p=ctx.create
 function drawFog(x0,x1){ if(front>=RL-2) return; const fx=rivAt(front)[0]+170; if(fx>x1) return; const a=Math.max(x0,fx-10), g=ctx.createLinearGradient(fx,0,fx+300,0); g.addColorStop(0,'rgba(14,20,44,0)'); g.addColorStop(1,'rgba(14,20,44,.86)'); ctx.fillStyle=g; ctx.fillRect(a,-900,x1-a+40,2800); }
 function drawDecor(x0,x1){ const vis=(a,b)=>!(b<x0-150||a>x1+150);
   if(vis(0,X.b0)){ drawSnezhnik(); for(const x of [430,470,510]) tree(x,.7,'p');
-    if(rain>.02){ if(sprOK('dezoblak')){ ctx.globalAlpha=clamp(rain*1.5,0,1); spr('dezoblak',170,62,105); spr('dezoblak',355,52,95,1); ctx.globalAlpha=1; } else { cloud(150,40,1.25); cloud(330,24,1.1); ctx.fillStyle='rgba(120,135,150,.35)'; ctx.beginPath(); ctx.ellipse(250,56,170,34,0,0,7); ctx.fill(); } ctx.strokeStyle=`rgba(70,140,220,${.75*rain})`; ctx.lineWidth=2.5; for(let i=0;i<46;i++){ const x=70+rnd(i)*440, y=40+((T*330+rnd(i+50)*300)%300); if(y<surfY(x)-4){ if(i%2&&sprOK('kaplja')){ ctx.globalAlpha=clamp(rain,0,1); spr('kaplja',x,y+14,15); ctx.globalAlpha=1; } else { ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-4,y+14); ctx.stroke(); } } } } }
+    if(false&&rain>.02){ if(sprOK('dezoblak')){ ctx.globalAlpha=clamp(rain*1.5,0,1); spr('dezoblak',170,62,105); spr('dezoblak',355,52,95,1); ctx.globalAlpha=1; } else { cloud(150,40,1.25); cloud(330,24,1.1); ctx.fillStyle='rgba(120,135,150,.35)'; ctx.beginPath(); ctx.ellipse(250,56,170,34,0,0,7); ctx.fill(); } ctx.strokeStyle=`rgba(70,140,220,${.75*rain})`; ctx.lineWidth=2.5; for(let i=0;i<46;i++){ const x=70+rnd(i)*440, y=40+((T*330+rnd(i+50)*300)%300); if(y<surfY(x)-4){ if(i%2&&sprOK('kaplja')){ ctx.globalAlpha=clamp(rain,0,1); spr('kaplja',x,y+14,15); ctx.globalAlpha=1; } else { ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-4,y+14); ctx.stroke(); } } } } }
   if(vis(X.b0,X.b1)){ sign(X.b0+215,'Babno polje','750 m n. v.'); church(X.b0+122,.8); house(X.b0+52,.9,'#fbf3df','#b5482f'); kozolec(X.b0+310,.8); flowers(X.b0+20,X.b1-20,1); ctx.fillStyle='#fff'; for(let i=0;i<8;i++){ const x=X.b0+rnd(i+70)*340, y=Yb-150+((T*22+rnd(i)*140)%140); if(!spr('snezinka',x+Math.sin(T+i)*6,y+6,11)){ ctx.beginPath(); ctx.arc(x+Math.sin(T+i)*6,y,2.4,0,7); ctx.fill(); } } }
   if(vis(X.b1,X.l0)){ spr('srna',X.b1+330,surfY(X.b1+330)+2,50); spr('grm',X.b1+520,surfY(X.b1+520)+3,28); spr('stor',X.b1+215,surfY(X.b1+215)+3,24); for(let x=X.b1+60;x<X.l0-30;x+=62) tree(x+rnd(x)*20,.75+rnd(x)*.3,rnd(x)>.4?'p':'d'); }
   if(vis(X.l0,X.l1)){ sign(X.l0+150,'Loško polje','580 m n. v.'); spr('kopica',X.l0+520,Yl+2,30); if(!spr('gradsneznik',X.l0+410,Yl+3,124)){ const x=X.l0+410,y=Yl; ctx.fillStyle='#f6f1e4'; ctx.fillRect(x-46,y-70,92,70); ctx.fillRect(x-64,y-52,24,52); ctx.fillRect(x+40,y-92,26,92); ctx.fillStyle='#b5482f'; path([[x-52,y-70],[x,y-104],[x+52,y-70]],true); ctx.fill(); path([[x+36,y-92],[x+53,y-124],[x+70,y-92]],true); ctx.fill(); path([[x-68,y-52],[x-52,y-72],[x-36,y-52]],true); ctx.fill(); ctx.fillStyle='#6b4a2e'; ctx.beginPath(); ctx.arc(x,y,13,Math.PI,0); ctx.fill(); ctx.fillStyle='#bfe0f5'; for(const [dx,dy] of [[-28,-48],[-8,-48],[14,-48],[48,-66],[48,-40]]) ctx.fillRect(x+dx,y+dy,9,13); }
@@ -263,7 +271,7 @@ function drawKarst(){ const t=karT, E=(a,b)=>smooth(clamp((t-a)/(b-a),0,1)), e1=
   ctx.font='900 19px Grandstander,Nunito,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillStyle='#6a4a22'; ctx.fillText('apnenec',x0+18,y0+h-22);
   if(e2>.7){ ctx.globalAlpha=pop*clamp((e2-.7)/.2,0,1); label(cx,cy-cry*1.35,'jama','#ffe9b0'); ctx.globalAlpha=pop; }
   const yrs=Math.round(E(.04,1)*100)*1000; label(VW/2,y0+h+24,yrs?'⏳ čez '+yrs.toLocaleString('sl-SI')+' let':'⏳ danes','#fff'); ctx.restore(); }
-function frame(now){ const dt=Math.min(.05,(now-(frame.t||now))/1000); frame.t=now; if(!paused){ T+=dt; step(dt); }
+function frame(now){ const dt=Math.min(.05,(now-(frame.t||now))/1000); if(frame.t&&!document.hidden){ const ms=now-frame.t; frame.n=(frame.n||0)+1; frame.sum=(frame.sum||0)+Math.min(ms,200); if(frame.n>=50){ const avg=frame.sum/frame.n; frame.n=0; frame.sum=0; if(avg>26&&DCAP>1){ DCAP=DCAP>1.5?1.5:(DCAP>1.25?1.25:1); resize(); } } } frame.t=now; if(!paused){ T+=dt; step(dt); }
   ctx.setTransform(DPR,0,0,DPR,0,0); ctx.clearRect(0,0,VW,VH); const vw=VW/SC; const tx=clamp(rivAt(front)[0]-vw*.42,0,Math.max(0,W-vw)); camX+= (tx-camX)*(1-Math.pow(.02,dt)); if(!running) camX=tx;
   { const p=rivAt(front), vh=VH/SC; let ty=p[1]; if(p[0]>POS[0]-600&&p[0]<JY[0]+160) ty+=75; rvY+=(ty-rvY)*(1-Math.pow(.12,dt)); if(!running) rvY=ty; Y0=rvY-vh*(VW>VH?.57:.5); }
   ctx.save(); ctx.scale(SC,SC); ctx.translate(-camX,-Y0); const x0=camX-20, x1=camX+vw+20;
