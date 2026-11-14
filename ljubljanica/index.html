@@ -49,23 +49,30 @@ const cv=$('cv'), ctx=cv.getContext('2d');
 let VW=0,VH=0,DPR=1,SC=1,Y0=60;
 function resize(){ DPR=Math.min(window.devicePixelRatio||1,2); VW=innerWidth; VH=innerHeight; cv.width=Math.round(VW*DPR); cv.height=Math.round(VH*DPR); SC=Math.min(VH/760,VW/620); Y0=440-(VH/SC)/2; }
 addEventListener('resize',resize); resize();
-const W=9700, H=1000;
+const W=10400, H=1000;
 const lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), smooth=t=>t*t*(3-2*t);
 function rnd(i){ const x=Math.sin(i*127.1+311.7)*43758.5453; return x-Math.floor(x); }
 
 // ---------------- površje (prerez) ----------------
-const SURF=[[0,330],[120,250],[260,120],[400,250],[520,370],[600,400],[1250,400],[1330,360],[1480,290],[1640,340],[1750,410],[2450,410],[2540,360],[2700,285],[2860,360],[2960,430],[4060,430],[4150,395],[4300,300],[4420,330],[4490,340],[4520,430],[5070,430],[5110,340],[5230,290],[5420,245],[5640,275],[5860,300],[5905,440],[6850,440],[6940,380],[7160,255],[7380,285],[7500,310],[7535,455],[9700,455]];
+// Vodoravno merilo: 120 px = 1 km zračne razdalje. Navpično: 0,7 px = 1 m nadmorske višine (Snežnik ni v merilu).
+const KM=120, EY=e=>600-(e-270)*.7;
+const X={b0:560,b1:920,l0:1760,l1:2360,c0:2720,c1:3800,r0:4100,r1:4400,p0:4820,p1:5540,v0:6860,lj0:8900,lj1:9700,s0:10220};
+const E={b:750,l:580,c:550,r:500,p:450,v:290,s:270}, Yb=EY(E.b), Yl=EY(E.l), Yc=EY(E.c), Yr=EY(E.r), Yp=EY(E.p), Yv=EY(E.v), Ys=EY(E.s);
+const SURF=[[0,300],[120,230],[260,70],[400,170],[500,Yb-18],[X.b0,Yb],[X.b1,Yb],[X.b1+70,Yb-40],[1250,Yb-70],[1520,Yl-150],[1690,Yl-60],[X.l0-8,Yl-30],[X.l0,Yl],[X.l1,Yl],[X.l1+70,Yl-50],[2540,Yl-120],[2670,Yc-50],[X.c0-8,Yc-26],[X.c0,Yc],[X.c1,Yc],[X.c1+60,Yc-40],[3950,Yc-105],[4060,Yr-70],[X.r0-10,Yr-66],[X.r0,Yr],[X.r1,Yr],[X.r1+12,Yr-70],[4520,Yr-120],[4680,Yp-140],[X.p0-70,Yp-110],[X.p0-6,Yp-70],[X.p0,Yp],[X.p1,Yp],[X.p1+80,Yp-50],[5800,Yp-150],[6200,Yv-250],[6560,Yv-170],[X.v0-40,Yv-110],[X.v0-6,Yv-60],[X.v0,Yv],[X.s0-60,Yv],[X.s0,Ys],[W,Ys]];
 function surfY(x){ if(x<=SURF[0][0]) return SURF[0][1]; for(let i=1;i<SURF.length;i++){ if(x<=SURF[i][0]){ const a=SURF[i-1], b=SURF[i]; return lerp(a[1],b[1],smooth((x-a[0])/(b[0]-a[0]))); } } return SURF[SURF.length-1][1]; }
 
-// ---------------- pot reke ----------------  u = pod zemljo
-const RIV=[[548,372,0],[600,404,0],[1238,404,0],[1262,440,1],[1300,520,1],[1420,565,1],[1560,560,1],[1680,490,1],[1740,430,1],[1768,414,0],[2440,414,0],[2466,450,1],[2510,540,1],[2640,585,1],[2780,570,1],[2890,490,1],[2945,446,1],[2975,434,0],[4040,434,0],[4066,470,1],[4110,560,1],[4240,600,1],[4370,560,1],[4460,470,1],[4505,440,1],[4530,434,0],[5058,434,0],[5082,462,1],[5130,530,1],[5300,575,1],[5500,585,1],[5700,545,1],[5840,480,1],[5905,446,1],[5930,444,0],[6838,444,0],[6864,480,1],[6910,580,1],[7060,650,1],[7250,660,1],[7410,590,1],[7500,500,1],[7540,462,1],[7565,459,0],[9200,459,0],[9700,462,0]];
+// ---------------- pot reke ----------------  tretji podatek: 1 = pod zemljo
+function cave(x0,y0,x1,y1,sag){ const n=Math.max(4,Math.round((x1-x0)/130)), out=[[x0+22,y0+34,1]]; for(let k=1;k<n;k++){ const t=k/n; out.push([lerp(x0+40,x1-40,t),lerp(y0+46,y1+10,t)+Math.sin(t*Math.PI)*sag+Math.sin(t*9+x0)*7,1]); } out.push([x1-26,y1+12,1]); return out; }
+const RIV=[[X.b0-14,Yb-12,0],[X.b0+20,Yb+4,0],[X.b1-4,Yb+4,0],...cave(X.b1,Yb,X.l0,Yl,26),[X.l0+6,Yl+4,0],[X.l1-4,Yl+4,0],...cave(X.l1,Yl,X.c0,Yc,34),[X.c0+6,Yc+4,0],[X.c1-4,Yc+4,0],...cave(X.c1,Yc,X.r0,Yr,30),[X.r0+6,Yr+4,0],[X.r1-4,Yr+4,0],...cave(X.r1,Yr,X.p0,Yp,34),[X.p0+6,Yp+4,0],[X.p1-4,Yp+4,0],...cave(X.p1,Yp,X.v0,Yv,40),[X.v0+6,Yv+4,0],[X.s0-70,Yv+4,0],[X.s0,Ys+6,0],[W,Ys+6,0]];
 const CUM=[0]; for(let i=1;i<RIV.length;i++) CUM.push(CUM[i-1]+Math.hypot(RIV[i][0]-RIV[i-1][0],RIV[i][1]-RIV[i-1][1]));
 const RL=CUM[CUM.length-1];
 function rivAt(s){ s=clamp(s,0,RL); let i=1; while(i<CUM.length-1&&CUM[i]<s) i++; const t=(s-CUM[i-1])/(CUM[i]-CUM[i-1]||1); return [lerp(RIV[i-1][0],RIV[i][0],t),lerp(RIV[i-1][1],RIV[i][1],t),RIV[i][2]&&RIV[i-1][2]?1:(RIV[i][2]||RIV[i-1][2]?.5:0)]; }
 function sAtX(x){ for(let i=1;i<RIV.length;i++){ if(RIV[i][0]>=x){ const t=(x-RIV[i-1][0])/(RIV[i][0]-RIV[i-1][0]||1); return lerp(CUM[i-1],CUM[i],clamp(t,0,1)); } } return RL; }
-// Pivka: priteče skozi Postojnsko jamo in se pod zemljo pridruži Raku
-const PIV=[[4780,790],[4900,760],[5020,735],[5150,725],[5290,715],[5400,680],[5470,625],[5500,585]];
+// Pivka: ponikne v Postojnsko jamo in po približno 9 km pod zemljo priteče v Planinsko jamo
+const JX=4690, JY=(()=>{ let b=RIV[0]; for(const q of RIV) if(Math.abs(q[0]-JX)<Math.abs(b[0]-JX)) b=q; return b; })();
+const PIV=[[JY[0]-1080,655],[JY[0]-930,650],[JY[0]-780,662],[JY[0]-620,650],[JY[0]-460,628],[JY[0]-300,596],[JY[0]-150,548],[JY[0]-50,505],[JY[0],JY[1]]];
 const PCUM=[0]; for(let i=1;i<PIV.length;i++) PCUM.push(PCUM[i-1]+Math.hypot(PIV[i][0]-PIV[i-1][0],PIV[i][1]-PIV[i-1][1])); const PL=PCUM[PCUM.length-1];
+const POS=[JY[0]-800,662];   // sredina Postojnske jame
 
 // ---------------- stanje ----------------
 let T=0, front=0, camX=300, pivT=0, lake=0, lakeTgt=0, rain=1, running=false, paused=false, runId=0, nameIdx=0;
@@ -81,7 +88,7 @@ function church(x,s){ const y=surfY(x); ctx.fillStyle='#fbf6ea'; ctx.fillRect(x-
 function kozolec(x,s){ const y=surfY(x); ctx.fillStyle='#8a6238'; for(const dx of [-22,0,22]) ctx.fillRect(x+dx*s-2*s,y-40*s,4*s,40*s); ctx.fillStyle='#e3c56a'; for(let k=0;k<4;k++) ctx.fillRect(x-24*s,y-(34-k*8)*s,48*s,5*s); ctx.fillStyle='#7a5230'; ctx.beginPath(); ctx.moveTo(x-30*s,y-40*s); ctx.lineTo(x,y-52*s); ctx.lineTo(x+30*s,y-40*s); ctx.closePath(); ctx.fill(); }
 function cow(x,s,flip){ const y=surfY(x); ctx.save(); ctx.translate(x,y); ctx.scale(flip?-s:s,s); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.ellipse(0,-17,17,10,0,0,7); ctx.fill(); ctx.fillStyle='#5a4030'; ctx.beginPath(); ctx.ellipse(-4,-19,6,5,0,0,7); ctx.fill(); ctx.beginPath(); ctx.ellipse(8,-14,4,3,0,0,7); ctx.fill(); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.ellipse(18,-23,7,6,0,0,7); ctx.fill(); ctx.fillStyle='#e9b3a5'; ctx.beginPath(); ctx.ellipse(23,-21,3.5,3,0,0,7); ctx.fill(); ctx.fillStyle='#444'; ctx.fillRect(-12,-9,3,9); ctx.fillRect(-4,-9,3,9); ctx.fillRect(6,-9,3,9); ctx.fillRect(12,-9,3,9); ctx.restore(); }
 function flowers(x0,x1,seed){ for(let i=0;i<Math.floor((x1-x0)/26);i++){ const x=x0+rnd(seed+i)*(x1-x0), y=surfY(x)-3; ctx.fillStyle=['#fff','#ffd84a','#ff8fb3','#ffffff'][i%4]; ctx.beginPath(); ctx.arc(x,y,2.6,0,7); ctx.fill(); } }
-function sign(x,txt,dy){ const y=surfY(x)+(dy||0); ctx.fillStyle='#7a5230'; ctx.fillRect(x-3,y-46,6,48); ctx.font='800 17px Grandstander,Nunito,sans-serif'; const w=ctx.measureText(txt).width+18; ctx.fillStyle='#ffe9b0'; ctx.strokeStyle='#5a3a1a'; ctx.lineWidth=3; ctx.beginPath(); ctx.roundRect(x-w/2,y-74,w,28,7); ctx.fill(); ctx.stroke(); ctx.fillStyle='#5a3a1a'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(txt,x,y-59); }
+function sign(x,txt,sub){ const y=surfY(x); ctx.fillStyle='#7a5230'; ctx.fillRect(x-3,y-46,6,48); ctx.font='800 17px Grandstander,Nunito,sans-serif'; let w=ctx.measureText(txt).width+18; if(sub){ ctx.font='900 13px Nunito,sans-serif'; w=Math.max(w,ctx.measureText(sub).width+18); } const h=sub?44:28; ctx.fillStyle='#ffe9b0'; ctx.strokeStyle='#5a3a1a'; ctx.lineWidth=3; ctx.beginPath(); ctx.roundRect(x-w/2,y-46-h,w,h,7); ctx.fill(); ctx.stroke(); ctx.fillStyle='#5a3a1a'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='800 17px Grandstander,Nunito,sans-serif'; ctx.fillText(txt,x,y-46-h+15); if(sub){ ctx.font='900 13px Nunito,sans-serif'; ctx.fillStyle='#a05a14'; ctx.fillText(sub,x,y-46-h+33); } }
 function label(x,y,txt,col){ ctx.font='800 19px Grandstander,Nunito,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.lineWidth=5; ctx.strokeStyle='rgba(20,18,30,.75)'; ctx.strokeText(txt,x,y); ctx.fillStyle=col||'#ffe9b0'; ctx.fillText(txt,x,y); }
 function cloud(x,y,s){ ctx.fillStyle='rgba(255,255,255,.92)'; for(const [dx,dy,r] of [[0,0,30],[30,-12,36],[66,0,30],[34,10,34]]){ ctx.beginPath(); ctx.arc(x+dx*s,y+dy*s,r*s,0,7); ctx.fill(); } }
 
@@ -92,11 +99,9 @@ function drawSky(x0,x1){ const g=ctx.createLinearGradient(0,0,0,480); g.addColor
   for(let i=0;i<26;i++){ const cx=i*520+((T*6+i*97)%520)+camX*.45-900; if(cx<x0-200||cx>x1+200) continue; cloud(cx,60+rnd(i)*110,.7+rnd(i+9)*.6); }
   // oddaljeni hribi
   const hx=camX*.55; for(const [col,amp,base,f,ph] of [['#b9d9c8',70,330,.004,0],['#9fcbb0',90,380,.0062,2]]){ ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(x0,520); for(let x=x0;x<=x1+20;x+=20){ const u=x-hx*(col==='#b9d9c8'?1:.6); ctx.lineTo(x,base-amp*(.5+.5*Math.sin(u*f+ph))-25*Math.sin(u*f*2.7+1)); } ctx.lineTo(x1+20,520); ctx.closePath(); ctx.fill(); } }
-function drawSnezhnik(){ // gora Snežnik na začetku
-  ctx.fillStyle='#8fa7a0'; path([[40,330],[260,118],[470,330]],true); ctx.fill(); ctx.fillStyle='#fff'; path([[205,172],[260,118],[318,178],[290,170],[262,190],[236,168]],true); ctx.fill(); }
-function drawLjBack(){ // grajski grič in grad za Ljubljano
-  ctx.fillStyle='#6fb86a'; ctx.beginPath(); ctx.moveTo(8500,455); ctx.quadraticCurveTo(8760,210,9020,455); ctx.closePath(); ctx.fill(); for(let i=0;i<9;i++) blob(8600+i*42,400-Math.sin(i/8*3.14)*95,26,24,i%2?'#4f9f45':'#5aae4e');
-  const x=8760,y=318; ctx.fillStyle='#efe6d2'; ctx.fillRect(x-70,y-40,140,44); ctx.fillRect(x-14,y-96,26,60); ctx.fillStyle='#b5482f'; path([[x-76,y-40],[x-40,y-62],[x+40,y-62],[x+76,y-40]],true); ctx.fill(); ctx.fillStyle='#efe6d2'; for(let k=0;k<4;k++) ctx.fillRect(x-14+k*7,y-104,4,9); ctx.strokeStyle='#5a3a1a'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x-1,y-104); ctx.lineTo(x-1,y-130); ctx.stroke(); ctx.fillStyle='#3d9b4a'; ctx.fillRect(x-1,y-130,20,7); ctx.fillStyle='#fff'; ctx.fillRect(x-1,y-123,20,6); }
+function drawSnezhnik(){ ctx.fillStyle='#8fa7a0'; path([[30,300],[260,68],[480,Yb-10]],true); ctx.fill(); ctx.fillStyle='#fff'; path([[203,126],[260,68],[320,134],[292,124],[262,146],[234,122]],true); ctx.fill(); label(260,40,'Snežnik · 1796 m','#fff'); }
+function drawLjBack(){ const cx=X.lj0+360, y0=Yv; ctx.fillStyle='#6fb86a'; ctx.beginPath(); ctx.moveTo(cx-260,y0); ctx.quadraticCurveTo(cx,y0-250,cx+260,y0); ctx.closePath(); ctx.fill(); for(let i=0;i<9;i++) blob(cx-160+i*42,y0-55-Math.sin(i/8*3.14)*95,26,24,i%2?'#4f9f45':'#5aae4e');
+  const x=cx,y=y0-137; ctx.fillStyle='#efe6d2'; ctx.fillRect(x-70,y-40,140,44); ctx.fillRect(x-14,y-96,26,60); ctx.fillStyle='#b5482f'; path([[x-76,y-40],[x-40,y-62],[x+40,y-62],[x+76,y-40]],true); ctx.fill(); ctx.fillStyle='#efe6d2'; for(let k=0;k<4;k++) ctx.fillRect(x-14+k*7,y-104,4,9); ctx.strokeStyle='#5a3a1a'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x-1,y-104); ctx.lineTo(x-1,y-130); ctx.stroke(); ctx.fillStyle='#3d9b4a'; ctx.fillRect(x-1,y-130,20,7); ctx.fillStyle='#fff'; ctx.fillRect(x-1,y-123,20,6); }
 function drawGround(x0,x1){ // kamnina (apnenec) + prst + trava
   ctx.beginPath(); ctx.moveTo(x0,H+900); for(let x=x0;x<=x1+12;x+=12) ctx.lineTo(x,surfY(x)); ctx.lineTo(x1+12,H+900); ctx.closePath();
   const g=ctx.createLinearGradient(0,250,0,H); g.addColorStop(0,'#d9c9a6'); g.addColorStop(.35,'#c4b391'); g.addColorStop(1,'#8f8674'); ctx.fillStyle=g; ctx.fill();
@@ -112,98 +117,88 @@ function drawGround(x0,x1){ // kamnina (apnenec) + prst + trava
   ctx.beginPath(); for(let x=x0;x<=x1+12;x+=12){ const y=surfY(x)-3; x===x0?ctx.moveTo(x,y):ctx.lineTo(x,y); } ctx.strokeStyle='#9ad86f'; ctx.lineWidth=4; ctx.stroke(); }
 function caveRuns(){ const runs=[]; let cur=null; for(const p of RIV){ if(p[2]){ if(!cur){ cur=[]; runs.push(cur); } cur.push(p); } else cur=null; } return runs; }
 const CAVES=caveRuns();
-function drawCaves(x0,x1){ ctx.lineCap='round'; ctx.lineJoin='round';
-  const all=CAVES.concat([PIV]);
-  for(const [wd,col] of [[104,'#5d5648'],[90,'#2a2733'],[60,'#211f2a']]){ ctx.strokeStyle=col; for(const r of all){ if(r[r.length-1][0]<x0-200||r[0][0]>x1+200) continue; ctx.lineWidth=wd*(r===PIV?1.15:1); path(r); ctx.stroke(); } }
-  // Postojnska jama: velika dvorana
-  ctx.fillStyle='#5d5648'; ctx.beginPath(); ctx.ellipse(5130,705,205,88,-.05,0,7); ctx.fill(); ctx.fillStyle='#2a2733'; ctx.beginPath(); ctx.ellipse(5130,705,195,80,-.05,0,7); ctx.fill();
-  // Planinska jama: dvorana ob sotočju
-  ctx.fillStyle='#5d5648'; ctx.beginPath(); ctx.ellipse(5510,570,150,66,0,0,7); ctx.fill(); ctx.fillStyle='#2a2733'; ctx.beginPath(); ctx.ellipse(5510,570,142,59,0,0,7); ctx.fill();
-  // kapniki
-  for(const r of all){ for(let i=1;i<r.length;i++){ const a=r[i-1], b=r[i], n=Math.floor(Math.hypot(b[0]-a[0],b[1]-a[1])/34); for(let k=0;k<n;k++){ const t=(k+.5)/n, x=lerp(a[0],b[0],t), y=lerp(a[1],b[1],t); if(x<x0-40||x>x1+40||Math.abs(b[1]-a[1])>Math.abs(b[0]-a[0])*1.2) continue; const h=10+rnd(x)*20; ctx.fillStyle='#b9ad93'; ctx.beginPath(); ctx.moveTo(x-5,y-43); ctx.lineTo(x+5,y-43); ctx.lineTo(x,y-43+h); ctx.closePath(); ctx.fill(); if(rnd(x+7)>.55){ ctx.beginPath(); ctx.moveTo(x+14,y+42); ctx.lineTo(x+24,y+42); ctx.lineTo(x+19,y+42-h*.8); ctx.closePath(); ctx.fill(); } } } }
-  for(let i=0;i<13;i++){ const x=4960+i*28, top=705-78*Math.sqrt(Math.max(0,1-Math.pow((x-5130)/195,2))); const h=16+rnd(i*3)*34; ctx.fillStyle=i%3?'#c9bea4':'#e6dcc4'; ctx.beginPath(); ctx.moveTo(x-7,top-2); ctx.lineTo(x+7,top-2); ctx.lineTo(x,top+h); ctx.closePath(); ctx.fill(); }
-  for(const [x,h] of [[5010,30],[5075,46],[5215,38],[5270,24]]){ ctx.fillStyle='#d9cfb6'; ctx.beginPath(); ctx.moveTo(x-10,768); ctx.lineTo(x+10,768); ctx.lineTo(x,768-h); ctx.closePath(); ctx.fill(); } }
+function drawCaves(x0,x1){ ctx.lineCap='round'; ctx.lineJoin='round'; const all=CAVES.concat([PIV]);
+  for(const [wd,col] of [[92,'#5d5648'],[78,'#2a2733'],[50,'#211f2a']]){ ctx.strokeStyle=col; for(const r of all){ if(r[r.length-1][0]<x0-200||r[0][0]>x1+200) continue; ctx.lineWidth=wd; path(r); ctx.stroke(); } }
+  // Postojnska jama (velika dvorana) in Planinska jama (dvorana ob sotočju)
+  ctx.fillStyle='#5d5648'; ctx.beginPath(); ctx.ellipse(POS[0],POS[1]-12,215,84,0,0,7); ctx.fill(); ctx.fillStyle='#2a2733'; ctx.beginPath(); ctx.ellipse(POS[0],POS[1]-12,205,76,0,0,7); ctx.fill();
+  ctx.fillStyle='#5d5648'; ctx.beginPath(); ctx.ellipse(JY[0],JY[1]-6,120,60,0,0,7); ctx.fill(); ctx.fillStyle='#2a2733'; ctx.beginPath(); ctx.ellipse(JY[0],JY[1]-6,112,53,0,0,7); ctx.fill();
+  for(const r of all){ for(let i=1;i<r.length;i++){ const a=r[i-1], b=r[i], n=Math.floor(Math.hypot(b[0]-a[0],b[1]-a[1])/34); for(let k=0;k<n;k++){ const t=(k+.5)/n, x=lerp(a[0],b[0],t), y=lerp(a[1],b[1],t); if(x<x0-40||x>x1+40||Math.abs(b[1]-a[1])>Math.abs(b[0]-a[0])*1.2) continue; const h=9+rnd(x)*17; ctx.fillStyle='#b9ad93'; ctx.beginPath(); ctx.moveTo(x-5,y-37); ctx.lineTo(x+5,y-37); ctx.lineTo(x,y-37+h); ctx.closePath(); ctx.fill(); if(rnd(x+7)>.55){ ctx.beginPath(); ctx.moveTo(x+14,y+37); ctx.lineTo(x+24,y+37); ctx.lineTo(x+19,y+37-h*.8); ctx.closePath(); ctx.fill(); } } } }
+  for(let i=0;i<14;i++){ const x=POS[0]-185+i*28, top=POS[1]-12-74*Math.sqrt(Math.max(0,1-Math.pow((x-POS[0])/205,2))); const h=16+rnd(i*3)*32; ctx.fillStyle=i%3?'#c9bea4':'#e6dcc4'; ctx.beginPath(); ctx.moveTo(x-7,top-2); ctx.lineTo(x+7,top-2); ctx.lineTo(x,top+h); ctx.closePath(); ctx.fill(); }
+  for(const [dx,h] of [[-130,28],[-60,42],[80,34],[140,22]]){ const x=POS[0]+dx, yb=POS[1]+56; ctx.fillStyle='#d9cfb6'; ctx.beginPath(); ctx.moveTo(x-10,yb); ctx.lineTo(x+10,yb); ctx.lineTo(x,yb-h); ctx.closePath(); ctx.fill(); } }
 function drawPonors(){ // požiralniki in izviri na površju
   for(let i=1;i<RIV.length;i++){ const a=RIV[i-1], b=RIV[i]; if(a[2]!==b[2]){ const p=a[2]?a:b; const sy=surfY(p[0]); ctx.fillStyle='#211f2a'; ctx.beginPath(); ctx.ellipse(p[0],sy+12,24,15,0,0,7); ctx.fill(); ctx.fillStyle='#8f8674'; for(const dx of [-27,27]){ ctx.beginPath(); ctx.ellipse(p[0]+dx,sy+4,12,9,0,0,7); ctx.fill(); } } } }
 function strokeRiver(pts,w,col,dash,off){ if(pts.length<2) return; ctx.lineCap='round'; ctx.lineJoin='round'; path(pts); ctx.lineWidth=w; ctx.strokeStyle=col; if(dash){ ctx.setLineDash(dash); ctx.lineDashOffset=off; } ctx.stroke(); ctx.setLineDash([]); }
 function partial(P,C,s){ const out=[]; for(let i=0;i<P.length;i++){ if(C[i]<=s) out.push(P[i]); else { const t=(s-C[i-1])/(C[i]-C[i-1]||1); if(i>0) out.push([lerp(P[i-1][0],P[i][0],t),lerp(P[i-1][1],P[i][1],t)]); break; } } return out; }
 function drawWater(){ // Cerkniško jezero
-  if(lake>.01){ const y=434-lake*30; ctx.fillStyle='rgba(60,160,230,.92)'; ctx.beginPath(); ctx.moveTo(2985,436); ctx.lineTo(2985+ (1-lake)*220,y); for(let x=3200;x<=3900;x+=20) ctx.lineTo(x,y+Math.sin(x*.05+T*2)*1.6); ctx.lineTo(4035-(1-lake)*120,y); ctx.lineTo(4040,438); ctx.closePath(); ctx.fill(); ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=2.5; for(let k=0;k<5;k++){ const x=3260+k*140+Math.sin(T+k)*12; ctx.beginPath(); ctx.moveTo(x,y+9); ctx.lineTo(x+40,y+9); ctx.stroke(); }
-    // čoln z ribičem
-    if(lake>.5){ const bx=3560+Math.sin(T*.4)*60, by=y-2+Math.sin(T*2)*1.5; ctx.fillStyle='#8a5a30'; ctx.beginPath(); ctx.moveTo(bx-32,by-8); ctx.lineTo(bx+32,by-8); ctx.lineTo(bx+22,by+6); ctx.lineTo(bx-22,by+6); ctx.closePath(); ctx.fill(); ctx.fillStyle='#e9574a'; ctx.fillRect(bx-6,by-28,12,20); ctx.fillStyle='#f2c9a0'; ctx.beginPath(); ctx.arc(bx,by-34,7,0,7); ctx.fill(); ctx.fillStyle='#e8c74a'; ctx.beginPath(); ctx.ellipse(bx,by-40,12,4,0,0,7); ctx.fill(); ctx.strokeStyle='#5a3a1a'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(bx+5,by-22); ctx.lineTo(bx+44,by-48); ctx.lineTo(bx+46,by-4); ctx.stroke(); } }
-  const main=partial(RIV,CUM,front); strokeRiver(main,17,'#2f8fe0'); strokeRiver(main,9,'#59b6f5'); strokeRiver(main,3,'rgba(255,255,255,.75)',[14,30],-T*46);
-  if(pivT>0){ const pv=partial(PIV,PCUM,pivT*PL); strokeRiver(pv,19,'#2f8fe0'); strokeRiver(pv,10,'#59b6f5'); strokeRiver(pv,3,'rgba(255,255,255,.75)',[14,30],-T*46); }
-  // Sava na koncu
-  ctx.fillStyle='#3d9be6'; ctx.fillRect(9250,452,460,26); ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=3; for(let k=0;k<5;k++){ const x=9270+((T*40+k*90)%430); ctx.beginPath(); ctx.moveTo(x,462); ctx.lineTo(x+30,462); ctx.stroke(); } }
-function drawDrop(){ const p=rivAt(front); const x=p[0], y=p[1]-20+Math.sin(T*6)*2.5; ctx.fillStyle='rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x,p[1]+2,13,4,0,0,7); ctx.fill();
-  if(p[2]>0){ const g=ctx.createRadialGradient(x,y,6,x,y,120); g.addColorStop(0,'rgba(255,240,180,.42)'); g.addColorStop(1,'rgba(255,240,180,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,120,0,7); ctx.fill(); }
-  ctx.fillStyle='#37a6f0'; ctx.strokeStyle='#17609c'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x,y-26); ctx.bezierCurveTo(x+20,y-4,x+18,y+16,x,y+16); ctx.bezierCurveTo(x-18,y+16,x-20,y-4,x,y-26); ctx.fill(); ctx.stroke();
-  ctx.fillStyle='rgba(255,255,255,.75)'; ctx.beginPath(); ctx.ellipse(x-7,y-2,3.5,6,.4,0,7); ctx.fill(); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x-5,y+3,4.6,0,7); ctx.arc(x+6,y+3,4.6,0,7); ctx.fill(); ctx.fillStyle='#1b2a44'; const bl=(T%3.2)<.12?0.3:1; ctx.beginPath(); ctx.ellipse(x-4,y+3.5,2.2,2.2*bl,0,0,7); ctx.ellipse(x+7,y+3.5,2.2,2.2*bl,0,0,7); ctx.fill(); ctx.strokeStyle='#1b2a44'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x+1,y+8,4.5,.15*Math.PI,.85*Math.PI); ctx.stroke(); }
+  if(lake>.01){ const a=X.c0+60, b=X.c1-30, y=Yc+4-lake*26; ctx.fillStyle='rgba(60,160,230,.92)'; ctx.beginPath(); ctx.moveTo(a,Yc+6); ctx.lineTo(a+(1-lake)*200,y); for(let x=a+220;x<=b-140;x+=20) ctx.lineTo(x,y+Math.sin(x*.05+T*2)*1.6); ctx.lineTo(b-(1-lake)*110,y); ctx.lineTo(b,Yc+8); ctx.closePath(); ctx.fill(); ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=2.5; for(let k=0;k<5;k++){ const x=a+260+k*130+Math.sin(T+k)*12; ctx.beginPath(); ctx.moveTo(x,y+9); ctx.lineTo(x+40,y+9); ctx.stroke(); }
+    if(lake>.5){ const bx=X.c0+620+Math.sin(T*.4)*60, by=y-2+Math.sin(T*2)*1.5; ctx.fillStyle='#8a5a30'; ctx.beginPath(); ctx.moveTo(bx-32,by-8); ctx.lineTo(bx+32,by-8); ctx.lineTo(bx+22,by+6); ctx.lineTo(bx-22,by+6); ctx.closePath(); ctx.fill(); ctx.fillStyle='#e9574a'; ctx.fillRect(bx-6,by-28,12,20); ctx.fillStyle='#f2c9a0'; ctx.beginPath(); ctx.arc(bx,by-34,7,0,7); ctx.fill(); ctx.fillStyle='#e8c74a'; ctx.beginPath(); ctx.ellipse(bx,by-40,12,4,0,0,7); ctx.fill(); ctx.strokeStyle='#5a3a1a'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(bx+5,by-22); ctx.lineTo(bx+44,by-48); ctx.lineTo(bx+46,by-4); ctx.stroke(); } }
+  // Sava
+  ctx.fillStyle='#3d9be6'; ctx.fillRect(X.s0-10,Ys-2,W-X.s0+20,30); ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=3; for(let k=0;k<3;k++){ const x=X.s0+10+((T*40+k*60)%150); ctx.beginPath(); ctx.moveTo(x,Ys+10); ctx.lineTo(x+26,Ys+10); ctx.stroke(); }
+  const main=partial(RIV,CUM,front); strokeRiver(main,22,'#1f7fd0'); strokeRiver(main,14,'#3ea4f0'); strokeRiver(main,6,'#8fd0ff'); strokeRiver(main,3,'rgba(255,255,255,.85)',[14,30],-T*52);
+  if(pivT>0){ const pv=partial(PIV,PCUM,pivT*PL); strokeRiver(pv,22,'#1f7fd0'); strokeRiver(pv,14,'#3ea4f0'); strokeRiver(pv,6,'#8fd0ff'); strokeRiver(pv,3,'rgba(255,255,255,.85)',[14,30],-T*52); }
+  // čelo reke: svetel sij, da se vidi, kje smo
+  if(running&&front<RL-2){ const p=rivAt(front), r=26+Math.sin(T*5)*5; const g=ctx.createRadialGradient(p[0],p[1],2,p[0],p[1],r*2.4); g.addColorStop(0,'rgba(255,255,255,.95)'); g.addColorStop(.35,'rgba(170,225,255,.6)'); g.addColorStop(1,'rgba(170,225,255,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(p[0],p[1],r*2.4,0,7); ctx.fill(); label(p[0],p[1]-50,'▲ '+Math.round((270+(604-p[1])/.7)/10)*10+' m','#fff'); } }
+// zatemnitev dela, do katerega reka še ni pritekla
+function drawFog(x0,x1){ if(front>=RL-2) return; const fx=rivAt(front)[0]+170; if(fx>x1) return; const a=Math.max(x0,fx-10), g=ctx.createLinearGradient(fx,0,fx+300,0); g.addColorStop(0,'rgba(14,20,44,0)'); g.addColorStop(1,'rgba(14,20,44,.86)'); ctx.fillStyle=g; ctx.fillRect(a,-900,x1-a+40,2800); }
 function drawDecor(x0,x1){ const vis=(a,b)=>!(b<x0-150||a>x1+150);
-  if(vis(0,560)){ drawSnezhnik(); for(const x of [440,490,535]) tree(x,.8,'p'); // dež
-    if(rain>.02){ cloud(150,70,1.25); cloud(330,50,1.1); ctx.fillStyle='rgba(120,135,150,.35)'; ctx.beginPath(); ctx.ellipse(250,82,170,34,0,0,7); ctx.fill(); ctx.strokeStyle=`rgba(70,140,220,${.75*rain})`; ctx.lineWidth=2.5; for(let i=0;i<46;i++){ const x=70+rnd(i)*440, yy=(T*330+rnd(i+50)*300)%300; const y=100+yy; if(y<surfY(x)-4){ ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-4,y+14); ctx.stroke(); } } } }
-  if(vis(560,1300)){ sign(900,'Babno polje'); house(700,1,'#fbf3df','#b5482f'); house(760,.85,'#f3e2c0','#8f3b28'); church(1040,.9); kozolec(1150,.9); cow(830,1); tree(640,.8,'d'); flowers(620,1230,1); // mraz: snežinke
-    ctx.fillStyle='#fff'; for(let i=0;i<10;i++){ const x=640+rnd(i+70)*560, y=250+((T*22+rnd(i)*150)%150); ctx.beginPath(); ctx.arc(x+Math.sin(T+i)*6,y,2.4,0,7); ctx.fill(); } }
-  if(vis(1300,1750)){ for(const x of [1360,1410,1470,1530,1590,1650,1700]) tree(x,.75+rnd(x)*.3,rnd(x)>.4?'p':'d'); }
-  if(vis(1750,2500)){ sign(2020,'Loško polje'); // grad Snežnik
-    const x=2250,y=surfY(2250); ctx.fillStyle='#f6f1e4'; ctx.fillRect(x-46,y-70,92,70); ctx.fillRect(x-64,y-52,24,52); ctx.fillRect(x+40,y-92,26,92); ctx.fillStyle='#b5482f'; path([[x-52,y-70],[x,y-104],[x+52,y-70]],true); ctx.fill(); path([[x+36,y-92],[x+53,y-124],[x+70,y-92]],true); ctx.fill(); path([[x-68,y-52],[x-52,y-72],[x-36,y-52]],true); ctx.fill(); ctx.fillStyle='#6b4a2e'; ctx.beginPath(); ctx.arc(x,y,13,Math.PI,0); ctx.fill(); ctx.fillStyle='#bfe0f5'; for(const [dx,dy] of [[-28,-48],[-8,-48],[14,-48],[48,-66],[48,-40]]) ctx.fillRect(x+dx,y+dy,9,13);
-    house(1860,.9,'#fbf3df','#b5482f'); tree(1930,.9,'d'); tree(2380,.9,'p'); tree(2140,.8,'d'); cow(2090,.9,1); flowers(1790,2430,7); }
-  if(vis(2500,2960)){ for(const x of [2530,2580,2640,2700,2760,2820,2880,2930]) tree(x,.8+rnd(x)*.3,rnd(x)>.3?'p':'d'); }
-  if(vis(2960,4100)){ sign(3120,'Cerkniško polje'); church(3000,.75); if(lake<.35){ flowers(3200,3950,13); cow(3400,1); cow(3700,.9,1); kozolec(3880,.9); } // štorklja
-    const x=4010,y=surfY(4010); ctx.strokeStyle='#e0603a'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x-3,y); ctx.lineTo(x-3,y-22); ctx.moveTo(x+4,y); ctx.lineTo(x+4,y-22); ctx.stroke(); blob(x,y-30,13,9,'#fff'); blob(x-9,y-28,6,5,'#333'); ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(x+9,y-34); ctx.lineTo(x+15,y-50); ctx.stroke(); blob(x+16,y-52,5,4,'#fff'); ctx.strokeStyle='#e0603a'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x+20,y-52); ctx.lineTo(x+34,y-49); ctx.stroke(); }
-  if(vis(4100,4520)){ for(const x of [4140,4200,4260,4320,4380,4440]) tree(x,.8+rnd(x)*.3,'p'); }
-  if(vis(4480,5120)){ // Rakov Škocjan: skalna naravna mostova nad reko
-    for(const [x,w] of [[4680,150],[4930,170]]){ ctx.fillStyle='#b3a88e'; ctx.beginPath(); ctx.moveTo(x-w/2-34,436); ctx.lineTo(x-w/2-22,330); ctx.quadraticCurveTo(x,292,x+w/2+22,330); ctx.lineTo(x+w/2+34,436); ctx.lineTo(x+w/2-6,436); ctx.quadraticCurveTo(x+w/2-10,362,x,356); ctx.quadraticCurveTo(x-w/2+10,362,x-w/2+6,436); ctx.closePath(); ctx.fill(); ctx.strokeStyle='rgba(90,74,52,.3)'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x-w/2-10,345); ctx.quadraticCurveTo(x,318,x+w/2+10,345); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x-w/2-24,318); ctx.quadraticCurveTo(x,282,x+w/2+24,318); ctx.strokeStyle='#7cc35a'; ctx.lineWidth=11; ctx.stroke(); blob(x-30,300,16,15,'#4f9f45'); blob(x+26,298,18,16,'#5aae4e'); }
-    sign(4805,'Rakov Škocjan'); flowers(4560,5040,21); }
-  if(vis(5100,5900)){ for(const x of [5150,5210,5280,5350,5430,5510,5600,5690,5770,5830]) tree(x,.8+rnd(x)*.35,rnd(x)>.35?'p':'d'); // vhod v Planinsko jamo
-    ctx.fillStyle='#211f2a'; ctx.beginPath(); ctx.ellipse(5898,432,26,34,0,0,7); ctx.fill(); }
-  if(vis(5900,6900)){ sign(6330,'Planinsko polje'); house(6080,.9,'#fbf3df','#b5482f'); house(6140,.8,'#f3e2c0','#8f3b28'); kozolec(6560,1); cow(6230,1); cow(6470,.85,1); tree(6000,.9,'d'); tree(6760,.9,'d'); flowers(5960,6820,31); }
-  if(vis(6900,7540)){ for(const x of [6950,7010,7070,7130,7190,7250,7310,7370,7430,7480]) tree(x,.85+rnd(x)*.35,rnd(x)>.5?'p':'d'); // medved
-    const x=7205,y=surfY(7205); blob(x,y-22,26,17,'#7a5230'); blob(x+24,y-32,13,12,'#7a5230'); blob(x+19,y-43,4.5,4.5,'#7a5230'); blob(x+30,y-43,4.5,4.5,'#7a5230'); blob(x+34,y-30,5,4,'#c9a37a'); ctx.fillStyle='#222'; ctx.beginPath(); ctx.arc(x+27,y-35,1.8,0,7); ctx.arc(x+37,y-31,1.6,0,7); ctx.fill(); ctx.fillStyle='#6b4527'; ctx.fillRect(x-18,y-10,8,12); ctx.fillRect(x+8,y-10,8,12); }
-  if(vis(7540,8400)){ sign(7640,'Vrhnika'); house(7700,.9,'#fbf3df','#b5482f'); church(7770,.8); sign(8310,'Ljubljansko barje');
-    // koliščarji: hiše na kolih
-    for(const x of [7930,8010,8200]){ const y=459; ctx.strokeStyle='#6b4a2e'; ctx.lineWidth=5; for(const dx of [-22,-8,8,22]){ ctx.beginPath(); ctx.moveTo(x+dx,y+6); ctx.lineTo(x+dx,y-34); ctx.stroke(); } ctx.fillStyle='#8a6238'; ctx.fillRect(x-32,y-38,64,7); ctx.fillStyle='#c9a35e'; ctx.fillRect(x-24,y-62,48,25); ctx.fillStyle='#d9b24a'; path([[x-32,y-60],[x,y-90],[x+32,y-60]],true); ctx.fill(); ctx.fillStyle='#5a3a1a'; ctx.fillRect(x-5,y-52,10,15); }
-    // najstarejše kolo
-    const wx=8120, wy=432; ctx.strokeStyle='#8a5a30'; ctx.lineWidth=7; ctx.beginPath(); ctx.arc(wx,wy,16,0,7); ctx.stroke(); ctx.fillStyle='#b98a52'; ctx.beginPath(); ctx.arc(wx,wy,13,0,7); ctx.fill(); ctx.fillStyle='#5a3a1a'; ctx.fillRect(wx-3,wy-3,6,6);
-    // trsje
-    ctx.strokeStyle='#5d9c3a'; ctx.lineWidth=3; for(let i=0;i<40;i++){ const x=7850+rnd(i+90)*500, sw=Math.sin(T*1.5+i)*3; ctx.beginPath(); ctx.moveTo(x,456); ctx.lineTo(x+sw,432-rnd(i)*14); ctx.stroke(); } }
-  if(vis(8400,9300)){ sign(8470,'Ljubljana'); const cols=['#f6d8a8','#f2b8a0','#e8e2c8','#c9dfe8','#f4e3a1','#e9c4c4']; for(let i=0;i<9;i++){ const x=8560+i*44; if(x>8830&&x<8990) continue; const hh=70+rnd(i+40)*46; ctx.fillStyle=cols[i%cols.length]; ctx.fillRect(x-20,455-hh,40,hh-6); ctx.fillStyle='#b5482f'; path([[x-23,455-hh],[x,455-hh-22],[x+23,455-hh]],true); ctx.fill(); ctx.fillStyle='#fff8dc'; for(let r=0;r<3;r++) for(const dx of [-11,4]) ctx.fillRect(x+dx,455-hh+12+r*20,7,10); }
-    // Tromostovje: trije loki
-    ctx.fillStyle='#f3efe3'; ctx.fillRect(8820,430,180,12); for(let k=0;k<3;k++){ const x=8850+k*60; ctx.fillStyle='#f3efe3'; ctx.fillRect(x-30,440,60,24); ctx.fillStyle='#59b6f5'; ctx.beginPath(); ctx.arc(x,466,20,Math.PI,0); ctx.fill(); } for(let k=0;k<16;k++){ ctx.fillStyle='#f3efe3'; ctx.fillRect(8824+k*11.4,418,5,13); } ctx.fillRect(8820,415,180,5);
-    // zmaj z Zmajskega mosta
-    const x=9080,y=455; ctx.fillStyle='#d9d3c3'; ctx.fillRect(x-20,y-40,40,40); ctx.fillStyle='#3f9a5a'; ctx.beginPath(); ctx.ellipse(x,y-56,17,13,0,0,7); ctx.fill(); ctx.beginPath(); ctx.ellipse(x+14,y-74,10,8,-.3,0,7); ctx.fill(); path([[x+20,y-76],[x+36,y-72],[x+21,y-68]],true); ctx.fill(); path([[x-4,y-62],[x-34,y-92+Math.sin(T*3)*4],[x-12,y-56]],true); ctx.fill(); path([[x-15,y-52],[x-34,y-44],[x-40,y-56],[x-30,y-50]],true); ctx.fill(); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x+16,y-76,2.4,0,7); ctx.fill(); ctx.fillStyle='#e9574a'; path([[x+35,y-72],[x+46,y-70+Math.sin(T*8)*2],[x+35,y-69]],true); ctx.fill(); }
-  if(vis(9200,9700)){ sign(9450,'reka Sava',-2); tree(9330,.9,'d'); tree(9600,1,'d'); } }
-function drawUnderLabels(x0,x1){ if(!(5400<x0-300||4700>x1+300)){ label(5130,810,'Postojnska jama'); // človeška ribica
-    const x=5180+Math.sin(T*.7)*30, y=752+Math.sin(T*1.3)*4; ctx.strokeStyle='#f6b8b0'; ctx.lineWidth=7; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(x-24,y); ctx.quadraticCurveTo(x-8,y-8+Math.sin(T*4)*4,x+6,y); ctx.quadraticCurveTo(x+16,y+6,x+26,y-1); ctx.stroke(); ctx.strokeStyle='#e88f86'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x-10,y+2); ctx.lineTo(x-13,y+9); ctx.moveTo(x+10,y+3); ctx.lineTo(x+8,y+10); ctx.moveTo(x+28,y-5); ctx.lineTo(x+33,y-10); ctx.moveTo(x+28,y-1); ctx.lineTo(x+35,y-1); ctx.stroke();
-    // jamski vlakec
-    const tx=5020+((T*26)%200), ty=757; ctx.fillStyle='#e8c74a'; for(let k=0;k<3;k++){ ctx.fillRect(tx-k*30,ty-14,26,12); } ctx.fillStyle='#e9574a'; ctx.fillRect(tx+2,ty-22,14,9); ctx.fillStyle='#333'; for(let k=0;k<3;k++){ ctx.beginPath(); ctx.arc(tx-k*30+6,ty,4,0,7); ctx.arc(tx-k*30+20,ty,4,0,7); ctx.fill(); } }
-  if(!(5750<x0-200||5350>x1+200)) label(5510,655,'Planinska jama'); if(pivT>.2&&!(5100<x0-200||4750>x1+200)) label(4900,690,'Pivka','#bfe4ff'); }
+  if(vis(0,X.b0)){ drawSnezhnik(); for(const x of [430,470,510]) tree(x,.7,'p');
+    if(rain>.02){ cloud(150,40,1.25); cloud(330,24,1.1); ctx.fillStyle='rgba(120,135,150,.35)'; ctx.beginPath(); ctx.ellipse(250,56,170,34,0,0,7); ctx.fill(); ctx.strokeStyle=`rgba(70,140,220,${.75*rain})`; ctx.lineWidth=2.5; for(let i=0;i<46;i++){ const x=70+rnd(i)*440, y=74+((T*330+rnd(i+50)*300)%300); if(y<surfY(x)-4){ ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-4,y+14); ctx.stroke(); } } } }
+  if(vis(X.b0,X.b1)){ sign(X.b0+215,'Babno polje','750 m nad morjem'); house(X.b0+60,.9,'#fbf3df','#b5482f'); church(X.b0+120,.8); kozolec(X.b0+310,.8); flowers(X.b0+20,X.b1-20,1); ctx.fillStyle='#fff'; for(let i=0;i<8;i++){ const x=X.b0+rnd(i+70)*340, y=Yb-150+((T*22+rnd(i)*140)%140); ctx.beginPath(); ctx.arc(x+Math.sin(T+i)*6,y,2.4,0,7); ctx.fill(); } }
+  if(vis(X.b1,X.l0)){ for(let x=X.b1+60;x<X.l0-30;x+=62) tree(x+rnd(x)*20,.75+rnd(x)*.3,rnd(x)>.4?'p':'d'); }
+  if(vis(X.l0,X.l1)){ sign(X.l0+150,'Loško polje','580 m'); const x=X.l0+410,y=Yl; ctx.fillStyle='#f6f1e4'; ctx.fillRect(x-46,y-70,92,70); ctx.fillRect(x-64,y-52,24,52); ctx.fillRect(x+40,y-92,26,92); ctx.fillStyle='#b5482f'; path([[x-52,y-70],[x,y-104],[x+52,y-70]],true); ctx.fill(); path([[x+36,y-92],[x+53,y-124],[x+70,y-92]],true); ctx.fill(); path([[x-68,y-52],[x-52,y-72],[x-36,y-52]],true); ctx.fill(); ctx.fillStyle='#6b4a2e'; ctx.beginPath(); ctx.arc(x,y,13,Math.PI,0); ctx.fill(); ctx.fillStyle='#bfe0f5'; for(const [dx,dy] of [[-28,-48],[-8,-48],[14,-48],[48,-66],[48,-40]]) ctx.fillRect(x+dx,y+dy,9,13);
+    house(X.l0+60,.9,'#fbf3df','#b5482f'); tree(X.l0+250,.85,'d'); tree(X.l1-50,.9,'p'); cow(X.l0+300,.9,1); flowers(X.l0+20,X.l1-20,7); }
+  if(vis(X.l1,X.c0)){ for(let x=X.l1+50;x<X.c0-30;x+=58) tree(x+rnd(x)*18,.8+rnd(x)*.3,rnd(x)>.3?'p':'d'); }
+  if(vis(X.c0,X.c1)){ sign(X.c0+150,'Cerkniško polje','550 m'); church(X.c0+50,.75); if(lake<.35){ flowers(X.c0+230,X.c1-100,13); cow(X.c0+430,1); cow(X.c0+730,.9,1); kozolec(X.c1-170,.9); }
+    const x=X.c1-40,y=Yc; ctx.strokeStyle='#e0603a'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x-3,y); ctx.lineTo(x-3,y-22); ctx.moveTo(x+4,y); ctx.lineTo(x+4,y-22); ctx.stroke(); blob(x,y-30,13,9,'#fff'); blob(x-9,y-28,6,5,'#333'); ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(x+9,y-34); ctx.lineTo(x+15,y-50); ctx.stroke(); blob(x+16,y-52,5,4,'#fff'); ctx.strokeStyle='#e0603a'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x+20,y-52); ctx.lineTo(x+34,y-49); ctx.stroke(); }
+  if(vis(X.c1,X.r0)){ for(let x=X.c1+50;x<X.r0-20;x+=56) tree(x,.8+rnd(x)*.3,'p'); }
+  if(vis(X.r0-40,X.r1+60)){ for(const [x,w] of [[X.r0+82,84],[X.r0+222,92]]){ const yt=Yr-78; ctx.fillStyle='#b3a88e'; ctx.beginPath(); ctx.moveTo(x-w/2-26,Yr+6); ctx.lineTo(x-w/2-18,yt+12); ctx.quadraticCurveTo(x,yt-20,x+w/2+18,yt+12); ctx.lineTo(x+w/2+26,Yr+6); ctx.lineTo(x+w/2-4,Yr+6); ctx.quadraticCurveTo(x+w/2-8,yt+38,x,yt+32); ctx.quadraticCurveTo(x-w/2+8,yt+38,x-w/2+4,Yr+6); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(x-w/2-20,yt+4); ctx.quadraticCurveTo(x,yt-28,x+w/2+20,yt+4); ctx.strokeStyle='#7cc35a'; ctx.lineWidth=10; ctx.stroke(); blob(x-20,yt-14,13,12,'#4f9f45'); blob(x+18,yt-16,14,13,'#5aae4e'); }
+    sign(X.r0+152,'Rakov Škocjan','500 m'); }
+  if(vis(X.r1,X.p0)){ for(let x=X.r1+40;x<X.p0-60;x+=60) tree(x,.8+rnd(x)*.35,rnd(x)>.35?'p':'d'); ctx.fillStyle='#211f2a'; ctx.beginPath(); ctx.ellipse(X.p0-8,Yp-8,24,30,0,0,7); ctx.fill(); }
+  if(vis(X.p0,X.p1)){ sign(X.p0+330,'Planinsko polje','450 m'); house(X.p0+110,.9,'#fbf3df','#b5482f'); house(X.p0+165,.8,'#f3e2c0','#8f3b28'); kozolec(X.p0+520,1); cow(X.p0+240,1); cow(X.p0+440,.85,1); tree(X.p0+50,.85,'d'); tree(X.p1-60,.9,'d'); flowers(X.p0+30,X.p1-20,31); }
+  if(vis(X.p1,X.v0)){ for(let x=X.p1+50;x<X.v0-50;x+=66) tree(x+rnd(x)*22,.85+rnd(x)*.35,rnd(x)>.5?'p':'d');
+    const x=6120,y=surfY(6120); blob(x,y-22,26,17,'#7a5230'); blob(x+24,y-32,13,12,'#7a5230'); blob(x+19,y-43,4.5,4.5,'#7a5230'); blob(x+30,y-43,4.5,4.5,'#7a5230'); blob(x+34,y-30,5,4,'#c9a37a'); ctx.fillStyle='#222'; ctx.beginPath(); ctx.arc(x+27,y-35,1.8,0,7); ctx.arc(x+37,y-31,1.6,0,7); ctx.fill(); ctx.fillStyle='#6b4527'; ctx.fillRect(x-18,y-10,8,12); ctx.fillRect(x+8,y-10,8,12); }
+  if(vis(X.v0,X.lj0)){ sign(X.v0+130,'Vrhnika','290 m'); house(X.v0+220,.9,'#fbf3df','#b5482f'); church(X.v0+290,.8); house(X.v0+360,.8,'#f3e2c0','#8f3b28'); sign(X.v0+1000,'Ljubljansko barje','290 m');
+    for(const x of [X.v0+620,X.v0+720,X.v0+1260,X.v0+1340]){ const y=Yv+4; ctx.strokeStyle='#6b4a2e'; ctx.lineWidth=5; for(const dx of [-22,-8,8,22]){ ctx.beginPath(); ctx.moveTo(x+dx,y+6); ctx.lineTo(x+dx,y-34); ctx.stroke(); } ctx.fillStyle='#8a6238'; ctx.fillRect(x-32,y-38,64,7); ctx.fillStyle='#c9a35e'; ctx.fillRect(x-24,y-62,48,25); ctx.fillStyle='#d9b24a'; path([[x-32,y-60],[x,y-90],[x+32,y-60]],true); ctx.fill(); ctx.fillStyle='#5a3a1a'; ctx.fillRect(x-5,y-52,10,15); }
+    const wx=X.v0+840, wy=Yv-23; ctx.strokeStyle='#8a5a30'; ctx.lineWidth=7; ctx.beginPath(); ctx.arc(wx,wy,16,0,7); ctx.stroke(); ctx.fillStyle='#b98a52'; ctx.beginPath(); ctx.arc(wx,wy,13,0,7); ctx.fill(); ctx.fillStyle='#5a3a1a'; ctx.fillRect(wx-3,wy-3,6,6);
+    ctx.strokeStyle='#5d9c3a'; ctx.lineWidth=3; for(let i=0;i<110;i++){ const x=X.v0+480+rnd(i+90)*1450, sw=Math.sin(T*1.5+i)*3; if(x<x0-20||x>x1+20) continue; ctx.beginPath(); ctx.moveTo(x,Yv+1); ctx.lineTo(x+sw,Yv-23-rnd(i)*14); ctx.stroke(); }
+    for(const x of [X.v0+1600,X.v0+1750,X.v0+1900]) tree(x,.85,'d'); cow(X.v0+1680,.9); }
+  if(vis(X.lj0,X.s0)){ sign(X.lj0+60,'Ljubljana','295 m'); const cols=['#f6d8a8','#f2b8a0','#e8e2c8','#c9dfe8','#f4e3a1','#e9c4c4']; for(let i=0;i<13;i++){ const x=X.lj0+150+i*44; if(x>X.lj0+420&&x<X.lj0+600) continue; const hh=70+rnd(i+40)*46; ctx.fillStyle=cols[i%cols.length]; ctx.fillRect(x-20,Yv-hh,40,hh-6); ctx.fillStyle='#b5482f'; path([[x-23,Yv-hh],[x,Yv-hh-22],[x+23,Yv-hh]],true); ctx.fill(); ctx.fillStyle='#fff8dc'; for(let r=0;r<3;r++) for(const dx of [-11,4]) ctx.fillRect(x+dx,Yv-hh+12+r*20,7,10); }
+    const bx=X.lj0+420; ctx.fillStyle='#f3efe3'; ctx.fillRect(bx,Yv-25,180,12); for(let k=0;k<3;k++){ const x=bx+30+k*60; ctx.fillStyle='#f3efe3'; ctx.fillRect(x-30,Yv-15,60,24); ctx.fillStyle='#3ea4f0'; ctx.beginPath(); ctx.arc(x,Yv+11,20,Math.PI,0); ctx.fill(); } for(let k=0;k<16;k++){ ctx.fillStyle='#f3efe3'; ctx.fillRect(bx+4+k*11.4,Yv-37,5,13); } ctx.fillRect(bx,Yv-40,180,5);
+    const x=X.lj0+720,y=Yv; ctx.fillStyle='#d9d3c3'; ctx.fillRect(x-20,y-40,40,40); ctx.fillStyle='#3f9a5a'; ctx.beginPath(); ctx.ellipse(x,y-56,17,13,0,0,7); ctx.fill(); ctx.beginPath(); ctx.ellipse(x+14,y-74,10,8,-.3,0,7); ctx.fill(); path([[x+20,y-76],[x+36,y-72],[x+21,y-68]],true); ctx.fill(); path([[x-4,y-62],[x-34,y-92+Math.sin(T*3)*4],[x-12,y-56]],true); ctx.fill(); path([[x-15,y-52],[x-34,y-44],[x-40,y-56],[x-30,y-50]],true); ctx.fill(); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x+16,y-76,2.4,0,7); ctx.fill(); ctx.fillStyle='#e9574a'; path([[x+35,y-72],[x+46,y-70+Math.sin(T*8)*2],[x+35,y-69]],true); ctx.fill();
+    for(const tx of [X.lj1+80,X.lj1+200,X.lj1+330]) tree(tx,.9,'d'); sign(X.s0-110,'reka Sava','270 m'); }
+  if(vis(X.s0,W)){ tree(W-60,1,'d'); } }
+function drawUnderLabels(x0,x1){ const cl=(a,b,km)=>{ const x=(a+b)/2; if(x<x0-200||x>x1+200) return; let q=RIV[0]; for(const r of RIV) if(r[2]&&Math.abs(r[0]-x)<Math.abs(q[0]-x)) q=r; label(x,q[1]+62,'pod zemljo ≈ '+km+' km','#d8d2c2'); };
+  cl(X.b1,X.l0,'7'); cl(X.l1,X.c0,'3'); cl(X.c1,X.r0,'2,5'); cl(X.p1,X.v0,'11');
+  if(!(POS[0]+300<x0||POS[0]-300>x1)){ label(POS[0],POS[1]+92,'Postojnska jama');
+    const x=POS[0]+60+Math.sin(T*.7)*30, y=POS[1]+36+Math.sin(T*1.3)*4; ctx.strokeStyle='#f6b8b0'; ctx.lineWidth=7; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(x-24,y); ctx.quadraticCurveTo(x-8,y-8+Math.sin(T*4)*4,x+6,y); ctx.quadraticCurveTo(x+16,y+6,x+26,y-1); ctx.stroke(); ctx.strokeStyle='#e88f86'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x-10,y+2); ctx.lineTo(x-13,y+9); ctx.moveTo(x+10,y+3); ctx.lineTo(x+8,y+10); ctx.moveTo(x+28,y-5); ctx.lineTo(x+33,y-10); ctx.moveTo(x+28,y-1); ctx.lineTo(x+35,y-1); ctx.stroke();
+    const tx=POS[0]-150+((T*26)%200), ty=POS[1]+44; ctx.fillStyle='#e8c74a'; for(let k=0;k<3;k++) ctx.fillRect(tx-k*30,ty-14,26,12); ctx.fillStyle='#e9574a'; ctx.fillRect(tx+2,ty-22,14,9); ctx.fillStyle='#333'; for(let k=0;k<3;k++){ ctx.beginPath(); ctx.arc(tx-k*30+6,ty,4,0,7); ctx.arc(tx-k*30+20,ty,4,0,7); ctx.fill(); } }
+  if(!(JY[0]+250<x0||JY[0]-250>x1)) label(JY[0],JY[1]+72,'Planinska jama'); if(pivT>.15&&!(PIV[2][0]+300<x0||PIV[0][0]-300>x1)) label(PIV[1][0],PIV[1][1]-52,'Pivka · pod zemljo ≈ 9 km','#bfe4ff'); }
 function frame(now){ const dt=Math.min(.05,(now-(frame.t||now))/1000); frame.t=now; if(!paused){ T+=dt; step(dt); }
   ctx.setTransform(DPR,0,0,DPR,0,0); ctx.clearRect(0,0,VW,VH); const vw=VW/SC; const tx=clamp(rivAt(front)[0]-vw*.42,0,Math.max(0,W-vw)); camX+= (tx-camX)*(1-Math.pow(.02,dt)); if(!running) camX=tx;
   ctx.save(); ctx.scale(SC,SC); ctx.translate(-camX,-Y0); const x0=camX-20, x1=camX+vw+20;
-  drawSky(x0,x1); if(x1>8300) drawLjBack(); drawGround(x0,x1); drawCaves(x0,x1); drawPonors(); drawDecor(x0,x1); drawWater(); drawUnderLabels(x0,x1); if(running||front>0) drawDrop(); ctx.restore(); requestAnimationFrame(frame); }
+  drawSky(x0,x1); if(x1>X.lj0-200) drawLjBack(); drawGround(x0,x1); drawCaves(x0,x1); drawPonors(); drawDecor(x0,x1); drawWater(); drawUnderLabels(x0,x1); drawFog(x0,x1); ctx.restore(); requestAnimationFrame(frame); }
 
 // ---------------- zgodba ----------------
 const STORY=[
- {x:548,say:'To je zgodba o reki, ki se sedemkrat skrije pod zemljo. Vsakič, ko pride spet na dan, dobi novo ime.'},
+ {x:X.b0-14,say:'To je zgodba o reki, ki se sedemkrat skrije pod zemljo. Vsakič, ko pride spet na dan, dobi novo ime.'},
  {say:'Vse se začne z dežjem na kraških hribih pod goro Snežnik. Tu so tla iz apnenca. To je kamen, ki ga voda počasi topi, zato je v njem polno lukenj in jam.'},
- {x:900,name:'Trbuhovica',say:'Prvo ime je Trbuhovica. Teče po Babnem polju. To je eno najbolj mrzlih polj v Sloveniji.'},
- {x:1238,say:'Na robu polja voda izgine v luknjo v tleh. Taki luknji rečemo požiralnik.'},
- {x:2020,name:'Obrh',say:'Na Loškem polju pride voda spet na dan. Zdaj ji je ime Obrh. Teče mimo gradu Snežnik.'},
- {x:2440,say:'Potem potone v jamo Golobino.'},
- {x:3300,name:'Stržen',fx:'lakeUp',say:'Na Cerkniškem polju se reka imenuje Stržen. Kadar veliko dežuje, voda zalije polje in nastane Cerkniško jezero.'},
- {x:3700,fx:'lakeDown',say:'Poleti voda odteče v požiralnike in jezero izgine. Zato mu rečemo presihajoče jezero.'},
- {x:4800,name:'Rak',say:'V Rakovem Škocjanu je reki ime Rak. Tu se je strop stare jame podrl. Ostala sta dva naravna mostova iz skale.'},
- {x:5300,name:'Pivka',fx:'pivka',say:'Pod zemljo se Raku pridruži reka Pivka. Pivka priteče skozi Postojnsko jamo, kjer rastejo kapniki in živi človeška ribica.'},
- {x:6330,name:'Unica',say:'Iz Planinske jame priteče reka z imenom Unica. Počasi vijuga po Planinskem polju.'},
- {x:6838,say:'Potem potone še zadnjič. Zdaj teče dolgo pot pod gozdovi, kjer živijo medvedi.'},
- {x:7680,name:'Ljubljanica',say:'Pri Vrhniki voda privre na dan iz več izvirov. Zdaj je to Ljubljanica.'},
- {x:8160,say:'Teče čez Ljubljansko barje. Tu so pred davnimi časi koliščarji živeli v hišah na kolih. Na Barju so našli najstarejše leseno kolo na svetu.'},
- {x:8900,say:'Ljubljanica teče skozi Ljubljano, pod Tromostovjem in mimo zmajev na Zmajskem mostu.'},
- {x:9420,say:'Na koncu se zlije v reko Savo. Sedem imen, ena reka: Trbuhovica, Obrh, Stržen, Rak, Pivka, Unica in Ljubljanica.'}];
+ {x:X.b0+215,name:'Trbuhovica',say:'Prvo ime je Trbuhovica. Teče po Babnem polju. To je eno najbolj mrzlih polj v Sloveniji.'},
+ {x:X.b1-4,say:'Na robu polja voda izgine v luknjo v tleh. Taki luknji rečemo požiralnik.'},
+ {x:X.l0+300,name:'Obrh',say:'Na Loškem polju pride voda spet na dan. Zdaj ji je ime Obrh. Teče mimo gradu Snežnik.'},
+ {x:X.l1-4,say:'Potem potone v jamo Golobino.'},
+ {x:X.c0+480,name:'Stržen',fx:'lakeUp',say:'Na Cerkniškem polju se reka imenuje Stržen. Kadar veliko dežuje, voda zalije polje in nastane Cerkniško jezero.'},
+ {x:X.c0+820,fx:'lakeDown',say:'Poleti voda odteče v požiralnike in jezero izgine. Zato mu rečemo presihajoče jezero.'},
+ {x:X.r0+150,name:'Rak',say:'V Rakovem Škocjanu je reki ime Rak. Tu se je strop stare jame podrl. Ostala sta dva naravna mostova iz skale.'},
+ {x:JX-70,name:'Pivka',fx:'pivka',say:'Pod zemljo se Raku pridruži reka Pivka. Pivka priteče skozi Postojnsko jamo, kjer rastejo kapniki in živi človeška ribica.'},
+ {x:X.p0+380,name:'Unica',say:'Iz Planinske jame priteče reka z imenom Unica. Počasi vijuga po Planinskem polju.'},
+ {x:X.p1-4,say:'Potem potone še zadnjič. Zdaj teče dolgo pot pod gozdovi, kjer živijo medvedi.'},
+ {x:X.v0+170,name:'Ljubljanica',say:'Pri Vrhniki voda privre na dan iz več izvirov. Zdaj je to Ljubljanica.'},
+ {x:X.v0+1000,say:'Teče čez Ljubljansko barje. Tu so pred davnimi časi koliščarji živeli v hišah na kolih. Na Barju so našli najstarejše leseno kolo na svetu.'},
+ {x:X.lj0+560,say:'Ljubljanica teče skozi Ljubljano, pod Tromostovjem in mimo zmajev na Zmajskem mostu.'},
+ {x:X.s0+90,say:'Na koncu se zlije v reko Savo. Sedem imen, ena reka: Trbuhovica, Obrh, Stržen, Rak, Pivka, Unica in Ljubljanica.'}];
 const ORD=['Prvo','Drugo','Tretje','Četrto','Peto','Šesto','Sedmo'];
 let moveTgt=0, moveRes=null, fx='';
-function step(dt){ if(running&&front<moveTgt){ const p=rivAt(front); const sp=(p[2]>0?330:250)*(moveTgt-front>900?1.5:1); front=Math.min(moveTgt,front+sp*dt); } else if(moveRes){ const r=moveRes; moveRes=null; r(); }
+function step(dt){ if(running&&front<moveTgt){ const p=rivAt(front); const sp=(p[2]>0?330:250)*(moveTgt-front>800?1.9:1); front=Math.min(moveTgt,front+sp*dt); } else if(moveRes){ const r=moveRes; moveRes=null; r(); }
   lake+= (lakeTgt-lake)*(1-Math.pow(.3,dt)); if(fx==='pivka') pivT=Math.min(1,pivT+dt/4.5); rain+=((front<700?1:0)-rain)*(1-Math.pow(.2,dt)); }
 function moveTo(x){ moveTgt=Math.max(front,sAtX(x)); return new Promise(r=>{ moveRes=r; }); }
 // ---------------- glas ----------------
