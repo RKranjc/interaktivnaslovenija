@@ -56,14 +56,19 @@ def synth(p):
     with torch.inference_mode(): a = snac.decoder(snac.quantizer.from_codes(codes))[0, 0].float().numpy()
     return a, CODE_END in gen
 
+import numpy as np
+def save(a, out):
+    sf.write('/tmp/x.wav', np.nan_to_num(a).clip(-1, 1), 24000)
+    r = subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', '/tmp/x.wav', '-af', 'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,adelay=40,apad=pad_dur=0.08,loudnorm=I=-18:TP=-2',
+                        '-ac', '1', '-ar', '24000', '-b:a', '48k', out])
+    return r.returncode == 0
+
 for n, p in enumerate(todo):
-    exp = 0.4 + len(p['t']) * 0.085
-    for attempt in range(4):
+    exp = 0.4 + len(p['t']) * 0.085; ok = False
+    for attempt in range(5):
         a, ended = synth(p)
-        if a is not None and ended and 0.35 * exp < len(a) / 24000 < 2.6 * exp: break
-        print('ponovi', p['t'], None if a is None else round(len(a) / 24000, 2), ended, flush=True); a = None
-    if a is None: continue
-    sf.write('/tmp/x.wav', a, 24000)
-    subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', '/tmp/x.wav', '-af', 'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,adelay=40,apad=pad_dur=0.08,loudnorm=I=-18:TP=-2',
-                    '-ac', '1', '-ar', '24000', '-b:a', '48k', f"zlogi/zvok/{p['k']}.mp3"], check=True)
-    print(f'{n+1}/{len(todo)}', flush=True)
+        if a is None or not ended or not 0.35 * exp < len(a) / 24000 < 2.6 * exp:
+            print('ponovi', p['t'], None if a is None else round(len(a) / 24000, 2), ended, flush=True); continue
+        if save(a, f"zlogi/zvok/{p['k']}.mp3"): ok = True; break
+        print('ffmpeg ni uspel, ponovi', p['t'], flush=True)
+    print(f"{n+1}/{len(todo)}", 'ok' if ok else 'PRESKOČENO', flush=True)
