@@ -29,8 +29,8 @@ button:focus-visible{outline:3px dashed var(--brick);outline-offset:4px}
 svg.i{width:60%;height:60%;fill:none;stroke:var(--line);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 /* papirnata ploskev z narisano obrobo: ozadje v ::before, rahlo tresoče */
 .pp{position:relative;isolation:isolate;color:#4a2f1c}
-.lvl,.card,.slot,.ibtn,.jar,.pill{border-radius:16px 22px 15px 20px/20px 15px 22px 16px!important}
-.lvl:nth-child(even),.card:nth-child(even),.slot:nth-child(even){border-radius:21px 15px 22px 16px/15px 21px 16px 22px!important}
+.card,.slot,.ibtn,.jar,.pill{border-radius:16px 22px 15px 20px/20px 15px 22px 16px!important}
+.card:nth-child(even),.slot:nth-child(even){border-radius:21px 15px 22px 16px/15px 21px 16px 22px!important}
 .pic,.box{border-radius:30px 38px 28px 36px/36px 28px 38px 30px!important}
 .pp::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--noise),var(--bg,var(--card));border:3px solid var(--line);box-shadow:3px 5px 0 var(--soft)}
 /* naslikana pokrajina */
@@ -49,20 +49,32 @@ h1 span{color:var(--c);-webkit-text-stroke:3px var(--line);paint-order:stroke fi
 .progress{display:flex;align-items:center;gap:12px;width:min(720px,100%);margin:0 0 6px;font-size:22px;white-space:nowrap}
 .track{flex:1;height:24px;border-radius:14px;--bg:#fbf3e1;overflow:hidden}
 .fill{position:absolute;inset:3px auto 3px 3px;width:0;border-radius:10px;background:repeating-linear-gradient(-55deg,var(--ochre) 0 3px,#eec26a 3px 6px);transition:width .8s}
-.levels{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;width:min(720px,100%);padding:30px 6px 20px}
-.lvl{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:20px;padding:6px;text-align:center;transition:transform .12s}
-.lvl:nth-child(4n+1){rotate:-1.5deg}.lvl:nth-child(4n+3){rotate:1.2deg}
+/* pot čez travnik, ribnik in gozd */
+.path{position:relative;width:min(640px,100%);margin:10px auto 40px;flex:none}
+.path>svg.trail{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.trail path{fill:none;stroke:#8a6a4c;stroke-width:5;stroke-dasharray:2 14;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.7}
+.zone{position:absolute;left:-4%;right:-4%;border-radius:46% 54% 50% 50%/8% 8% 10% 10%;opacity:.9}
+.zone.z0{background:radial-gradient(60% 50% at 40% 50%,#cddcae,#b9c79a00)}
+.zone.z1{background:radial-gradient(55% 45% at 55% 50%,#a9c3d6,#a9c3d600)}
+.zone.z2{background:radial-gradient(60% 50% at 45% 50%,#8fa86a,#8fa86a00)}
+.zname{position:absolute;left:0;right:0;text-align:center;font-size:26px;color:var(--ink);opacity:.85}
+.dec{position:absolute;width:clamp(54px,12vw,86px);pointer-events:none;translate:-50% -50%}
+.lvl{position:absolute;width:var(--st);height:var(--st);translate:-50% -50%;border-radius:50%!important;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:transform .12s}
 .lvl:active{transform:translateY(3px)}
-.lvl b{display:block;font:700 34px/1 var(--print)}
-.lvl.lock{--bg:#e3d6ba;cursor:default;opacity:.75}.lvl.lock svg.i{width:46%;height:46%;opacity:.7}
-.lvl.cur{--bg:#fff7df}.lvl.cur::after{content:"";position:absolute;inset:-7px;border:3px dashed var(--ochre);border-radius:24px;animation:glow 1.6s infinite}
-.me{position:absolute;top:-34px;z-index:2;left:50%;translate:-50% 0;width:58px;animation:hop 1.2s infinite;pointer-events:none}
+.lvl b{display:block;font:700 calc(var(--st)*.42)/1 var(--print)}
+.lvl .st{position:absolute;bottom:-14px;gap:0}.lvl .st svg{width:15px;height:15px}
+.lvl.lock{--bg:#e3d6ba;cursor:default;opacity:.8}.lvl.lock svg.i{width:42%;height:42%;opacity:.7}
+.lvl.cur{--bg:#fff7df}.lvl.cur::after{content:"";position:absolute;inset:-8px;border:3px dashed var(--ochre);border-radius:50%;animation:glow 1.6s infinite}
+.lvl.goal{--bg:#fde9b8}
+.me{position:absolute;z-index:3;width:calc(var(--st)*.95);translate:-50% -96%;pointer-events:none;transition:left .9s ease-in-out,top .9s ease-in-out}
+.me.hop{animation:jump .9s ease-in-out}
+@keyframes jump{50%{transform:translateY(-46px) rotate(-8deg)}}
 @keyframes glow{50%{opacity:.3}}
 .st{display:flex;gap:1px;margin-top:4px}.st svg{width:17px;height:17px}
 .star{fill:#e6dbc2;stroke:#b8a684;stroke-width:1.6}.star.on{fill:var(--ochre);stroke:var(--line)}
 .musbtn{position:fixed;top:max(12px,env(safe-area-inset-top));right:14px;z-index:5}
 .total{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:22px}.total svg{width:24px;height:24px}
-@media(max-width:600px){#home{padding-top:max(72px,env(safe-area-inset-top))}.me{width:42px;top:-26px}.levels{grid-template-columns:repeat(5,minmax(0,1fr));gap:11px}.lvl b{font-size:26px}.st svg{width:12px;height:12px}.progress{flex-wrap:wrap;justify-content:center}}
+@media(max-width:600px){#home{padding-top:max(72px,env(safe-area-inset-top))}.progress{flex-wrap:wrap;justify-content:center}}
 /* igra */
 .bar{width:min(980px,100%);display:flex;align-items:center;gap:10px}
 .ibtn{width:54px;height:54px;flex:none;border-radius:16px;display:grid;place-items:center}
@@ -96,6 +108,14 @@ h1 span{color:var(--c);-webkit-text-stroke:3px var(--line);paint-order:stroke fi
 @keyframes hop{0%,100%{transform:none}50%{transform:translateY(-12px)}}
 .wordtxt{min-height:44px;font:700 36px var(--print);letter-spacing:.08em;color:var(--brick);-webkit-text-stroke:1px var(--line);opacity:0;transition:opacity .3s}
 .play.won .wordtxt{opacity:1}
+/* igrice: manjka (en zlog manjka), beri (preberi in najdi sliko) */
+.slot.given::before{border-style:solid;border-color:var(--line);background:var(--noise),var(--card);box-shadow:3px 5px 0 var(--soft)}
+.play.mode-beri .pic,.play.mode-beri .slots{display:none}
+.play.mode-beri .wordtxt{opacity:1;font-size:clamp(48px,11vw,84px);letter-spacing:.06em;color:#4a2f1c;-webkit-text-stroke:0;min-height:0}
+.task{font-size:24px;min-height:30px;text-align:center}
+.opt{width:clamp(110px,min(40vw,27vw + 60px,26vh),200px);aspect-ratio:1;border-radius:24px!important;display:grid;place-items:center;padding:8px}
+.opt img{width:88%;height:88%;object-fit:contain;pointer-events:none}
+.opt.no{animation:shake .4s;opacity:.45}.opt.ok::before{--bg:#dfe8cc;border-color:#5f7a3e}
 /* konec */
 .over{position:fixed;inset:0;background:#3a28184d;display:none;place-items:center;z-index:20;padding:16px}
 .over.on{display:grid}
@@ -135,7 +155,7 @@ h1 span{color:var(--c);-webkit-text-stroke:3px var(--line);paint-order:stroke fi
  <h1 aria-label="ZLOGOLOV"><span style="--c:var(--brick);--r:-4deg">Z</span><span style="--c:var(--ochre);--r:3deg">L</span><span style="--c:var(--sage);--r:-2deg">O</span><span style="--c:var(--blue);--r:4deg">G</span><span style="--c:var(--brick);--r:-3deg">O</span><span style="--c:var(--ochre);--r:2deg">L</span><span style="--c:var(--sage);--r:-4deg">O</span><span style="--c:var(--blue);--r:3deg">V</span></h1>
  <p class="sub">Ulovi zloge in sestavi besedo</p>
  <div class="progress"><div class="track pp"><div class="fill" id="prog"></div></div><span id="progtxt"></span></div>
- <div class="levels" id="levels"></div>
+ <div class="path" id="levels"></div>
  <div class="total" id="total"></div>
 </section>
 
@@ -149,6 +169,7 @@ h1 span{color:var(--c);-webkit-text-stroke:3px var(--line);paint-order:stroke fi
  </div>
  <div class="play" id="play">
   <div class="pic pp" id="pic"></div>
+  <div class="task" id="task"></div>
   <div class="wordtxt" id="wordtxt"></div>
   <div class="slots" id="slots"></div>
   <div class="tray" id="tray"></div>
@@ -311,15 +332,29 @@ addEventListener('pointerdown',e=>{if(musicOn&&(!curEl||curEl.paused)&&!e.target
 
 // ---- domov ----
 function home(){setTune(-1);
- $('levels').innerHTML=LEVELS.map((l,i)=>{const st=save.stars[i]||0;
-  const open=unlocked(i),cur=i===LEVELS.findIndex((_,k)=>!save.stars[k]);
-  return `<button class="lvl pp${open?'':' lock'}${cur?' cur':''}" data-l="${i}" ${open?`aria-label="Stopnja ${i+1}"`:'disabled aria-label="Zaklenjeno"'}>${cur?'<img class="me" src="slike/zaba.png" alt="">':''}${open?`<b>${i+1}</b><span class="st">${STARS(st)}</span>`:'<svg class="i"><use href="#i-lock"/></svg>'}</button>`}).join('');
+ const P=$('levels'),W=P.clientWidth||Math.min(640,innerWidth-28),ST=innerWidth<600?58:70,STEP=innerWidth<600?92:104,TOP=70;
+ const pt=i=>({x:50+33*Math.sin(i*.8),y:TOP+i*STEP+Math.floor(i/10)*70});
+ const H=pt(29).y+110,cur=LEVELS.findIndex((_,k)=>!save.stars[k]),last=cur<0?29:cur;
+ P.style.height=H+'px';P.style.setProperty('--st',ST+'px');
+ const zones=['Travnik','Ribnik','Gozd'].map((n,z)=>{const y0=pt(z*10).y-60,y1=pt(z*10+9).y+50;
+  return `<div class="zone z${z}" style="top:${y0}px;height:${y1-y0}px"></div><div class="zname" style="top:${y0-8}px">${n}</div>`}).join('');
+ const DEC=[['zajec',8,1.5],['marjetica',90,4.5],['muca',10,7.5],['raca',88,11.5],['riba',12,14.5],['hobotnica',90,17.5],['delfin',14,19],['lisica',88,21.5],['sova',12,24.5],['pajek',88,27.5]];
+ const decs=DEC.map(([n,x,i])=>`<img class="dec" src="slike/${n}.png" alt="" style="left:${x}%;top:${pt(i).y}px">`).join('');
+ let d='';for(let i=0;i<30;i++){const p=pt(i);if(!i)d+=`M${p.x} ${p.y}`;else{const q=pt(i-1);d+=` C${q.x} ${(q.y+p.y)/2} ${p.x} ${(q.y+p.y)/2} ${p.x} ${p.y}`}}
+ const stones=LEVELS.map((l,i)=>{const st=save.stars[i]||0,open=unlocked(i),p=pt(i);
+  return `<button class="lvl pp${open?'':' lock'}${i===cur?' cur':''}${i===29?' goal':''}" data-l="${i}" style="left:${p.x}%;top:${p.y}px" ${open?`aria-label="Stopnja ${i+1}"`:'disabled aria-label="Zaklenjeno"'}>${open?`<b>${i+1}</b><span class="st">${STARS(st)}</span>`:'<svg class="i"><use href="#i-lock"/></svg>'}</button>`}).join('');
+ P.innerHTML=zones+decs+`<svg class="trail" viewBox="0 0 100 ${H}" preserveAspectRatio="none"><path d="${d}"/></svg>`+stones+'<img class="me" id="me" src="slike/zaba.png" alt="">';
  const done=LEVELS.filter((_,i)=>save.stars[i]).length;
  $('prog').style.width=(done/LEVELS.length*100)+'%';
  $('progtxt').textContent=done==LEVELS.length?'Prišel si do konca! 🏆':`Stopnja ${done+1} od ${LEVELS.length}`;
  $('total').innerHTML=save.total?`Zbral si že ${save.total} <svg class="star on"><use href="#i-star"/></svg>`:'';
  show('home');
- const c=document.querySelector('.lvl.cur');if(c)c.scrollIntoView({block:'center'});
+ // žabica: stoji na zadnji obiskani stopnji in skoči na novo
+ const me=$('me'),from=Math.min(save.frog??last,last),place=i=>{const p=pt(i);me.style.left=p.x+'%';me.style.top=(p.y-ST*.35)+'px'};
+ me.style.transition='none';place(from);void me.offsetWidth;me.style.transition='';
+ const target=P.querySelector(`.lvl[data-l="${last}"]`);if(target)target.scrollIntoView({block:'center'});
+ if(from<last){let k=from;const step=()=>{k++;me.classList.remove('hop');void me.offsetWidth;me.classList.add('hop');place(k);if(k<last)setTimeout(step,950)};setTimeout(step,500)}
+ save.frog=last;store();
 }
 const LOCKS=true; // true = stopnje se odklepajo po vrsti
 function unlocked(i){return !LOCKS||i==0||(save.stars[i-1]||0)>0}
@@ -327,11 +362,13 @@ function show(id){$('mus').style.display=id==='home'?'':'none';for(const s of do
 $('levels').addEventListener('click',e=>{const b=e.target.closest('.lvl');if(b&&!b.disabled)startLevel(+b.dataset.l)});
 
 // ---- igra ----
-let L=0,words=[],wi=0,miss=0,wordMiss=0,locked=false,drag=null;
+const MODES=['sestavi','manjka','beri'];
+let L=0,words=[],wi=0,miss=0,wordMiss=0,locked=false,drag=null,mode='sestavi';
 function startLevel(i){L=i;setTune(i);words=shuffle(LEVELS[i].words);wi=0;miss=0;$('over').classList.remove('on');show('game');$('jar').textContent=save.total;loadWord()}
 function loadWord(){
  const w=words[wi],lv=LEVELS[L];wordMiss=0;locked=false;
- $('play').classList.remove('won');$('pic').classList.remove('win');
+ mode=MODES[(L+wi)%MODES.length];
+ $('play').className='play mode-'+mode;$('pic').classList.remove('win');
  $('dots').innerHTML=words.map((_,k)=>`<i class="${k<wi?'done':k==wi?'now':''}"></i>`).join('');
  $('pic').innerHTML=`<img src="slike/${w.id}.png" alt="${w.s.join('')}" onerror="this.outerHTML='<span class=emo>${w.emo}</span>'"><button class="say pp" id="sayw" aria-label="Povej besedo"><svg class="i"><use href="#i-say"/></svg></button>`;
  if(wi==0)for(const x of words){const p=new Image();p.src=`slike/${x.id}.png`}
@@ -346,10 +383,34 @@ function loadWord(){
  const score=x=>w.s.some(y=>y.slice(-1)===x.slice(-1))*2+w.s.some(y=>y[0]===x[0])+Math.random()*1.5;
  for(let i=0;i<lv.extra;i++){const len=w.s[i%w.s.length].length;
   const c=pool.filter(x=>!extra.includes(x)&&x.length===len).sort((p,q)=>score(q)-score(p))[0]||pool.find(x=>!extra.includes(x));extra.push(c)}
- $('tray').innerHTML=shuffle([...w.s,...extra]).map(s=>`<div class="card pp" data-s="${s}">${s}</div>`).join('');
- setTimeout(()=>say(K.beseda(w.s.join(''))),350);
+ if(mode==='sestavi'){
+  $('task').textContent='Sestavi besedo';
+  $('tray').innerHTML=shuffle([...w.s,...extra]).map(s=>`<div class="card pp" data-s="${s}">${s}</div>`).join('');
+  setTimeout(()=>say(K.beseda(w.s.join(''))),350);
+ }else if(mode==='manjka'){
+  // vsi zlogi so že na mestu, en manjka; izbira izmed 3–4 kartic
+  const miss1=Math.random()*w.s.length|0,k=Math.max(2,Math.min(3,lv.extra+1));
+  for(const sl of document.querySelectorAll('.slot'))if(+sl.dataset.k!==miss1){sl.classList.add('ok','given');sl.innerHTML='<span>'+sl.dataset.s+'</span>'}
+  const len=w.s[miss1].length,opts=pool.filter(x=>x.length===len).sort((p,q)=>score(q)-score(p)).slice(0,k);
+  $('task').textContent='Kateri zlog manjka?';
+  $('tray').innerHTML=shuffle([w.s[miss1],...opts]).map(s=>`<div class="card pp" data-s="${s}">${s}</div>`).join('');
+  setTimeout(()=>say(K.beseda(w.s.join(''))),350);
+ }else{
+  // preberi besedo in najdi pravo sliko (glas je ne prebere – otrok bere sam)
+  const all=[...P2,...P3,...P4,PIKA].filter(x=>x.id!==w.id),n=L<10?2:3;
+  const sc=x=>(x.s.length===w.s.length)*2+(x.s[0][0]===w.s[0][0])*2+(x.s[0]===w.s[0])+Math.random()*2;
+  const others=all.sort((p,q)=>sc(q)-sc(p)).slice(0,n);
+  $('task').textContent='Preberi in poišči sliko';
+  $('wordtxt').textContent=w.s.join('');
+  $('tray').innerHTML=shuffle([w,...others]).map(x=>`<button class="opt pp" data-id="${x.id}" aria-label="slika"><img src="slike/${x.id}.png" alt=""></button>`).join('');
+ }
 }
-$('play').addEventListener('click',e=>{if(e.target.closest('#sayw'))say(K.beseda(words[wi].s.join('')))});
+$('play').addEventListener('click',e=>{if(e.target.closest('#sayw'))say(K.beseda(words[wi].s.join('')))
+ const o=e.target.closest('.opt');if(!o||locked||o.classList.contains('no'))return;
+ const w=words[wi];
+ if(o.dataset.id===w.id){o.classList.add('ok');check(true)}
+ else{o.classList.add('no');miss++;wordMiss++;const x=[...P2,...P3,...P4,PIKA].find(x=>x.id===o.dataset.id);if(x)say(K.beseda(x.s.join('')));if(wordMiss>=2)setTimeout(()=>say(K.beseda(w.s.join(''))),1100)}
+});
 
 const slots=()=>[...document.querySelectorAll('.slot:not(.ok)')];
 function slotAt(x,y){
@@ -372,9 +433,10 @@ addEventListener('pointermove',e=>{
 });
 function drop(e){
  if(!drag||e.pointerId!==drag.id)return;
- const {c}=drag;drag=null;c.classList.remove('drag');
+ const {c}=drag,tap=Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)<10;drag=null;c.classList.remove('drag');
  for(const x of slots())x.classList.remove('hot');
- const s=slotAt(e.clientX,e.clientY);
+ let s=slotAt(e.clientX,e.clientY);
+ if(tap){const t=slots()[0]||null;s=t&&(t.dataset.s===c.dataset.s||mode==='manjka')?t:null} // dotik: v sestavi samo posluša, če ni pravi
  if(s&&s.dataset.s===c.dataset.s){
   const a=c.getBoundingClientRect(),b=s.getBoundingClientRect(),m=c.style.transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px/)||[0,0,0];
   c.style.transform=`translate(${+m[1]+b.left-a.left+(b.width-a.width)/2}px,${+m[2]+b.top-a.top+(b.height-a.height)/2}px)`;
@@ -391,8 +453,8 @@ function hint(){
  const c=[...document.querySelectorAll('.card:not(.used)')].find(c=>c.dataset.s===s.dataset.s);
  if(c)c.classList.add('hint');
 }
-function check(){
- if(slots().length)return;
+function check(force){
+ if(!force&&slots().length)return;
  locked=true;const w=words[wi];
  $('play').classList.add('won');$('pic').classList.add('win');
  save.total++;store();$('jar').textContent=save.total;
@@ -404,7 +466,7 @@ function finish(){
  save.stars[L]=Math.max(save.stars[L]||0,st);store();
  const opened=first&&L<LEVELS.length-1;
  $('endstars').innerHTML=STARS(st);
- $('endmsg').textContent=st==3?'Odlično! Vse besede brez težav.':st==2?'Zelo dobro! Sestavil si vse besede.':'Zmogel si! Poskusi še enkrat za več zvezdic.';
+ $('endmsg').textContent=st==3?'Odlično! Vse brez napake.':st==2?'Zelo dobro! Rešil si vse besede.':'Zmogel si! Poskusi še enkrat za več zvezdic.';
  if(opened)$('endmsg').innerHTML+=`<br><strong style="color:var(--accent)">🔓 Odklenil si stopnjo ${L+2}!</strong>`;
  if(first&&L==LEVELS.length-1)$('endmsg').innerHTML+='<br><strong style="color:var(--accent)">🏆 Prišel si do konca!</strong>';
  $('next').textContent=L<LEVELS.length-1?'Naprej':'Domov';
