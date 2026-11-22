@@ -1,0 +1,848 @@
+[
+{
+"k": "z-zha",
+"t": "ža."
+},
+{
+"k": "z-ba",
+"t": "ba."
+},
+{
+"k": "z-mu",
+"t": "mu."
+},
+{
+"k": "z-ca",
+"t": "ca."
+},
+{
+"k": "z-ri",
+"t": "ri."
+},
+{
+"k": "z-lu",
+"t": "lu."
+},
+{
+"k": "z-na",
+"t": "na."
+},
+{
+"k": "z-hi",
+"t": "hi."
+},
+{
+"k": "z-sha",
+"t": "ša."
+},
+{
+"k": "z-zho",
+"t": "žo."
+},
+{
+"k": "z-ga",
+"t": "ga."
+},
+{
+"k": "z-ko",
+"t": "ko."
+},
+{
+"k": "z-za",
+"t": "za."
+},
+{
+"k": "z-ro",
+"t": "ro."
+},
+{
+"k": "z-vo",
+"t": "vo."
+},
+{
+"k": "z-da",
+"t": "da."
+},
+{
+"k": "z-so",
+"t": "so."
+},
+{
+"k": "z-va",
+"t": "va."
+},
+{
+"k": "z-lo",
+"t": "lo."
+},
+{
+"k": "z-pi",
+"t": "pi."
+},
+{
+"k": "z-ka",
+"t": "ka."
+},
+{
+"k": "z-cha",
+"t": "ča."
+},
+{
+"k": "z-ra",
+"t": "ra."
+},
+{
+"k": "z-bu",
+"t": "bu."
+},
+{
+"k": "z-sho",
+"t": "šo."
+},
+{
+"k": "z-la",
+"t": "la."
+},
+{
+"k": "z-no",
+"t": "no."
+},
+{
+"k": "z-pa",
+"t": "pa."
+},
+{
+"k": "z-ta",
+"t": "ta."
+},
+{
+"k": "z-pe",
+"t": "pe."
+},
+{
+"k": "z-sa",
+"t": "sa."
+},
+{
+"k": "z-ni",
+"t": "ni."
+},
+{
+"k": "z-u",
+"t": "u."
+},
+{
+"k": "z-mle",
+"t": "mle."
+},
+{
+"k": "z-kra",
+"t": "kra."
+},
+{
+"k": "z-ze",
+"t": "ze."
+},
+{
+"k": "z-bra",
+"t": "bra."
+},
+{
+"k": "z-dja",
+"t": "dja."
+},
+{
+"k": "z-hla",
+"t": "hla."
+},
+{
+"k": "z-che",
+"t": "če."
+},
+{
+"k": "z-me",
+"t": "me."
+},
+{
+"k": "z-tla",
+"t": "tla."
+},
+{
+"k": "z-knji",
+"t": "knji."
+},
+{
+"k": "z-hru",
+"t": "hru."
+},
+{
+"k": "z-shka",
+"t": "ška."
+},
+{
+"k": "z-mi",
+"t": "mi."
+},
+{
+"k": "z-jec",
+"t": "jec."
+},
+{
+"k": "z-jek",
+"t": "jek."
+},
+{
+"k": "z-ov",
+"t": "ov."
+},
+{
+"k": "z-ti",
+"t": "ti."
+},
+{
+"k": "z-ger",
+"t": "ger."
+},
+{
+"k": "z-pan",
+"t": "pan."
+},
+{
+"k": "z-av",
+"t": "av."
+},
+{
+"k": "z-to",
+"t": "to."
+},
+{
+"k": "z-tor",
+"t": "tor."
+},
+{
+"k": "z-son",
+"t": "son."
+},
+{
+"k": "z-ce",
+"t": "ce."
+},
+{
+"k": "z-zvez",
+"t": "zvez."
+},
+{
+"k": "z-ob",
+"t": "ob."
+},
+{
+"k": "z-lak",
+"t": "lak."
+},
+{
+"k": "z-dezh",
+"t": "dež."
+},
+{
+"k": "z-nik",
+"t": "nik."
+},
+{
+"k": "z-jaj",
+"t": "jaj."
+},
+{
+"k": "z-tulj",
+"t": "tulj."
+},
+{
+"k": "z-pin",
+"t": "pin."
+},
+{
+"k": "z-gvin",
+"t": "gvin."
+},
+{
+"k": "z-del",
+"t": "del."
+},
+{
+"k": "z-fin",
+"t": "fin."
+},
+{
+"k": "z-klo",
+"t": "klo."
+},
+{
+"k": "z-buk",
+"t": "buk."
+},
+{
+"k": "z-trak",
+"t": "trak."
+},
+{
+"k": "z-zhi",
+"t": "ži."
+},
+{
+"k": "z-fa",
+"t": "fa."
+},
+{
+"k": "z-ja",
+"t": "ja."
+},
+{
+"k": "z-go",
+"t": "go."
+},
+{
+"k": "z-ke",
+"t": "ke."
+},
+{
+"k": "z-li",
+"t": "li."
+},
+{
+"k": "z-si",
+"t": "si."
+},
+{
+"k": "z-be",
+"t": "be."
+},
+{
+"k": "z-ru",
+"t": "ru."
+},
+{
+"k": "z-mo",
+"t": "mo."
+},
+{
+"k": "z-ki",
+"t": "ki."
+},
+{
+"k": "z-a",
+"t": "a."
+},
+{
+"k": "z-te",
+"t": "te."
+},
+{
+"k": "z-le",
+"t": "le."
+},
+{
+"k": "z-fon",
+"t": "fon."
+},
+{
+"k": "z-lin",
+"t": "lin."
+},
+{
+"k": "z-rog",
+"t": "rog."
+},
+{
+"k": "z-bol",
+"t": "bol."
+},
+{
+"k": "z-bus",
+"t": "bus."
+},
+{
+"k": "z-kro",
+"t": "kro."
+},
+{
+"k": "z-dil",
+"t": "dil."
+},
+{
+"k": "z-ken",
+"t": "ken."
+},
+{
+"k": "z-gu",
+"t": "gu."
+},
+{
+"k": "z-po",
+"t": "po."
+},
+{
+"k": "z-ma",
+"t": "ma."
+},
+{
+"k": "z-ran",
+"t": "ran."
+},
+{
+"k": "z-ho",
+"t": "ho."
+},
+{
+"k": "z-bot",
+"t": "bot."
+},
+{
+"k": "z-se",
+"t": "se."
+},
+{
+"k": "z-mar",
+"t": "mar."
+},
+{
+"k": "z-je",
+"t": "je."
+},
+{
+"k": "z-he",
+"t": "he."
+},
+{
+"k": "z-kop",
+"t": "kop."
+},
+{
+"k": "z-ter",
+"t": "ter."
+},
+{
+"k": "z-vi",
+"t": "vi."
+},
+{
+"k": "z-zor",
+"t": "zor."
+},
+{
+"k": "b-zhaba",
+"t": "žaba.",
+"n": "žába"
+},
+{
+"k": "b-muca",
+"t": "muca.",
+"n": "múca"
+},
+{
+"k": "b-riba",
+"t": "riba.",
+"n": "ríba"
+},
+{
+"k": "b-luna",
+"t": "luna.",
+"n": "lúna"
+},
+{
+"k": "b-hisha",
+"t": "hiša.",
+"n": "híša"
+},
+{
+"k": "b-zhoga",
+"t": "žoga.",
+"n": "žóga"
+},
+{
+"k": "b-koza",
+"t": "koza.",
+"n": "kóza"
+},
+{
+"k": "b-rozha",
+"t": "roža.",
+"n": "róža"
+},
+{
+"k": "b-voda",
+"t": "voda.",
+"n": "vóda"
+},
+{
+"k": "b-sova",
+"t": "sova.",
+"n": "sóva"
+},
+{
+"k": "b-kolo",
+"t": "kolo.",
+"n": "kólo"
+},
+{
+"k": "b-pica",
+"t": "pica.",
+"n": "píca"
+},
+{
+"k": "b-kacha",
+"t": "kača.",
+"n": "káča"
+},
+{
+"k": "b-raca",
+"t": "raca.",
+"n": "ráca"
+},
+{
+"k": "b-bucha",
+"t": "buča.",
+"n": "búča"
+},
+{
+"k": "b-shola",
+"t": "šola.",
+"n": "šóla"
+},
+{
+"k": "b-noga",
+"t": "noga.",
+"n": "nóga"
+},
+{
+"k": "b-roka",
+"t": "roka.",
+"n": "róka"
+},
+{
+"k": "b-kapa",
+"t": "kapa.",
+"n": "kápa"
+},
+{
+"k": "b-vaza",
+"t": "vaza.",
+"n": "váza"
+},
+{
+"k": "b-taca",
+"t": "taca.",
+"n": "táca"
+},
+{
+"k": "b-pero",
+"t": "pero.",
+"n": "peró"
+},
+{
+"k": "b-sani",
+"t": "sani.",
+"n": "sáni"
+},
+{
+"k": "b-ura",
+"t": "ura.",
+"n": "úra"
+},
+{
+"k": "b-mleko",
+"t": "mleko.",
+"n": "mléko"
+},
+{
+"k": "b-krava",
+"t": "krava.",
+"n": "kráva"
+},
+{
+"k": "b-zebra",
+"t": "zebra.",
+"n": "zébra"
+},
+{
+"k": "b-ladja",
+"t": "ladja.",
+"n": "ládja"
+},
+{
+"k": "b-hlache",
+"t": "hlače.",
+"n": "hláče"
+},
+{
+"k": "b-metla",
+"t": "metla.",
+"n": "métla"
+},
+{
+"k": "b-knjiga",
+"t": "knjiga.",
+"n": "knjíga"
+},
+{
+"k": "b-hrushka",
+"t": "hruška.",
+"n": "hrúška"
+},
+{
+"k": "b-mishka",
+"t": "miška.",
+"n": "míška"
+},
+{
+"k": "b-zajec",
+"t": "zajec.",
+"n": "zájec"
+},
+{
+"k": "b-pajek",
+"t": "pajek.",
+"n": "pájek"
+},
+{
+"k": "b-ovca",
+"t": "ovca.",
+"n": "óvca"
+},
+{
+"k": "b-tiger",
+"t": "tiger.",
+"n": "tíger"
+},
+{
+"k": "b-panda",
+"t": "panda.",
+"n": "pánda"
+},
+{
+"k": "b-avto",
+"t": "avto.",
+"n": "ávto"
+},
+{
+"k": "b-torta",
+"t": "torta.",
+"n": "tórta"
+},
+{
+"k": "b-sonce",
+"t": "sonce.",
+"n": "sónce"
+},
+{
+"k": "b-zvezda",
+"t": "zvezda.",
+"n": "zvézda"
+},
+{
+"k": "b-oblak",
+"t": "oblak.",
+"n": "oblák"
+},
+{
+"k": "b-dezhnik",
+"t": "dežnik.",
+"n": "déžnik"
+},
+{
+"k": "b-jajce",
+"t": "jajce.",
+"n": "jájce"
+},
+{
+"k": "b-metulj",
+"t": "metulj.",
+"n": "metúlj"
+},
+{
+"k": "b-pingvin",
+"t": "pingvin.",
+"n": "píngvin"
+},
+{
+"k": "b-delfin",
+"t": "delfin.",
+"n": "délfin"
+},
+{
+"k": "b-klobuk",
+"t": "klobuk.",
+"n": "klobúk"
+},
+{
+"k": "b-traktor",
+"t": "traktor.",
+"n": "tráktor"
+},
+{
+"k": "b-banana",
+"t": "banana.",
+"n": "banána"
+},
+{
+"k": "b-papiga",
+"t": "papiga.",
+"n": "papíga"
+},
+{
+"k": "b-zhirafa",
+"t": "žirafa.",
+"n": "žiráfa"
+},
+{
+"k": "b-jagoda",
+"t": "jagoda.",
+"n": "jagóda"
+},
+{
+"k": "b-raketa",
+"t": "raketa.",
+"n": "rakéta"
+},
+{
+"k": "b-lisica",
+"t": "lisica.",
+"n": "lisíca"
+},
+{
+"k": "b-kamela",
+"t": "kamela.",
+"n": "kaméla"
+},
+{
+"k": "b-chebela",
+"t": "čebela.",
+"n": "čebéla"
+},
+{
+"k": "b-koruza",
+"t": "koruza.",
+"n": "korúza"
+},
+{
+"k": "b-limona",
+"t": "limona.",
+"n": "limóna"
+},
+{
+"k": "b-kitara",
+"t": "kitara.",
+"n": "kitára"
+},
+{
+"k": "b-koala",
+"t": "koala.",
+"n": "koála"
+},
+{
+"k": "b-koshara",
+"t": "košara.",
+"n": "košára"
+},
+{
+"k": "b-telefon",
+"t": "telefon.",
+"n": "telefón"
+},
+{
+"k": "b-petelin",
+"t": "petelin.",
+"n": "petelín"
+},
+{
+"k": "b-nosorog",
+"t": "nosorog.",
+"n": "nosoróg"
+},
+{
+"k": "b-jabolko",
+"t": "jabolko.",
+"n": "jábolko"
+},
+{
+"k": "b-avtobus",
+"t": "avtobus.",
+"n": "ávtobus"
+},
+{
+"k": "b-krokodil",
+"t": "krokodil.",
+"n": "krokodíl"
+},
+{
+"k": "b-kenguru",
+"t": "kenguru.",
+"n": "kengurú"
+},
+{
+"k": "b-lubenica",
+"t": "lubenica.",
+"n": "lubeníca"
+},
+{
+"k": "b-pomarancha",
+"t": "pomaranča.",
+"n": "pomaránča"
+},
+{
+"k": "b-hobotnica",
+"t": "hobotnica.",
+"n": "hobótnica"
+},
+{
+"k": "b-gosenica",
+"t": "gosenica.",
+"n": "goseníca"
+},
+{
+"k": "b-marjetica",
+"t": "marjetica.",
+"n": "marjetíca"
+},
+{
+"k": "b-helikopter",
+"t": "helikopter.",
+"n": "helikópter"
+},
+{
+"k": "b-televizor",
+"t": "televizor.",
+"n": "televízor"
+},
+{
+"k": "b-pikapolonica",
+"t": "pikapolonica.",
+"n": "pikapolóníca"
+},
+{
+"k": "f-bravo",
+"t": "Bravo!"
+},
+{
+"k": "f-odlicno",
+"t": "Odlično!"
+},
+{
+"k": "f-super",
+"t": "Super!"
+},
+{
+"k": "f-takoje",
+"t": "Tako je!"
+},
+{
+"k": "f-vse",
+"t": "Sestavil si vse besede!"
+},
+{
+"k": "f-odklenil",
+"t": "Odklenil si novo stopnjo!"
+},
+{
+"k": "f-konec",
+"t": "Prišel si do konca!"
+}
+]
