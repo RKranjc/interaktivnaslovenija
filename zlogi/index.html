@@ -321,7 +321,7 @@ function home(){setTune(-1);
  show('home');
  const c=document.querySelector('.lvl.cur');if(c)c.scrollIntoView({block:'center'});
 }
-const LOCKS=false; // true = stopnje se odklepajo po vrsti
+const LOCKS=true; // true = stopnje se odklepajo po vrsti
 function unlocked(i){return !LOCKS||i==0||(save.stars[i-1]||0)>0}
 function show(id){$('mus').style.display=id==='home'?'':'none';for(const s of document.querySelectorAll('.screen'))s.classList.toggle('on',s.id===id)}
 $('levels').addEventListener('click',e=>{const b=e.target.closest('.lvl');if(b&&!b.disabled)startLevel(+b.dataset.l)});
