@@ -312,7 +312,7 @@ addEventListener('pointerdown',e=>{if(musicOn&&(!curEl||curEl.paused)&&!e.target
 // ---- domov ----
 function home(){setTune(-1);
  $('levels').innerHTML=LEVELS.map((l,i)=>{const st=save.stars[i]||0;
-  const open=unlocked(i),cur=open&&!st;
+  const open=unlocked(i),cur=i===LEVELS.findIndex((_,k)=>!save.stars[k]);
   return `<button class="lvl pp${open?'':' lock'}${cur?' cur':''}" data-l="${i}" ${open?`aria-label="Stopnja ${i+1}"`:'disabled aria-label="Zaklenjeno"'}>${cur?'<img class="me" src="slike/zaba.png" alt="">':''}${open?`<b>${i+1}</b><span class="st">${STARS(st)}</span>`:'<svg class="i"><use href="#i-lock"/></svg>'}</button>`}).join('');
  const done=LEVELS.filter((_,i)=>save.stars[i]).length;
  $('prog').style.width=(done/LEVELS.length*100)+'%';
@@ -321,7 +321,8 @@ function home(){setTune(-1);
  show('home');
  const c=document.querySelector('.lvl.cur');if(c)c.scrollIntoView({block:'center'});
 }
-function unlocked(i){return i==0||(save.stars[i-1]||0)>0}
+const LOCKS=false; // true = stopnje se odklepajo po vrsti
+function unlocked(i){return !LOCKS||i==0||(save.stars[i-1]||0)>0}
 function show(id){$('mus').style.display=id==='home'?'':'none';for(const s of document.querySelectorAll('.screen'))s.classList.toggle('on',s.id===id)}
 $('levels').addEventListener('click',e=>{const b=e.target.closest('.lvl');if(b&&!b.disabled)startLevel(+b.dataset.l)});
 
