@@ -208,11 +208,16 @@ const PRAISE=['f-bravo','f-odlicno','f-super','f-takoje'];
 const TXT={'f-bravo':'Bravo!','f-odlicno':'Odlično!','f-super':'Super!','f-takoje':'Tako je!','f-vse':'Sestavil si vse besede!','f-odklenil':'Odklenil si novo stopnjo!','f-konec':'Prišel si do konca!'};
 const keyText=k=>TXT[k]||k.slice(2).replace(/ch/g,'č').replace(/sh/g,'š').replace(/zh/g,'ž');
 let seq=0,cur=null;
+// vsi posnetki v eni datoteki: zvok.mp3 + zvok.json {ključ:[začetek,trajanje]}
+let SPR=null,SPRI=null,sprRaw=null;
+fetch('zvok.json').then(r=>r.json()).then(j=>SPRI=j).catch(()=>{});
+fetch('zvok.mp3').then(r=>r.arrayBuffer()).then(b=>{sprRaw=b;decodeSpr()}).catch(()=>{});
+function decodeSpr(){if(SPR||!sprRaw||!actx)return;const raw=sprRaw;sprRaw=null;try{actx.decodeAudioData(raw,b=>SPR=b,()=>{})}catch(e){}}
 function stopVoice(){seq++;try{cur&&cur.pause()}catch(e){}try{speechSynthesis.cancel()}catch(e){}duck(false)}
 function say(keys){
  if(muted)return;keys=[].concat(keys);stopVoice();const my=seq;
  const tts=k=>new Promise(r=>{if(!voice)return r();try{const u=new SpeechSynthesisUtterance(keyText(k));u.lang='sl-SI';u.voice=voice;u.rate=.85;u.onend=u.onerror=r;speechSynthesis.speak(u)}catch(e){r()}});
- const one=k=>new Promise(r=>{const a=new Audio('zvok/'+k+'.mp3');cur=a;a.onended=()=>r();a.onerror=()=>tts(k).then(r);a.play().catch(()=>tts(k).then(r))});
+ const one=k=>new Promise(r=>{decodeSpr();if(!SPR||!SPRI||!SPRI[k])return tts(k).then(r);const [st,du]=SPRI[k],src=actx.createBufferSource();src.buffer=SPR;src.connect(actx.destination);cur={pause(){try{src.stop()}catch(e){}}};src.onended=()=>r();src.start(0,st,du)});
  (async()=>{duck(true);for(const k of keys){if(my!==seq)return;await one(k)}if(my===seq)duck(false)})();
 }
 
@@ -301,6 +306,7 @@ function duck(on){} // glasba ostane ves čas enako tiha
 function musIcons(){for(const id of ['mus','mus2']){const b=$(id);b.classList.toggle('off',!musicOn);b.setAttribute('aria-label',musicOn?'Glasba vklopljena':'Glasba izklopljena')}}
 function toggleMusic(){musicOn=!musicOn;save.music=musicOn;store();musicOn?startMusic():stopMusic();musIcons()}
 $('mus').onclick=toggleMusic;$('mus2').onclick=toggleMusic;musIcons();
+addEventListener('pointerdown',()=>{try{ensureAudio();actx.resume();decodeSpr()}catch(_){}});
 addEventListener('pointerdown',e=>{if(musicOn&&(!curEl||curEl.paused)&&!e.target.closest('#mus,#mus2'))startMusic()});
 
 // ---- domov ----
