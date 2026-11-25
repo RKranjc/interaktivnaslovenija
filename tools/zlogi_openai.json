@@ -1,7 +1,7 @@
 {
   "nacin": "test",
   "glas": "marin",
-  "glasovi_test": ["marin", "cedar", "coral", "sage"],
+  "glasovi_test": ["marin", "coral", "cedar", "ash"],
   "test_kljuci": ["z-va", "z-zha", "z-cha", "z-knji", "z-u", "b-zhaba", "b-mleko", "b-hlache", "f-odlicno", "f-odklenil"],
   "test_stavki": [
     "Pozdravljen! Danes bova skupaj sestavljala besede iz zlogov.",
