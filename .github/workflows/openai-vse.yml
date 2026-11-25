@@ -1,0 +1,31 @@
+name: Glas OpenAI (Moja Slovenija, vsi stavki)
+# zagon 2026-11-25: coral, naravni tempo
+on:
+  workflow_dispatch: {}
+  push: { branches: [main], paths: ['.github/workflows/openai-vse.yml'] }
+permissions: { contents: write }
+concurrency: { group: openai-vse, cancel-in-progress: false }
+jobs:
+  posnemi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: { shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19] }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          pip install -q openai
+      - env:
+          OPENAI_API_KEY: ${{ secrets.ZVOK || secrets.OPENAI_API_KEY }}
+          SHARD: '${{ matrix.shard }}'
+          SHARDS: '20'
+          GLAS: coral
+          TEMPO: '1.0'
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898281+github-actions[bot]@users.noreply.github.com"
+          python tools/openai_bake.py
