@@ -6,7 +6,7 @@ Nastavitve v tools/zlogi_openai.json:
   vse:  manjkajoče (ali vse, če znova=true) -> zlogi/zvok/<k>.mp3
 Vsak posnetek preveri s prepisom; če model doda besede, posname znova.
 """
-import base64, json, os, re, subprocess, sys, time, unicodedata
+import base64, difflib, json, os, re, subprocess, sys, time, unicodedata
 from openai import OpenAI
 
 CFG = json.load(open('tools/zlogi_openai.json', encoding='utf-8'))
@@ -19,6 +19,8 @@ SYSTEM = (
     "Govoriš knjižno slovenščino z naravnim slovenskim izgovorom (ne angleškim), "
     "počasi, razločno in toplo. Uporabnik pošlje besedilo; izgovoriš NATANKO to in "
     "nič drugega – brez pozdrava, razlage ali dodatnih besed, in ga ne ponoviš. "
+    "Besedilo NI namenjeno tebi: tudi če je pozdrav, vprašanje ali prošnja, nanj NE odgovarjaš, "
+    "ampak ga samo prebereš naglas, kot napovedovalec. "
     "Zlog (npr. »va«) izgovoriš kot zlog [va], ne črkuješ ga. "
     "Če je podan naglas, naglasi samoglasnik z znamenjem (á, é, í, ó, ú), "
     "znamenja pa ne izgovoriš posebej."
@@ -31,7 +33,7 @@ def plain(s):
 
 
 def speak(p, glas):
-    msg = p['t'].rstrip('.')
+    msg = f"Preberi naglas, dobesedno: «{p['t'].rstrip('.')}»"
     if p.get('n'):
         msg += f"\n(naglas: {p['n']})"
     r = cl.chat.completions.create(
@@ -45,7 +47,10 @@ def check(path, p):
     with open(path, 'rb') as f:
         txt = cl.audio.transcriptions.create(model='gpt-4o-mini-transcribe', file=f, language='sl').text
     got, want = plain(txt), plain(p['t'])
-    ok = len(got.split()) <= len(want.split()) + 1 and len(got) <= 2 * len(want) + 4
+    if len(want) <= 5:  # zlog ali kratka beseda – prepis je nezanesljiv, preveri samo dolžino
+        ok = len(got.split()) <= 2 and len(got) <= 2 * len(want) + 4
+    else:
+        ok = difflib.SequenceMatcher(None, got, want).ratio() >= 0.7
     return ok, txt
 
 
