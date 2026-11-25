@@ -59,7 +59,7 @@ def save(wav, out, tempo=1.0):
     # enako kot pri Mayi: obreži tišino, normaliziraj glasnost, mono 24 kHz
     r = subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', '/tmp/x.wav', '-af',
                         'silenceremove=start_periods=1:start_threshold=-50dB,areverse,'
-                        'silenceremove=start_periods=1:start_threshold=-50dB,areverse,'
+                        'silenceremove=start_periods=1:start_threshold=-50dB,areverse,' +
                         (f'atempo={tempo},' if tempo != 1.0 else '') + 'adelay=40,apad=pad_dur=0.08,loudnorm=I=-18:TP=-2',
                         '-ac', '1', '-ar', '24000', '-b:a', '48k', out])
     return r.returncode == 0
