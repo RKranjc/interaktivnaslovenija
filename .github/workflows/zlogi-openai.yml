@@ -17,9 +17,9 @@ jobs:
           pip install -q openai
       - name: Posnemi
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || secrets.SLOVENIJA_ZVOK }}
+          OPENAI_API_KEY: ${{ secrets.ZVOK || secrets.OPENAI_API_KEY }}
         run: |
-          if [ -z "$OPENAI_API_KEY" ]; then echo "::error::Ni API ključa – shrani ga kot secret OPENAI_API_KEY"; exit 1; fi
+          if [ -z "$OPENAI_API_KEY" ]; then echo "::error::Ni API ključa – shrani ga kot secret ZVOK"; exit 1; fi
           python tools/zlogi_openai.py
       - name: Združi v zvok.mp3 (samo način »vse«)
         run: |
