@@ -1,0 +1,13 @@
+{
+  "nacin": "test",
+  "glas": "marin",
+  "glasovi_test": ["marin", "cedar", "coral", "sage"],
+  "test_kljuci": ["z-va", "z-zha", "z-cha", "z-knji", "z-u", "b-zhaba", "b-mleko", "b-hlache", "f-odlicno", "f-odklenil"],
+  "test_stavki": [
+    "Pozdravljen! Danes bova skupaj sestavljala besede iz zlogov.",
+    "Poslušaj zlog in poišči pravo kartico.",
+    "Žabica je skočila čez ribnik in pristala na zelenem listu.",
+    "Kateri zlog manjka? Poskusi še enkrat, zmoreš!"
+  ],
+  "znova": false
+}

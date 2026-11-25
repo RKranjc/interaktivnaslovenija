@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zlogolov – primerjava glasov</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f6efe1; color: #3b2f25; margin: 0; padding: 20px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.n { margin: 0 0 18px; color: #7a6a58; }
+  table { border-collapse: collapse; width: 100%; background: #fffaf0; border-radius: 12px; overflow: hidden; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid #eadfcb; text-align: center; }
+  th { background: #c9a227; color: #fff; font-weight: 600; }
+  td.t { text-align: left; font-weight: 600; }
+  button { border: 0; border-radius: 999px; width: 40px; height: 40px; font-size: 16px; cursor: pointer; background: #7d9b76; color: #fff; }
+  button.maya { background: #b8a48a; }
+  button:disabled { background: #ddd; cursor: default; }
+  button.on { background: #b5523b; }
+  .err { color: #b5523b; }
+</style>
+</head>
+<body>
+<h1>Zlogolov – primerjava glasov</h1>
+<p class="n">Isti zlogi, besede in stavki z več glasovi OpenAI (gpt-audio-1.5). V zadnjem stolpcu je za primerjavo zdajšnja Maya.</p>
+<div id="app">Nalagam …</div>
+<script>
+const audio = new Audio();
+let cur = null;
+function play(btn, src) {
+  if (cur) cur.classList.remove('on');
+  cur = btn; btn.classList.add('on');
+  audio.src = src + '?v=' + Date.now(); audio.play();
+  audio.onended = () => btn.classList.remove('on');
+}
+fetch('zvok_test/seznam.json?v=' + Date.now())
+  .then(r => r.json())
+  .then(({ glasovi, fraze }) => {
+    const head = '<tr><th>Besedilo</th>' + glasovi.map(g => `<th>${g}</th>`).join('') + '<th>Maya</th></tr>';
+    const rows = fraze.map(([k, t]) => {
+      const cells = glasovi.map(g => `<td><button onclick="play(this,'zvok_test/${g}/${k}.mp3')">▶</button></td>`).join('');
+      const maya = k.startsWith('s-') ? '<td><button class="maya" disabled>–</button></td>'
+        : `<td><button class="maya" onclick="play(this,'zvok/${k}.mp3')">▶</button></td>`;
+      return `<tr><td class="t">${t}</td>${cells}${maya}</tr>`;
+    }).join('');
+    document.getElementById('app').innerHTML = `<table>${head}${rows}</table>`;
+  })
+  .catch(() => { document.getElementById('app').innerHTML = '<p class="err">Posnetkov še ni – počakaj, da se snemanje na GitHubu konča.</p>'; });
+</script>
+</body>
+</html>
