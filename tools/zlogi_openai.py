@@ -72,6 +72,8 @@ def record(p, glas, out):
                 return True
         except Exception as e:
             print(f"{p['k']} napaka: {e}", flush=True)
+            if any(s in str(e) for s in ('no credits', 'insufficient_quota', 'invalid_api_key', 'Incorrect API key')):
+                sys.exit('Ustavljam: ni kredita ali napačen API ključ.')
             time.sleep(4 * (i + 1))
     print(f"{p['k']} PREVERI ROČNO (obdržan zadnji poskus)", flush=True)
     return False
