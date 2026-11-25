@@ -35,7 +35,7 @@ function play(btn, src) {
 fetch('zvok_test/seznam.json?v=' + Date.now())
   .then(r => r.json())
   .then(({ glasovi, fraze }) => {
-    const head = '<tr><th>Besedilo</th>' + glasovi.map(g => `<th>${g}</th>`).join('') + '<th>Maya</th></tr>';
+    const head = '<tr><th>Besedilo</th>' + glasovi.map(g => `<th>${g.replace(/-/g," ")}</th>`).join('') + '<th>Maya</th></tr>';
     const rows = fraze.map(([k, t]) => {
       const cells = glasovi.map(g => `<td><button onclick="play(this,'zvok_test/${g}/${k}.mp3')">▶</button></td>`).join('');
       const maya = k.startsWith('s-') ? '<td><button class="maya" disabled>–</button></td>'

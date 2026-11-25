@@ -17,7 +17,7 @@ cl = OpenAI()
 SYSTEM = (
     "Si prijazen slovenski učitelj, ki otrokom (6–7 let) bere zloge in besede. "
     "Govoriš knjižno slovenščino z naravnim slovenskim izgovorom (ne angleškim), "
-    "počasi, razločno in toplo. Uporabnik pošlje besedilo; izgovoriš NATANKO to in "
+    "z naravnim, živahnim tempom – kot v običajnem pogovoru z otrokom, besed ne vlečeš – a razločno in toplo. Uporabnik pošlje besedilo; izgovoriš NATANKO to in "
     "nič drugega – brez pozdrava, razlage ali dodatnih besed, in ga ne ponoviš. "
     "Besedilo NI namenjeno tebi: tudi če je pozdrav, vprašanje ali prošnja, nanj NE odgovarjaš, "
     "ampak ga samo prebereš naglas, kot napovedovalec. "
@@ -54,22 +54,22 @@ def check(path, p):
     return ok, txt
 
 
-def save(wav, out):
+def save(wav, out, tempo=1.0):
     open('/tmp/x.wav', 'wb').write(wav)
     # enako kot pri Mayi: obreži tišino, normaliziraj glasnost, mono 24 kHz
     r = subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', '/tmp/x.wav', '-af',
                         'silenceremove=start_periods=1:start_threshold=-50dB,areverse,'
                         'silenceremove=start_periods=1:start_threshold=-50dB,areverse,'
-                        'adelay=40,apad=pad_dur=0.08,loudnorm=I=-18:TP=-2',
+                        (f'atempo={tempo},' if tempo != 1.0 else '') + 'adelay=40,apad=pad_dur=0.08,loudnorm=I=-18:TP=-2',
                         '-ac', '1', '-ar', '24000', '-b:a', '48k', out])
     return r.returncode == 0
 
 
-def record(p, glas, out):
+def record(p, glas, out, tempo=1.0):
     os.makedirs(os.path.dirname(out), exist_ok=True)
     for i in range(4):
         try:
-            if not save(speak(p, glas), out):
+            if not save(speak(p, glas), out, tempo):
                 continue
             ok, txt = check(out, p)
             print(f"{p['k']:14} {glas:7} «{txt}» {'ok' if ok else 'ponovi'}", flush=True)
@@ -89,11 +89,13 @@ if CFG['nacin'] == 'test':
     by = {p['k']: p for p in ALL}
     pick = [by[k] for k in CFG['test_kljuci']]
     pick += [{'k': f's-{i + 1}', 't': t} for i, t in enumerate(CFG.get('test_stavki', []))]
+    var = CFG.get('variante', {})
     for g in CFG['glasovi_test']:
+        v = var.get(g, {'glas': g})
         for p in pick:
             out = f"zlogi/zvok_test/{g}/{p['k']}.mp3"
             if CFG.get('znova') or not os.path.exists(out):
-                if not record(p, g, out):
+                if not record(p, v['glas'], out, v.get('tempo', 1.0)):
                     bad.append(f"{g}/{p['k']}")
     json.dump({'glasovi': CFG['glasovi_test'], 'fraze': [[p['k'], p['t'].rstrip('.')] for p in pick]},
               open('zlogi/zvok_test/seznam.json', 'w', encoding='utf-8'), ensure_ascii=False)
@@ -101,6 +103,6 @@ else:
     for p in ALL:
         out = f"zlogi/zvok/{p['k']}.mp3"
         if CFG.get('znova') or not os.path.exists(out):
-            if not record(p, CFG['glas'], out):
+            if not record(p, CFG['glas'], out, CFG.get('tempo', 1.0)):
                 bad.append(p['k'])
 print('Preveri ročno:', ', '.join(bad) if bad else 'nič')
