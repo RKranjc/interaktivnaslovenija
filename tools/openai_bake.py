@@ -66,7 +66,9 @@ def check(path, t):
     got, want = plain(txt), plain(t)
     if len(want) <= 5:
         return len(got.split()) <= 2 and len(got) <= 2 * len(want) + 4, txt
-    return difflib.SequenceMatcher(None, got, want).ratio() >= 0.7, txt
+    # števila (2558) prepis izpiše z besedami, zato je pri stavkih s števili meja nižja
+    meja = 0.45 if re.search(r'\d', t) else 0.7
+    return difflib.SequenceMatcher(None, got, want).ratio() >= meja, txt
 
 
 def save(wav, out):
