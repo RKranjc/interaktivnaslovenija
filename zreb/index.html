@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="sl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Žreb barv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: party, playful, one-night
+   IDEA: a fairground prize wheel under a winter night sky
+   PICTURE: the big 5-colour wheel with a pointer, then fireworks in the drawn colour
+   COLOUR and TYPE: deep night teal ground, white ink, the five team colours; Baloo 2
+   LAYOUT: one column: title, wheel, password field */
+:root{color-scheme:dark;--bg:#0b2427;--ink:#f4f7f6;--mut:#9fbcbc;--card:#123236}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(120% 80% at 50% 0%,#164246 0%,var(--bg) 60%);background-color:var(--bg);color:var(--ink);font:17px/1.5 "Baloo 2",system-ui,sans-serif;overflow-x:clip;min-height:100vh}
+main{max-width:520px;margin:0 auto;padding:56px 16px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;position:relative;z-index:2}
+h1{font-size:clamp(26px,7vw,38px);line-height:1.05;margin:0;font-weight:800;text-wrap:balance}
+.rules{margin:0;padding:8px 12px 8px 28px;text-align:left;background:var(--card);border-radius:16px;width:100%;color:#dbe8e7;font-size:14px;line-height:1.3}.rules li{margin:1px 0}.rules b{color:#fff}
+.wheelbox{position:relative;width:min(72vw,42vh,340px);aspect-ratio:1}
+.wheelbox svg{width:100%;height:100%;display:block}
+#wheel{transform-origin:center center;will-change:transform;transition:transform 5.2s cubic-bezier(.12,.75,.12,1)}
+.pin{position:absolute;left:50%;top:-8px;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:30px solid #ffd54a;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4));z-index:3}
+form{display:flex;gap:10px;width:100%;flex-wrap:wrap;justify-content:center}
+input{flex:1 1 200px;font:600 20px "Baloo 2",system-ui;padding:10px 14px;border-radius:14px;border:2px solid #2c5a5e;background:var(--card);color:var(--ink);text-transform:uppercase;letter-spacing:.06em;text-align:center;min-height:52px}
+input:focus,button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+button{font:700 19px "Baloo 2",system-ui;padding:10px 22px;border:0;border-radius:14px;background:#fff;color:#0b2427;min-height:52px;cursor:pointer}
+button:disabled{opacity:.55}
+.msg{min-height:28px;margin:0;color:var(--mut)}
+.msg.err{color:#ff8f8f}
+.result{display:none;padding:18px 20px;border-radius:20px;width:100%;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.result.on{display:block;animation:pop .5s ease-out}
+.result .big{font-size:clamp(36px,11vw,56px);font-weight:800;line-height:1.05;text-transform:uppercase;letter-spacing:.02em}
+.result p{margin:4px 0 0}
+.bulb{animation:tw 1.2s ease-in-out infinite alternate}@keyframes tw{from{opacity:1}to{opacity:.35}}
+.snow{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}.snow i{position:absolute;top:-10px;width:6px;height:6px;border-radius:50%;background:#fff;opacity:.7;animation:fall linear infinite}@keyframes fall{to{transform:translate(30px,105vh)}}
+@media (prefers-reduced-motion:reduce){.snow,.bulb{animation:none}.snow{display:none}}
+.mute{position:fixed;top:10px;right:10px;z-index:5;font-size:14px;padding:6px 12px;min-height:44px;background:rgba(255,255,255,.14);color:#fff;border-radius:12px}
+#fw{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){#wheel{transition-duration:.01s}.result.on{animation:none}}
+</style></head><body>
+<div class="snow" id="snow"></div><button id="mute" class="mute" type="button" aria-pressed="false">Zvok: vklop</button><canvas id="fw"></canvas>
+<main>
+<h1>Božični žreb barv</h1>
+<ol class="rules">
+<li>Vsak dobi svoje geslo. Vpiši ga spodaj in zavrti kolo.</li>
+<li>Vsak par dobi <b>svojo barvo</b>: dva para ne moreta dobiti iste barve.</li>
+<li>Oba v paru dobita <b>isto barvo</b>, ne glede na to, kdo vrti.</li>
+<li>Kolo lahko zavrtiš samo enkrat.</li>
+</ol>
+<div class="wheelbox"><div class="pin"></div><svg id="wheel" viewBox="-110 -110 220 220" aria-label="Kolo barv"></svg></div>
+<form id="f" autocomplete="off"><input id="pw" placeholder="Tvoje geslo" aria-label="Geslo" autocapitalize="characters" spellcheck="false"><button id="go">Zavrti</button></form>
+<p class="msg" id="msg"></p>
+<div class="result" id="res"></div>
+</main>
+<script>
+const E=[{"s": "nGIZNE8dMVdv0jN7F+kINQ==", "i": "j9omEkOnNDw4MjMA", "d": "y5iPpUnLJSK5XDSx1H95Zu7HyqNHx9AZd0zNNX/G1QLdNfdvwG1MtFhCJI/X14anuhVQ"}, {"s": "1WhukgINjH+JdNBb+yZeAg==", "i": "Diyla1WE82htOxcm", "d": "v+NfZGuh3e3oL7Gt1dKTU7055ly+l3QElVwGpDy7SHHn7rJ2igBk84XmvWwBALAJrsBzCg=="}, {"s": "ZIvC99e2rsQkiHs1X1yRWg==", "i": "XBdjdsm6fY6j9xg9", "d": "eBWfWxG8Pd9h2bJaP1hy8AZpmHmkYt/uPI4IVMBxT774cei0e9s2YELJeqOxO7iHySJIHfY="}, {"s": "K5LwQA3ONdYLshvQPQLoMQ==", "i": "1675zPgyRa601znM", "d": "rok71exVMVBCWzXzT9xITWAUS+TOa0tCpk+2MMX4+9xTGokCvhgwBf/n/uIP+FpxFN8i4A=="}, {"s": "IOPpL2wtz1akaZilnjVrGA==", "i": "xPKXu5uqqw0ez2xr", "d": "zBfoN2GetwSJsfuSMmoEAft4Hc/xfttYJnGcuyTm8/NK+VNv3xrgUSGL9gWpzdjmH7tjcA=="}, {"s": "/R5dHcWi9G8+KuzztCg3Iw==", "i": "6aMzMu5P6z736wsY", "d": "4Xx/YoM2A+XGqqzSSbMQlOmqH5FFAcAHCHYrZRBRb11jwizR0GVYE/UN/Uk+MRR7xv3xog=="}, {"s": "ojLsVpIowxiO/wGuj7EmyA==", "i": "alMdtZE2kfbVXUrq", "d": "IGhXjPImRM/a9q8HSvLqEKOsVPEl/cWoYVJVyVsGXBHvyZ4iPPGqBjQbxSLwnFnDC3Tx"}, {"s": "lin0xhkMjIafebMEI5o7XA==", "i": "XCBce1qkoYJlfnSh", "d": "nnMJ3s19GKpFScGUtzvsqeyWcZml9RhxV8FqbLobP5Q6jH46AoHZr+IynoJKX8XKfq9T"}, {"s": "peaPmqTra02EXTXRGaSQAg==", "i": "jUKiAaB1MZjxFAhn", "d": "zL3xLrLQ3RiXKNPJ+XyFhSLIx+8k7R5nlJLA729sobvuyuV7IGBrhkoKsa2rNw4mamHzCwk="}, {"s": "u/9iy1XlbaDaI9rya1Fs9w==", "i": "thlUUPsGGjCCvwlx", "d": "pXmyEgKrc+bU3QyBu/1728zvOepJOcWoh7CI5Xwdue/2JPw0DKbU/sJmpiFs5dWub3F7"}];
+{
+const C=[["Modra","#1f6fe0"],["Zelena","#21a64a"],["Rdeča","#e3262f"],["Oranžna","#f7871c"],["Rjava","#8a5530"]];
+const W=document.getElementById('wheel'),f=document.getElementById('f'),pw=document.getElementById('pw'),go=document.getElementById('go'),msg=document.getElementById('msg'),res=document.getElementById('res');
+const pt=(a,r)=>[(Math.sin(a*Math.PI/180)*r).toFixed(2),(-Math.cos(a*Math.PI/180)*r).toFixed(2)];
+W.innerHTML='<circle r="110" fill="#0f4d2c"/><circle r="110" fill="none" stroke="#d8b24a" stroke-width="2"/><circle r="101" fill="#fff"/>'+C.map(([n,h],i)=>{const a0=i*72,a1=a0+72,[x0,y0]=pt(a0,100),[x1,y1]=pt(a1,100),[tx,ty]=pt(a0+36,60);return `<path d="M0 0L${x0} ${y0}A100 100 0 0 1 ${x1} ${y1}Z" fill="${h}" stroke="#fff" stroke-width="2"/><text x="${tx}" y="${ty}" fill="#fff" font-family="Baloo 2,system-ui" font-weight="800" font-size="15" text-anchor="middle" dominant-baseline="middle" transform="rotate(${a0+36} ${tx} ${ty})">${n}</text>`}).join('')+Array.from({length:24},(_,i)=>{const [x,y]=pt(i*15+7.5,105.5);return `<circle class="bulb" style="animation-delay:${(i%3)*.4}s" cx="${x}" cy="${y}" r="2.8" fill="${['#ffd54a','#ff5a5a','#fff3c4'][i%3]}"/>`}).join('')+'<circle r="17" fill="#0f4d2c" stroke="#fff" stroke-width="2"/>'+(()=>{let d='';for(let i=0;i<10;i++){const [x,y]=pt(i*36,i%2?6:14);d+=(i?'L':'M')+x+' '+y}return `<path d="${d}Z" fill="#ffd54a"/>`})();
+document.getElementById('snow').innerHTML=Array.from({length:36},()=>{const s=2+Math.random()*5;return `<i style="left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${7+Math.random()*9}s;animation-delay:${-Math.random()*16}s"></i>`}).join('');
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function unlock(p){const te=new TextEncoder(),base=await crypto.subtle.importKey('raw',te.encode(p),'PBKDF2',false,['deriveKey']);for(const e of E){const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(e.s),iterations:80000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);try{const d=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(e.i)},k,b64(e.d));return JSON.parse(new TextDecoder().decode(d))}catch(_){}}return null}
+let rot=0,busy=false;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+f.addEventListener('submit',async ev=>{ev.preventDefault();if(busy)return;ac();const p=pw.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(!p){msg.className='msg err';msg.textContent='Vpiši geslo.';return}
+busy=true;go.disabled=true;msg.className='msg';msg.textContent='Preverjam geslo …';res.className='result';
+let r=null;try{r=await unlock(p)}catch(_){}
+if(!r){msg.className='msg err';msg.textContent='Napačno geslo. Poskusi še enkrat.';busy=false;go.disabled=false;return}
+msg.textContent=`Živjo ${r.n}! Kolo se vrti …`;
+const target=360-(r.c*72+36)+(Math.random()*40-20);
+const base=Math.ceil(rot/360)*360;rot=base+360*6+target;W.style.transform=`rotate(${rot}deg)`;jingle();ticker();
+const dur=matchMedia('(prefers-reduced-motion: reduce)').matches?50:5300;
+setTimeout(()=>{const [n,h]=C[r.c];res.style.background=h;res.innerHTML=`<p>${esc(r.n)} in ${esc(r.p)}, vajina barva je</p><div class="big">${esc(n)}</div>`;res.className='result on';fanfare();msg.textContent='';f.style.display='none';document.querySelector('.rules').style.display='none';msg.style.display='none';res.scrollIntoView({behavior:'smooth',block:'center'});fire(h)},dur)});
+
+let AC=null,M=null,NB=null,muted=false;
+let SIL=null;try{navigator.audioSession&&(navigator.audioSession.type='playback')}catch(_){}
+function ac(){try{if(!SIL){SIL=new Audio('data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==');SIL.loop=true;SIL.setAttribute('playsinline','')}const pr=SIL.play();pr&&pr.catch(()=>{})}catch(_){}if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();M=AC.createGain();M.gain.value=muted?0:.9;M.connect(AC.destination);NB=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}catch(_){AC=null}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,t,d,type,v){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(M);o.start(t);o.stop(t+d+.05)}
+function noise(t,d,ft,fq,v){const s=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NB;fl.type=ft;fl.frequency.value=fq;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(fl);fl.connect(g);g.connect(M);s.start(t,Math.random()*.5);s.stop(t+d+.05)}
+const NF={C4:261.6,D4:293.7,E4:329.6,F4:349.2,G4:392,A4:440,C5:523.3,E5:659.3,G5:784};
+const SONG=[["E4",1],["E4",1],["E4",2],["E4",1],["E4",1],["E4",2],["E4",1],["G4",1],["C4",1.5],["D4",.5],["E4",4],["F4",1],["F4",1],["F4",1.5],["F4",.5],["F4",1],["E4",1],["E4",1],["E4",.5],["E4",.5],["E4",1],["D4",1],["D4",1],["E4",1],["D4",2],["G4",2]];
+function jingle(){if(!AC)return;let t=AC.currentTime+.05;const b=.27;for(const[n,l]of SONG){const f=NF[n];tone(f,t,l*b*.95+.15,'triangle',.2);tone(f*2,t,.35,'sine',.06);t+=l*b}for(let x=AC.currentTime+.05;x<t;x+=b/2)noise(x,.09,'highpass',7000,.12)}
+function tick(){if(!AC)return;const t=AC.currentTime;noise(t,.03,'bandpass',2500,.5);tone(1400,t,.04,'square',.03)}
+function fanfare(){if(!AC)return;const t=AC.currentTime;["C5","E5","G5"].forEach((n,i)=>tone(NF[n],t+i*.1,.5,'triangle',.18));tone(NF.C5*2,t+.3,1,'triangle',.18)}
+function pop(){if(!AC||muted)return;const t=AC.currentTime;noise(t,.7,'lowpass',700,.6);noise(t+.05,.5,'highpass',5000,.08)}
+function ticker(){let last=null;const until=performance.now()+5300;const fr=()=>{const m=new DOMMatrix(getComputedStyle(W).transform);const a=(Math.atan2(m.b,m.a)*180/Math.PI+360)%360,s=Math.floor(a/36);if(last!==null&&s!==last)tick();last=s;if(performance.now()<until)requestAnimationFrame(fr)};requestAnimationFrame(fr)}
+['pointerdown','touchend','keydown'].forEach(e=>addEventListener(e,()=>{ac()},{passive:true}));
+const mb=document.getElementById('mute');mb.addEventListener('click',()=>{muted=!muted;mb.textContent=muted?'Zvok: izklop':'Zvok: vklop';mb.setAttribute('aria-pressed',muted);if(AC)M.gain.value=muted?0:.9});
+const cv=document.getElementById('fw'),cx=cv.getContext('2d');let P=[],raf=0,end=0;
+function size(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio}size();addEventListener('resize',size);
+function shade(h,t){const n=parseInt(h.slice(1),16),r=n>>16,g=n>>8&255,b=n&255,m=v=>Math.round(v+(255-v)*t);return `rgb(${m(r)},${m(g)},${m(b)})`}
+function burst(h){pop();const d=devicePixelRatio,x=(.15+Math.random()*.7)*cv.width,y=(.12+Math.random()*.45)*cv.height,N=70;for(let i=0;i<N;i++){const a=Math.PI*2*i/N,s=(2+Math.random()*4)*d;P.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1,c:shade(h,Math.random()*.55),z:(1.5+Math.random()*1.8)*d})}}
+function loop(t){cx.globalCompositeOperation='destination-out';cx.fillStyle='rgba(0,0,0,.22)';cx.fillRect(0,0,cv.width,cv.height);cx.globalCompositeOperation='lighter';
+if(t<end&&Math.random()<.07)burst(cur);
+P=P.filter(p=>p.l>0);for(const p of P){p.x+=p.vx;p.y+=p.vy;p.vy+=.06*devicePixelRatio;p.vx*=.985;p.vy*=.985;p.l-=.011;cx.globalAlpha=Math.max(p.l,0);cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.z,0,7);cx.fill()}
+cx.globalAlpha=1;if(P.length||t<end)raf=requestAnimationFrame(loop);else{cx.clearRect(0,0,cv.width,cv.height);raf=0}}
+let cur='#fff';
+function fire(h){cur=h;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;end=performance.now()+6000;for(let i=0;i<3;i++)setTimeout(()=>burst(h),i*250);if(!raf)raf=requestAnimationFrame(loop)}
+}
+</script></body></html>
